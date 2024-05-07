@@ -1,0 +1,104 @@
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>search</title>
+<link rel="icon" href="./image/whirlpool.png" sizes="16x16" type="image/png" /> 
+<style>
+.parent {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  background: white;
+}
+.example {
+  display: block;
+  width: 100px
+  background: #FFF;
+}
+//検索欄のスタイル https://cotodama.co/search-box/
+.search_container{
+  box-sizing: border-box;
+}
+.search_container input[type="text"]{
+  border: 1px solid #999;
+  padding: 3px 5px;
+  border-radius: 30px;
+  height: 2.7em;
+  width: 400px;
+  overflow: hidden;
+  font-size: 100%;
+}
+.search_container input[type="text"]:focus {
+  outline: 0;
+}
+.search_container input[type="submit"]{
+  cursor: pointer;
+  font-family:&#xf002;
+  font-size: 1.3em;
+  border: none;
+  background: none;
+  color: #3879D9;
+  outline : none;
+  display: inline-block;
+  vertical-align: middle;
+  text-decoration:underline;  // 検索欄の文字に下線を引く
+  text-decoration-color:#3879D9;  // 下線の色
+}
+
+</style>
+</head>
+<body>
+<div class="parent">
+  <div class="example">
+    <form method="get" action="http://www.google.co.jp/search" target="_blank" class="search_container">
+    <input type="text" name="q" size="31" maxlength="255" value="" autocomplete="off">
+    <input type="submit" name="btng" value="on the internet">
+    <input type="hidden" name="hl" value="ja">
+    </form>
+  </div>
+</div>
+<form name="winsize">
+<!-- ウィンドウサイズのリアルタイム取得 -->
+<!-- 参考:http://www.shurey.com/js/samples/1_tips10.html -->
+<!-- input typeを"text"から"hidden"にすると,HTML上には表示されなくなる. -->
+<!-- ウィンドウサイズ：横幅 = -->
+<input name="sw" type="hidden" size="10"> <!-- / 高さ = --> <input name="sh" type="hidden" size="10">
+</form>
+<script type="text/javascript">
+//読み込み時の表示
+window_load();
+//ウィンドウサイズ変更時に更新
+window.onresize = window_load;
+//サイズの表示
+function window_load() {
+	document.winsize.sw.value = window.innerWidth;
+	document.winsize.sh.value = window.innerHeight;
+       // parentセレクタのheightを自動更新
+       var targetClass = getRuleBySelector('.parent');
+       targetClass.style.height = window.innerHeight;
+      // window.innerHeight-30にするとスクロールバーがでなくなる. 
+}
+// 指定セレクタのCSSルールを取得する
+// 呼び出し例　getRuleBySelector(".inner1")   seleにCSSセレクタ
+//参考:https://qiita.com/life5618/items/950558e4b72c038333f8
+function getRuleBySelector(sele){
+    var i, j, sheets, rules, rule = null;
+    // stylesheetのリストを取得
+    sheets = document.styleSheets;
+    for(i=0; i<sheets.length; i++){
+        // そのstylesheetが持つCSSルールのリストを取得
+        rules = sheets[i].cssRules;
+        for(j=0; j<rules.length; j++){
+            // セレクタが一致するか調べる
+            if(sele === rules[j].selectorText){
+                rule = rules[j];
+                break;
+            }
+        }
+    }
+    return rule;
+}
+</script>
+</body>

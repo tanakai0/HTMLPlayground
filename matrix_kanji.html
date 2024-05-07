@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Matrix with Random Kanji</title>
+    <style>
+        /* Setting the body to full viewport and removing any default margin */
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: black;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Canvas to render our matrix effect -->
+    <canvas id="matrixCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById("matrixCanvas");
+        const ctx = canvas.getContext("2d");
+
+        // Set canvas width and height to the window size
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const columns = canvas.width / 20;
+        const drops = [];
+
+        // Initialize drop positions, one per column
+        for (let x = 0; x < columns; x++)
+            drops[x] = 1;
+
+        // Function to get a random kanji character
+        function getRandomKanji() {
+            const randomCode = Math.floor(Math.random() * (0x9FFF - 0x4E00 + 1)) + 0x4E00;
+            return String.fromCharCode(randomCode);
+        }
+
+        // Function to update and draw the matrix effect
+        function drawMatrix() {
+            // Fading out the canvas for trail effect
+            ctx.fillStyle = "rgba(0, 0, 0, 0.04)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Setting the kanji character color and font
+            ctx.fillStyle = "#00FF00";
+            ctx.font = "20px arial";
+
+            // Drawing the kanji characters at current positions
+            for (let i = 0; i < drops.length; i++) {
+                const text = getRandomKanji();
+                ctx.fillText(text, i * 20, drops[i] * 20);
+
+                // Resetting the y position of a column to the top after it reaches the bottom
+                if (drops[i] * 20 > canvas.height && Math.random() > 0.975)
+                    drops[i] = 0;
+
+                // Incrementing the y position of the column for next frame
+                drops[i]++;
+            }
+        }
+
+        // Refreshing the canvas every 50ms to get the matrix animation effect
+        setInterval(drawMatrix, 50);
+
+        // Adjusting the canvas size if the window is resized
+        window.addEventListener("resize", function () {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+
+</html>

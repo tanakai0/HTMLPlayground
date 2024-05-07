@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fortune</title>
+    <style>
+        .output {
+            font-size: 240px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Fortune</h1>
+    <h2>Mahjong</h2>
+    <button onclick="getRandomMahjongCharacter()">Draw</button>
+    <div id="mahjongOutput" class="output"></div>
+
+    <h2>Playing cards</h2>
+    <button onclick="getRandomPlayingCard()">Draw</button>
+    <div id="playingCardOutput" class="output"></div>
+
+    <script>
+        const mahjongCharacters = ["🀀", "🀁", "🀂", "🀃", "🀆", "🀅", "🀄", "🀇", "🀈", "🀉", "🀊", "🀋", "🀌", "🀍", "🀎", "🀏", "🀐", "🀑", "🀒", "🀓", "🀔", "🀕", "🀖", "🀗", "🀘", "🀙", "🀚", "🀛", "🀜", "🀝", "🀞", "🀟", "🀠", "🀡"];
+        const playingCardCharacters = ["🂡", "🂢", "🂣", "🂤", "🂥", "🂦", "🂧", "🂨", "🂩", "🂪", "🂫", "🂭", "🂮", "🂱", "🂲", "🂳", "🂴", "🂵", "🂶", "🂷", "🂸", "🂹", "🂺", "🂻", "🂽", "🂾", "🃁", "🃂", "🃃", "🃄", "🃅", "🃆", "🃇", "🃈", "🃉", "🃊", "🃋", "🃍", "🃎", "🃑", "🃒", "🃓", "🃔", "🃕", "🃖", "🃗", "🃘", "🃙", "🃚", "🃛", "🃝", "🃞", "🃟"];
+
+        function getRandomMahjongCharacter() {
+            // choose one element at random 
+            const randomIndex = Math.floor(Math.random() * mahjongCharacters.length);
+            const selectedCharacter = mahjongCharacters[randomIndex];
+            // show a result
+            const outputElement = document.getElementById("mahjongOutput");
+            outputElement.textContent = selectedCharacter;
+        }
+
+        function getRandomPlayingCard() {
+             // choose one element at random 
+            const randomIndex = Math.floor(Math.random() * playingCardCharacters.length);
+            const selectedCharacter = playingCardCharacters[randomIndex];
+
+            // show a result
+            const outputElement = document.getElementById("playingCardOutput");
+            outputElement.textContent = selectedCharacter;
+        }
+    </script>
+</body>
+</html>

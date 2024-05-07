@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+
+        let cw = window.innerWidth;
+        let ch = window.innerHeight;
+
+        canvas.width = cw;
+        canvas.height = ch;
+
+        window.addEventListener('resize', function(event) {
+            cw = window.innerWidth;
+            ch = window.innerHeight;
+            canvas.width = cw;
+            canvas.height = ch;
+        }, true);
+
+        function getRandomKanji() {
+            const kanjiRange = [0x4E00, 0x9FAF];
+            const randomCode = Math.floor(Math.random() * (kanjiRange[1] - kanjiRange[0] + 1)) + kanjiRange[0];
+            return String.fromCharCode(randomCode);
+        }
+
+        function getRandomColor() {
+            const r = Math.floor(Math.random() * 256);
+            const g = Math.floor(Math.random() * 256);
+            const b = Math.floor(Math.random() * 256);
+            return `rgb(${r},${g},${b})`;
+        }
+
+        let maxCharCount = 150;
+        let parabolicCharArr = [];
+        let fontSize = 13;
+        let frames = 0;
+
+        class ParabolicChar {
+            constructor(x, y, velocity, angle) {
+                this.x = x;
+                this.y = y;
+                this.velocity = velocity;
+                this.angle = angle;
+                this.vx = velocity * Math.cos(this.angle);
+                this.vy = velocity * Math.sin(this.angle);
+                this.gravity = 0.15;  // Gravity adjustment
+                this.color = getRandomColor();
+            }
+
+            draw(ctx) {
+                this.value = getRandomKanji();
+
+                ctx.fillStyle = this.color;
+                ctx.font = fontSize + "px sans-serif";
+                ctx.fillText(this.value, this.x, this.y);
+
+                this.vy += this.gravity;
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Reset if reaches right side or the bottom
+                if (this.x > cw || this.y > ch) {
+                    this.reset();
+                }
+            }
+
+            reset() {
+                this.y = Math.random() * ch / 2; // Adjust starting height
+                this.x = 0;
+                this.angle = (-Math.PI / 4) * (Math.random() + 0.5);  // Adjust the angle range
+                this.vx = this.velocity * Math.cos(this.angle);
+                this.vy = this.velocity * Math.sin(this.angle) - 2;  // Adjust vertical speed
+            }
+        }
+
+        let update = () => {
+            if (parabolicCharArr.length < maxCharCount) {
+                let y = Math.random() * ch / 2;
+                let velocity = (Math.random() * 6 + 4);  // Speed adjustment
+                let angle = (-Math.PI / 4) * (Math.random() + 0.5);  // Adjust the angle range
+
+                let parabolicChar = new ParabolicChar(0, y, velocity, angle);
+                parabolicCharArr.push(parabolicChar);
+            }
+
+            ctx.fillStyle = "rgba(0,0,0,0.05)";
+            ctx.fillRect(0, 0, cw, ch);
+            for (let i = 0; i < parabolicCharArr.length && frames % 2 == 0; i++) {
+                parabolicCharArr[i].draw(ctx);
+            }
+
+            requestAnimationFrame(update);
+            frames++;
+        };
+
+        update();
+    </script>
+</body>
+</html>
