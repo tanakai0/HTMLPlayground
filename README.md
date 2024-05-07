@@ -5,8 +5,9 @@ HTMLPlayground offers a collection of unique HTML files designed to showcase cre
 - [Zen_search](https://tanakai0.github.io/HTMLPlayground/Zen_search.html)
 - [luck_of_the_draw](https://tanakai0.github.io/HTMLPlayground/luck_of_the_draw.html)
 - [matrix_kanji](https://tanakai0.github.io/HTMLPlayground/matrix_kanji.html)
-- [matrix_kanji_parabolic](https://tanakai0.github.io/HTMLPlayground/matrix_kanji_parabolic.html)
 - [matrix_kanji_in_all_directions](https://tanakai0.github.io/HTMLPlayground/matrix_kanji_in_all_directions.html)
+- [sparklers](https://tanakai0.github.io/HTMLPlayground/sparklers.html)
+
 
 ## Acknowledgements
 
