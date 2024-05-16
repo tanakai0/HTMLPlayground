@@ -14,10 +14,9 @@
 }
 .example {
   display: block;
-  width: 100px
   background: #FFF;
 }
-//検索欄のスタイル https://cotodama.co/search-box/
+//style, ref: https://cotodama.co/search-box/
 .search_container{
   box-sizing: border-box;
 }
@@ -43,8 +42,8 @@
   outline : none;
   display: inline-block;
   vertical-align: middle;
-  text-decoration:underline;  // 検索欄の文字に下線を引く
-  text-decoration-color:#3879D9;  // 下線の色
+  text-decoration:underline;
+  text-decoration-color:#3879D9;
 }
 
 </style>
@@ -60,38 +59,33 @@
   </div>
 </div>
 <form name="winsize">
-<!-- ウィンドウサイズのリアルタイム取得 -->
-<!-- 参考:http://www.shurey.com/js/samples/1_tips10.html -->
-<!-- input typeを"text"から"hidden"にすると,HTML上には表示されなくなる. -->
-<!-- ウィンドウサイズ：横幅 = -->
-<input name="sw" type="hidden" size="10"> <!-- / 高さ = --> <input name="sh" type="hidden" size="10">
+<!-- real time acquisition of the window size
+  Ref: http://www.shurey.com/js/samples/1_tips10.html -->
+<input name="sw" type="hidden" size="10">
+<input name="sh" type="hidden" size="10">
 </form>
 <script type="text/javascript">
-//読み込み時の表示
 window_load();
-//ウィンドウサイズ変更時に更新
+// update when resize the window
 window.onresize = window_load;
-//サイズの表示
+// show the window size
 function window_load() {
 	document.winsize.sw.value = window.innerWidth;
 	document.winsize.sh.value = window.innerHeight;
-       // parentセレクタのheightを自動更新
+       // auto update height of parent selector
        var targetClass = getRuleBySelector('.parent');
        targetClass.style.height = window.innerHeight;
-      // window.innerHeight-30にするとスクロールバーがでなくなる. 
+      // If I set this as window.innerHeight-30, scroll bar was hidden. 
 }
-// 指定セレクタのCSSルールを取得する
-// 呼び出し例　getRuleBySelector(".inner1")   seleにCSSセレクタ
-//参考:https://qiita.com/life5618/items/950558e4b72c038333f8
+<!-- Get a CSS rule of a selector
+  Ref: https://qiita.com/life5618/items/950558e4b72c038333f8
+-->
 function getRuleBySelector(sele){
     var i, j, sheets, rules, rule = null;
-    // stylesheetのリストを取得
     sheets = document.styleSheets;
     for(i=0; i<sheets.length; i++){
-        // そのstylesheetが持つCSSルールのリストを取得
         rules = sheets[i].cssRules;
         for(j=0; j<rules.length; j++){
-            // セレクタが一致するか調べる
             if(sele === rules[j].selectorText){
                 rule = rules[j];
                 break;
