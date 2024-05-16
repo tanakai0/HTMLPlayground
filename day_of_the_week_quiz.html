@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Day of the week</title>
+    <title>Quiz of the day of the week</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -51,10 +51,32 @@
             margin-top: 20px;
             font-size: 18px;
         }
+        .new-question-button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .new-question-button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .new-question-button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
     <div class="quiz-container">
+        <button class="new-question-button" onclick="loadNewQuestion()">New Question</button>
         <div class="quiz-question" id="quiz-question">
             <h3>Loading question...</h3>
         </div>
@@ -71,29 +93,120 @@
         <div class="quiz-result" id="quiz-result"></div>
     </div>
 
+    <!--
+        Javascript uses the proleptic Gregorian calendar. So 1582-10-04 is regarded as Monday.
+        Date.getYear() is not recommended to use.
+        Date.getFullYear() returns 1000~9999.
+        Date.getFullYear(Date(1, 0, 1)) returns 1901.
+        Date.getFullYear(Date(99, 0, 1)) returns 1999.
+        Date.getFullYear(Date(100, 0, 1)) returns 100.
+        Date.getDay() returns 0: Sunday, 1: Monday, ..., 6: Saturday.
+        https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Date
+    -->
     <script>
+        const IS_PROLEPTIC = false;
+        // IS_PROLEPTIC is true: proleptic Gregorian calendar
+        // IS_PROLEPTIC is false: the Julian calendar before October 4, 1582, and the Gregorian calendar thereafter
+
+        class DateTuple {
+            static weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            static daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+            constructor(year, monthIndex, day) {
+                this.year = year;
+                this.monthIndex = monthIndex;
+                this.day = day;
+                this.weekday = dayOfTheWeek(year, monthIndex, day);
+            }
+
+            formatDate() {
+                const date = new Date(this.year, this.monthIndex, this.day);
+                const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                return date.toLocaleDateString('en-US', options);
+            }
+
+            getWeekday() {
+                return DateTuple.weekdays[this.weekday];
+            }
+        }
+
         function getRandomDate() {
-            const start = new Date(1, 0, 1); // January 1, 1 AD
-            const end = new Date(9999, 11, 31); // December 31, 9999 AD
-            const date = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+            const startYear = 1;
+            const endYear = 9999;
+            const year = Math.floor(Math.random() * endYear) + startYear;
+            const monthIndex = Math.floor(Math.random() * 11) + 1;
+            day = Math.floor(Math.random() * 31) + 1;
+            daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+            if (isLeapYear(year)) {
+                daysInMonth[1] = 29;
+            } else {
+                daysInMonth[1] = 28;
+            }
+
+            if (day > daysInMonth[monthIndex]) {
+                day = daysInMonth[monthIndex];
+            }
+
+            if (year == 1582 && monthIndex == 9 && 5 <= day <= 14){
+                day = 15;
+            }
+            date = new DateTuple(year, monthIndex, day);
             return date;
         }
 
-        function formatDate(date) {
-            const options = { year: 'numeric', month: 'long', day: 'numeric' };
-            return date.toLocaleDateString('en-US', options);
+        function isLeapYear(year) {
+            if (IS_PROLEPTIC || 1582 < year){
+                if (year % 4 === 0) {
+                    if (year % 100 === 0) {
+                        if (year % 400 === 0) {
+                            return true;
+                        }
+                        return false;
+                    }
+                    return true;
+                }
+                return false;
+            }
+            else{
+                if (year % 4 == 0) {
+                    return true;
+                }
+                return false;
+            }
         }
 
-        function getWeekday(date) {
-            const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-            return weekdays[date.getDay()];
+        function dayOfTheWeek(year, monthIndex, day){
+            const thresholdDate = new Date(1582, 9, 4);
+            const monthValue = [1, 4, 4, 0, 2, 5, 0, 3, 6, 1, 4, 6];
+            const convertDoW = [6, 0, 1, 2, 3, 4, 5];
+            if (IS_PROLEPTIC || thresholdDate <= new Date(year, monthIndex, day)) {
+                const date = new Date(year, monthIndex, day);
+                return date.getDay();
+            } else{
+                dow = 11 - (Math.floor(year / 100) % 7)
+                      + Math.floor(10 * (year %  100) / 8)
+                      + monthValue[monthIndex]
+                      + day;
+                if (isLeapYear(year) && (monthIndex <= 1)){
+                    dow -= 1;
+                }
+                return convertDoW[dow % 7];
+            }
         }
 
-        const randomDate = getRandomDate();
-        const correctAnswer = getWeekday(randomDate);
+        function loadNewQuestion() {
+            const randomDate = getRandomDate();
+            const correctAnswer = randomDate.getWeekday();
+            const questionText = IS_PROLEPTIC
+                ? 'on the proleptic Gregorian calendar?'
+                : 'considering the Julian calendar before October 4, 1582, and the Gregorian calendar thereafter?';
 
-        document.getElementById('quiz-question').innerHTML = `<h3>What day of the week is ${formatDate(randomDate)}?</h3>`;
-
+            document.getElementById('quiz-question').innerHTML = `<h3>What day of the week is the following date ${questionText}<br><br>Date: ${randomDate.formatDate()}?</h3>`;
+            document.getElementById('quiz-result').textContent = '';
+            window.currentCorrectAnswer = correctAnswer;
+        }
+        
         function submitQuiz() {
             const options = document.getElementsByName('quiz-option');
             let selectedOption;
@@ -105,14 +218,17 @@
             }
 
             const resultDiv = document.getElementById('quiz-result');
-            if (selectedOption === correctAnswer) {
-                resultDiv.textContent = 'Correct! The day of the week is ' + correctAnswer + '.';
+            if (selectedOption === window.currentCorrectAnswer) {
+                resultDiv.textContent = 'Correct! The day of the week is ' + window.currentCorrectAnswer + '.';
                 resultDiv.style.color = 'green';
             } else {
-                resultDiv.textContent = 'Incorrect. The day of the week is ' + correctAnswer + '.';
+                resultDiv.textContent = 'Incorrect. The day of the week is ' + window.currentCorrectAnswer + '.';
                 resultDiv.style.color = 'red';
             }
         }
+
+        // Initialize the first question
+        loadNewQuestion();
     </script>
 </body>
 </html>
