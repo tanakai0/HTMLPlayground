@@ -19,27 +19,53 @@
     <button onclick="getRandomPlayingCard()">Draw</button>
     <div id="playingCardOutput" class="output"></div>
 
+    <h2>Domino tiles</h2>
+    <button onclick="getRandomDominoTile()">Draw</button>
+    <div id="dominoTileOutput" class="output"></div>
+
+    <h2>Dice</h2>
+    <button onclick="getRandomDice()">Draw</button>
+    <div id="diceOutput" class="output"></div>
+
+    <h2>Chess symbol</h2>
+    <button onclick="getRandomChessSymbol()">Draw</button>
+    <div id="chessSymbolOutput" class="output"></div>
+
     <script>
         const mahjongCharacters = ["🀀", "🀁", "🀂", "🀃", "🀆", "🀅", "🀄", "🀇", "🀈", "🀉", "🀊", "🀋", "🀌", "🀍", "🀎", "🀏", "🀐", "🀑", "🀒", "🀓", "🀔", "🀕", "🀖", "🀗", "🀘", "🀙", "🀚", "🀛", "🀜", "🀝", "🀞", "🀟", "🀠", "🀡"];
         const playingCardCharacters = ["🂡", "🂢", "🂣", "🂤", "🂥", "🂦", "🂧", "🂨", "🂩", "🂪", "🂫", "🂭", "🂮", "🂱", "🂲", "🂳", "🂴", "🂵", "🂶", "🂷", "🂸", "🂹", "🂺", "🂻", "🂽", "🂾", "🃁", "🃂", "🃃", "🃄", "🃅", "🃆", "🃇", "🃈", "🃉", "🃊", "🃋", "🃍", "🃎", "🃑", "🃒", "🃓", "🃔", "🃕", "🃖", "🃗", "🃘", "🃙", "🃚", "🃛", "🃝", "🃞", "🃟"];
+        const dominoTileCharacters = ["🀱", "🀲", "🀳", "🀴", "🀵", "🀶", "🀷", "🀸", "🀹", "🀺", "🀻", "🀼", "🀽", "🀾", "🀿", "🁀", "🁁", "🁂", "🁃", "🁄", "🁅", "🁆", "🁇", "🁈", "🁉", "🁊", "🁋", "🁌", "🁍", "🁎", "🁏", "🁐", "🁑", "🁒", "🁓", "🁔", "🁕", "🁖", "🁗", "🁘", "🁙", "🁚", "🁛", "🁜", "🁝", "🁞", "🁟", "🁠", "🁡", "🁣", "🁤", "🁥", "🁦", "🁧", "🁨", "🁩", "🁪", "🁫", "🁬", "🁭", "🁮", "🁯", "🁰", "🁱", "🁲", "🁳", "🁴", "🁵", "🁶", "🁷", "🁸", "🁹", "🁺", "🁻", "🁼", "🁽", "🁾", "🁿"];
+        const diceCharacters = ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
+        const chessSymbolCharacters = ["♔", "♕", "♖", "♗", "♘", "♙", "♚", "♛", "♜", "♝", "♞", "♟"]
 
         function getRandomMahjongCharacter() {
-            // choose one element at random 
             const randomIndex = Math.floor(Math.random() * mahjongCharacters.length);
             const selectedCharacter = mahjongCharacters[randomIndex];
-            // show a result
-            const outputElement = document.getElementById("mahjongOutput");
-            outputElement.textContent = selectedCharacter;
+            document.getElementById("mahjongOutput").textContent = selectedCharacter;
         }
 
         function getRandomPlayingCard() {
-             // choose one element at random 
             const randomIndex = Math.floor(Math.random() * playingCardCharacters.length);
             const selectedCharacter = playingCardCharacters[randomIndex];
+            document.getElementById("playingCardOutput").textContent = selectedCharacter;
+        }
 
-            // show a result
-            const outputElement = document.getElementById("playingCardOutput");
-            outputElement.textContent = selectedCharacter;
+        function getRandomDominoTile() {
+            const randomIndex = Math.floor(Math.random() * dominoTileCharacters.length);
+            const selectedCharacter = dominoTileCharacters[randomIndex];
+            document.getElementById("dominoTileOutput").textContent = selectedCharacter;
+        }
+
+        function getRandomDice() {
+            const randomIndex = Math.floor(Math.random() * diceCharacters.length);
+            const selectedCharacter = diceCharacters[randomIndex];
+            document.getElementById("diceOutput").textContent = selectedCharacter;
+        }
+
+        function getRandomChessSymbol() {
+            const randomIndex = Math.floor(Math.random() * chessSymbolCharacters.length);
+            const selectedCharacter = chessSymbolCharacters[randomIndex];
+            document.getElementById("chessSymbolOutput").textContent = selectedCharacter;
         }
     </script>
 </body>
