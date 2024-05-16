@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Template</title>
+    <title>Day of the week</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -55,20 +55,45 @@
 </head>
 <body>
     <div class="quiz-container">
-        <div class="quiz-question">
-            <h3>What is the capital of France?</h3>
+        <div class="quiz-question" id="quiz-question">
+            <h3>Loading question...</h3>
         </div>
-        <ul class="quiz-options">
-            <li><label><input type="radio" name="quiz-option" value="Paris"> Paris</label></li>
-            <li><label><input type="radio" name="quiz-option" value="London"> London</label></li>
-            <li><label><input type="radio" name="quiz-option" value="Rome"> Rome</label></li>
-            <li><label><input type="radio" name="quiz-option" value="Berlin"> Berlin</label></li>
+        <ul class="quiz-options" id="quiz-options">
+            <li><label><input type="radio" name="quiz-option" value="Sunday"> Sunday</label></li>
+            <li><label><input type="radio" name="quiz-option" value="Monday"> Monday</label></li>
+            <li><label><input type="radio" name="quiz-option" value="Tuesday"> Tuesday</label></li>
+            <li><label><input type="radio" name="quiz-option" value="Wednesday"> Wednesday</label></li>
+            <li><label><input type="radio" name="quiz-option" value="Thursday"> Thursday</label></li>
+            <li><label><input type="radio" name="quiz-option" value="Friday"> Friday</label></li>
+            <li><label><input type="radio" name="quiz-option" value="Saturday"> Saturday</label></li>
         </ul>
         <button class="quiz-button" onclick="submitQuiz()">Submit</button>
         <div class="quiz-result" id="quiz-result"></div>
     </div>
 
     <script>
+        function getRandomDate() {
+            const start = new Date(1, 0, 1); // January 1, 1 AD
+            const end = new Date(9999, 11, 31); // December 31, 9999 AD
+            const date = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+            return date;
+        }
+
+        function formatDate(date) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return date.toLocaleDateString('en-US', options);
+        }
+
+        function getWeekday(date) {
+            const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            return weekdays[date.getDay()];
+        }
+
+        const randomDate = getRandomDate();
+        const correctAnswer = getWeekday(randomDate);
+
+        document.getElementById('quiz-question').innerHTML = `<h3>What day of the week is ${formatDate(randomDate)}?</h3>`;
+
         function submitQuiz() {
             const options = document.getElementsByName('quiz-option');
             let selectedOption;
@@ -80,11 +105,11 @@
             }
 
             const resultDiv = document.getElementById('quiz-result');
-            if (selectedOption === 'Paris') {
-                resultDiv.textContent = 'Correct! The capital of France is Paris.';
+            if (selectedOption === correctAnswer) {
+                resultDiv.textContent = 'Correct! The day of the week is ' + correctAnswer + '.';
                 resultDiv.style.color = 'green';
             } else {
-                resultDiv.textContent = 'Incorrect. The capital of France is Paris.';
+                resultDiv.textContent = 'Incorrect. The day of the week is ' + correctAnswer + '.';
                 resultDiv.style.color = 'red';
             }
         }
