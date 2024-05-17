@@ -202,7 +202,7 @@
                 ? 'on the proleptic Gregorian calendar?'
                 : 'considering the Julian calendar before October 4, 1582, and the Gregorian calendar thereafter?';
 
-            document.getElementById('quiz-question').innerHTML = `<h3>What day of the week is the following date ${questionText}<br><br>Date: ${randomDate.formatDate()}?</h3>`;
+            document.getElementById('quiz-question').innerHTML = `<h3>What day of the week is the following date ${questionText}<br><br>Date: ${randomDate.formatDate()}.</h3>`;
             document.getElementById('quiz-result').textContent = '';
             window.currentCorrectAnswer = correctAnswer;
         }
