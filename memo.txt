@@ -1,3 +1,5 @@
 additional candidate
 quine
 water bucket
+square
+angel
