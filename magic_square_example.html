@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magic Square Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            margin: 20px;
+        }
+        .scrollable {
+            max-width: 90vw;
+            max-height: 90vh;
+            overflow: auto;
+            border: 3px solid #000;
+            padding: 10px;
+        }
+        table {
+            border-collapse: collapse;
+            margin-right: 20px;
+        }
+        td {
+            border: 1px solid #000;
+            padding: 5px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Magic Square Generator</h1>
+        <label for="dimension">Select Dimension:</label>
+        <input type="number" id="dimension" name="dimension" min="3" max="99" value="3">
+        <button onclick="generateMagicSquare()">Generate</button>
+        <p id="errorMessage" style="color: red;"></p>
+        <div class="scrollable">
+            <table id="magicSquare"></table>
+        </div>
+    </div>
+
+    <script>
+        function generateMagicSquare() {
+            const dim = parseInt(document.getElementById('dimension').value);
+            if (dim < 3) {
+                document.getElementById('errorMessage').innerText = 'Dimension must be 3 or greater.';
+                return;
+            }
+
+            let magicSquare;
+            if (dim % 2 === 1) {
+                magicSquare = oddMagicSquare(dim);
+            } else if (dim % 4 === 0) {
+                magicSquare = quadMagicSquare(dim);
+            } else {
+                magicSquare = twoModFourMagicSquare(dim);
+            }
+
+            if (checkMagicSquare(magicSquare)) {
+                document.getElementById('errorMessage').innerText = '';
+                displayMagicSquare(magicSquare);
+            } else {
+                document.getElementById('errorMessage').innerText = 'Error generating magic square.';
+            }
+        }
+
+        function displayMagicSquare(magicSquare) {
+            const table = document.getElementById('magicSquare');
+            table.innerHTML = '';
+            magicSquare.forEach(row => {
+                const tr = document.createElement('tr');
+                row.forEach(cell => {
+                    const td = document.createElement('td');
+                    td.innerText = cell;
+                    tr.appendChild(td);
+                });
+                table.appendChild(tr);
+            });
+        }
+
+        function oddMagicSquare(dim) {
+            // Returns a magic square of odd order by Siamese method.
+            const magicSquare = Array.from({ length: dim }, () => Array(dim).fill(0));
+            let row = dim - 1;
+            let col = Math.floor(dim / 2);
+            magicSquare[row][col] = 1;
+
+            for (let i = 2; i <= dim * dim; i++) {
+                let nextRow = (row + 1) % dim;
+                let nextCol = (col + 1) % dim;
+                if (magicSquare[nextRow][nextCol] === 0) {
+                    row = nextRow;
+                    col = nextCol;
+                } else {
+                    row = (row - 1 + dim) % dim;
+                }
+                magicSquare[row][col] = i;
+            }
+            return magicSquare;
+        }
+
+        function quadMagicSquare(dim) {
+            // Returns a magic square of order 4n.
+            const magicSquare = Array.from({ length: dim }, () => Array(dim).fill(0));
+            const n = dim / 4;
+            for (let i = 0; i < dim; i++) {
+                for (let j = 0; j < dim; j++) {
+                    magicSquare[i][j] = (dim * i + j + 1);
+                }
+            }
+            for (let i = 0; i < dim; i++) {
+                for (let j = 0; j < dim; j++) {
+                    if ((i < n || i >= dim - n) && (j < n || j >= dim - n) || (i >= n && i < dim - n && j >= n && j < dim - n)) {
+                        magicSquare[i][j] = dim * dim + 1 - magicSquare[i][j];
+                    }
+                }
+            }
+            return magicSquare;
+        }
+
+        function twoModFourMagicSquare(dim) {
+            // Returns a magic square of order 4n + 2 by the Strachey method.
+            const magicSquare = Array.from({ length: dim }, () => Array(dim).fill(0));
+            const halfDim = Math.floor(dim / 2);
+            const hint = oddMagicSquare(halfDim);
+            const constB = Math.floor(dim * dim / 4);
+            const constC = Math.floor(dim * dim / 2);
+            const constD = Math.floor(3 * dim * dim / 4);
+
+            for (let i = 0; i < dim; i++) {
+                for (let j = 0; j < dim; j++) {
+                    if (i < halfDim && j < halfDim) {
+                        magicSquare[i][j] = hint[i][j];
+                    } else if (i < halfDim && j >= halfDim) {
+                        magicSquare[i][j] = hint[i][j - halfDim] + constC;
+                    } else if (i >= halfDim && j < halfDim) {
+                        magicSquare[i][j] = hint[i - halfDim][j] + constD;
+                    } else {
+                        magicSquare[i][j] = hint[i - halfDim][j - halfDim] + constB;
+                    }
+                }
+            }
+
+            const k = Math.floor((dim - 2) / 4);
+            const middle = Math.floor((halfDim - 1) / 2);
+
+            for (let j = 0; j < k - 1; j++) {
+                for (let i = 0; i < halfDim; i++) {
+                    [magicSquare[i][dim - j - 1], magicSquare[i + halfDim][dim - j - 1]] = [magicSquare[i + halfDim][dim - j - 1], magicSquare[i][dim - j - 1]];
+                }
+            }
+
+            for (let j = 0; j < k; j++) {
+                for (let i = 0; i < halfDim; i++) {
+                    if (i !== middle) {
+                        [magicSquare[i][j], magicSquare[i + halfDim][j]] = [magicSquare[i + halfDim][j], magicSquare[i][j]];
+                    }
+                }
+            }
+
+            for (let j = 1; j <= k; j++) {
+                [magicSquare[middle][j], magicSquare[middle + halfDim][j]] = [magicSquare[middle + halfDim][j], magicSquare[middle][j]];
+            }
+
+            return magicSquare;
+        }
+
+        function checkMagicSquare(square) {
+            // Check if the square is a magic square.
+            const n = square.length;
+            const magicSum = (n * (n * n + 1)) / 2;
+
+            for (let i = 0; i < n; i++) {
+                let rowSum = 0, colSum = 0;
+                for (let j = 0; j < n; j++) {
+                    rowSum += square[i][j];
+                    colSum += square[j][i];
+                }
+                if (rowSum !== magicSum || colSum !== magicSum) {
+                    return false;
+                }
+            }
+
+            let diagSum1 = 0, diagSum2 = 0;
+            for (let i = 0; i < n; i++) {
+                diagSum1 += square[i][i];
+                diagSum2 += square[i][n - i - 1];
+            }
+
+            return diagSum1 === magicSum && diagSum2 === magicSum;
+        }
+    </script>
+</body>
+</html>
