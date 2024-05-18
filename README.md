@@ -9,6 +9,7 @@ HTMLPlayground offers a collection of unique HTML files designed to showcase cre
 - [sparklers](https://tanakai0.github.io/HTMLPlayground/sparklers.html)
 - [live_markdown_preview](https://tanakai0.github.io/HTMLPlayground/live_markdown_preview.html)
 - [magic_square_example](https://tanakai0.github.io/HTMLPlayground/magic_square_example.html)
+- [color_picker](https://tanakai0.github.io/HTMLPlayground/color_picker.html)
 
 
 ## Acknowledgements
