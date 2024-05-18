@@ -1,0 +1,4 @@
+additional candidate
+quine
+magic square
+water bucket
