@@ -14,20 +14,21 @@
         }
         .grid {
             display: grid;
-            grid-template-columns: repeat(10, 49px);
-            grid-template-rows: repeat(10, 49px);
+            grid-template-columns: repeat(10, var(--grid-interval-1));
+            grid-template-rows: repeat(10, var(--grid-interval-1));
             gap: 1px;
             background-color: #ddd;
+            outline: 2px solid #555;
         }
         .grid div {
-            width: 49px;
-            height: 49px;
+            width: var(--grid-interval-1);
+            height: var(--grid-interval-1);
             background-color: #fff;
             border: 1px solid #ccc;
         }
         .piece {
-            width: 200px;
-            height: 200px;
+            width: calc(var(--grid-interval) * 4);
+            height: calc(var(--grid-interval) * 4);
             background-color: lightblue;
             position: absolute;
             cursor: grab;
@@ -51,6 +52,10 @@
     <div class="piece" id="piece"></div>
 
     <script>
+        const GRID_INTERVAL = 50;
+        document.documentElement.style.setProperty('--grid-interval', `${GRID_INTERVAL}px`);
+        document.documentElement.style.setProperty('--grid-interval-1', `${GRID_INTERVAL - 1}px`);
+
         const piece = document.getElementById('piece');
         let offsetX, offsetY;
 
@@ -75,8 +80,8 @@
                 pieceRect.right <= gridRect.right &&
                 pieceRect.bottom <= gridRect.bottom
             ) {
-                const gridX = Math.round((pieceRect.left - gridRect.left) / 50) * 50;
-                const gridY = Math.round((pieceRect.top - gridRect.top) / 50) * 50;
+                const gridX = Math.round((pieceRect.left - gridRect.left) / GRID_INTERVAL) * GRID_INTERVAL;
+                const gridY = Math.round((pieceRect.top - gridRect.top) / GRID_INTERVAL) * GRID_INTERVAL;
                 piece.style.left = `${gridX + gridRect.left}px`;
                 piece.style.top = `${gridY + gridRect.top}px`;
             }
