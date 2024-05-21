@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -32,6 +32,15 @@
             background-color: lightblue;
             position: absolute;
             cursor: grab;
+            z-index: 1;
+        }
+        .small-piece {
+            width: calc(var(--grid-interval) * 2);
+            height: calc(var(--grid-interval) * 2);
+            background-color: lightcoral;
+            position: absolute;
+            cursor: grab;
+            z-index: 2;
         }
     </style>
 </head>
@@ -50,46 +59,75 @@
         <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
     </div>
     <div class="piece" id="piece"></div>
+    <div class="small-piece" id="small-piece"></div>
+    
 
     <script>
         const GRID_INTERVAL = 50;
         document.documentElement.style.setProperty('--grid-interval', `${GRID_INTERVAL}px`);
         document.documentElement.style.setProperty('--grid-interval-1', `${GRID_INTERVAL - 1}px`);
 
-        const piece = document.getElementById('piece');
+        const pieces = [
+            document.getElementById('piece'),
+            document.getElementById('small-piece')
+        ];
+        
+        let selectedPiece = null;
         let offsetX, offsetY;
 
-        piece.addEventListener('mousedown', (e) => {
-            offsetX = e.clientX - piece.getBoundingClientRect().left;
-            offsetY = e.clientY - piece.getBoundingClientRect().top;
-            piece.style.cursor = 'grabbing';
-            document.addEventListener('mousemove', onMouseMove);
+        pieces.forEach(piece => {
+            piece.addEventListener('mousedown', (e) => {
+                if (selectedPiece && selectedPiece !== piece) {
+                    const selectedRect = selectedPiece.getBoundingClientRect();
+                    const pieceRect = piece.getBoundingClientRect();
+                    if (
+                        pieceRect.left <= e.clientX &&
+                        e.clientX <= pieceRect.right &&
+                        pieceRect.top <= e.clientY &&
+                        e.clientY <= pieceRect.bottom
+                    ) {
+                        selectedPiece = piece;
+                    }
+                } else {
+                    selectedPiece = piece;
+                }
+
+                offsetX = e.clientX - selectedPiece.getBoundingClientRect().left;
+                offsetY = e.clientY - selectedPiece.getBoundingClientRect().top;
+                selectedPiece.style.cursor = 'grabbing';
+                document.addEventListener('mousemove', onMouseMove);
+            });
         });
 
         document.addEventListener('mouseup', () => {
-            piece.style.cursor = 'grab';
-            document.removeEventListener('mousemove', onMouseMove);
+            if (selectedPiece) {
+                selectedPiece.style.cursor = 'grab';
+                document.removeEventListener('mousemove', onMouseMove);
 
-            // Snap piece to grid if within bounds
-            const gridRect = document.querySelector('.grid').getBoundingClientRect();
-            const pieceRect = piece.getBoundingClientRect();
-            
-            if (
-                pieceRect.left >= gridRect.left &&
-                pieceRect.top >= gridRect.top &&
-                pieceRect.right <= gridRect.right &&
-                pieceRect.bottom <= gridRect.bottom
-            ) {
-                const gridX = Math.round((pieceRect.left - gridRect.left) / GRID_INTERVAL) * GRID_INTERVAL;
-                const gridY = Math.round((pieceRect.top - gridRect.top) / GRID_INTERVAL) * GRID_INTERVAL;
-                piece.style.left = `${gridX + gridRect.left}px`;
-                piece.style.top = `${gridY + gridRect.top}px`;
+                // Snap piece to grid if within bounds
+                const gridRect = document.querySelector('.grid').getBoundingClientRect();
+                const pieceRect = selectedPiece.getBoundingClientRect();
+                
+                if (
+                    pieceRect.left >= gridRect.left &&
+                    pieceRect.top >= gridRect.top &&
+                    pieceRect.right <= gridRect.right &&
+                    pieceRect.bottom <= gridRect.bottom
+                ) {
+                    const gridX = Math.round((pieceRect.left - gridRect.left) / GRID_INTERVAL) * GRID_INTERVAL;
+                    const gridY = Math.round((pieceRect.top - gridRect.top) / GRID_INTERVAL) * GRID_INTERVAL;
+                    selectedPiece.style.left = `${gridX + gridRect.left}px`;
+                    selectedPiece.style.top = `${gridY + gridRect.top}px`;
+                }
+                selectedPiece = null;
             }
         });
 
         function onMouseMove(e) {
-            piece.style.left = `${e.clientX - offsetX}px`;
-            piece.style.top = `${e.clientY - offsetY}px`;
+            if (selectedPiece) {
+                selectedPiece.style.left = `${e.clientX - offsetX}px`;
+                selectedPiece.style.top = `${e.clientY - offsetY}px`;
+            }
         }
     </script>
 </body>
