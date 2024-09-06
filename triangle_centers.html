@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Triangle Centroid</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+        .info {
+            margin-top: 10px;
+        }
+        #centroid {
+            color: red; /* Initially red */
+        }
+        #centroid-checkbox:checked + #centroid {
+            color: red; /* Red when checkbox is checked */
+        }
+        #centroid-checkbox:not(:checked) + #centroid {
+            color: lightgray; /* Light gray when unchecked */
+        }
+    </style>
+</head>
+<body>
+
+<h2>Triangle Centroid</h2>
+
+<!-- Drawing area -->
+<canvas id="triangleCanvas" width="1000" height="500"></canvas>
+
+<!-- Information display -->
+<div class="info">
+    <p>Side lengths: AB = <span id="ab-length"></span>, BC = <span id="bc-length"></span>, CA = <span id="ca-length"></span></p>
+    <p>Area: <span id="area"></span></p>
+    <p>
+        <input type="checkbox" id="centroid-checkbox" checked> 
+        <span id="centroid">● Centroid</span>
+    </p>
+</div>
+
+<script>
+// Triangle vertices
+let points = [
+    { x: 200, y: 100 }, // A
+    { x: 100, y: 300 }, // B
+    { x: 300, y: 300 }  // C
+];
+
+let selectedPoint = null;
+const scaleFactor = 0.01; // Factor to scale down distances
+
+// Canvas and context for drawing
+const canvas = document.getElementById('triangleCanvas');
+const ctx = canvas.getContext('2d');
+
+// Initial drawing
+drawTriangle();
+updateInfo();
+
+// Function to draw the triangle
+function drawTriangle() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, points[0].y);
+    ctx.lineTo(points[1].x, points[1].y);
+    ctx.lineTo(points[2].x, points[2].y);
+    ctx.closePath();
+    ctx.stroke();
+
+    // Draw vertices and labels
+    points.forEach((point, index) => {
+        drawPoint(point, ['A', 'B', 'C'][index]);
+    });
+
+    // Check if centroid should be drawn (checkbox checked)
+    if (document.getElementById('centroid-checkbox').checked) {
+        const centroid = calculateCentroid();
+        drawPoint(centroid, 'Centroid', 'red'); // Draw the centroid in red
+    }
+}
+
+// Function to draw a point and its label
+function drawPoint(point, label, color = 'black') {
+    ctx.beginPath();
+    ctx.arc(point.x, point.y, 5, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+    
+    // Draw the label near the point
+    ctx.font = '16px Arial';
+    ctx.fillStyle = color;
+    ctx.fillText(label, point.x - 5, point.y + 20); // Adjust position for readability
+}
+
+// Function to calculate the distance between two points
+function calculateDistance(p1, p2) {
+    const distance = Math.sqrt((p2.x - p1.x) ** 2 + (p2.y - p1.y) ** 2);
+    return (distance * scaleFactor); // Scale and return the distance
+}
+
+// Function to calculate the area of the triangle
+function calculateArea() {
+    const [A, B, C] = points;
+    // Using a determinant, |[[x1, y1, 1], [x2, y2, 1], [x3, y3, 1]]| / 2 is the area of the triangle.
+    return Math.abs((A.x * (B.y - C.y) + B.x * (C.y - A.y) + C.x * (A.y - B.y)) / 2 * scaleFactor ** 2);
+}
+
+// Function to calculate the centroid of the triangle
+function calculateCentroid() {
+    const [A, B, C] = points;
+    const x = ((A.x + B.x + C.x) / 3);
+    const y = ((A.y + B.y + C.y) / 3);
+    return { x, y };
+}
+
+// Function to update the information display
+function updateInfo() {
+    const [A, B, C] = points;
+
+    // Side lengths
+    document.getElementById('ab-length').textContent = calculateDistance(A, B).toFixed(2);
+    document.getElementById('bc-length').textContent = calculateDistance(B, C).toFixed(2);
+    document.getElementById('ca-length').textContent = calculateDistance(C, A).toFixed(2);
+
+    // Area
+    document.getElementById('area').textContent = calculateArea().toFixed(2);
+}
+
+// Function to check if a point is being dragged
+function getSelectedPoint(mouseX, mouseY) {
+    return points.find(point => {
+        const dist = Math.sqrt((point.x - mouseX) ** 2 + (point.y - mouseY) ** 2);
+        return dist < 10; // If within 10px, select the point
+    });
+}
+
+// Mouse events
+canvas.addEventListener('mousedown', (e) => {
+    const mouseX = e.offsetX;
+    const mouseY = e.offsetY;
+    selectedPoint = getSelectedPoint(mouseX, mouseY);
+});
+
+canvas.addEventListener('mousemove', (e) => {
+    if (selectedPoint) {
+        selectedPoint.x = e.offsetX;
+        selectedPoint.y = e.offsetY;
+        drawTriangle();
+        updateInfo();
+    }
+});
+
+canvas.addEventListener('mouseup', () => {
+    selectedPoint = null;
+});
+
+// Event listener for centroid checkbox
+document.getElementById('centroid-checkbox').addEventListener('change', () => {
+    drawTriangle(); // Redraw the triangle when checkbox is toggled
+});
+
+</script>
+
+</body>
+</html>
