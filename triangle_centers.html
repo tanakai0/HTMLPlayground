@@ -17,6 +17,12 @@
         .point-info.disabled {
             color: lightgray; /* Disabled state */
         }
+        .circle-info {
+            color: black; /* Default color */
+        }
+        .circle-info.disabled {
+            color: lightgray; /* Disabled state */
+        }
     </style>
 </head>
 <body>
@@ -31,6 +37,7 @@
     <p>Side lengths: AB = <span id="ab-length"></span>, BC = <span id="bc-length"></span>, CA = <span id="ca-length"></span></p>
     <p>Acute angles: ∠A = <span id="a-angle"></span>, ∠B = <span id="b-angle"></span>, ∠C = <span id="c-angle"></span></p>
     <p>Area: <span id="area"></span></p>
+    <p>Centers</p>
     <p>
         <input type="checkbox" id="centroid-checkbox" checked> 
         <span id="centroid" class="point-info">● Centroid</span>
@@ -55,14 +62,27 @@
         <input type="checkbox" id="excenterB-checkbox" checked> 
         <span id="excenterB" class="point-info">● Excenter opposite to vertex B</span>
     </p>
-    <p></p>
+    <p>
         <input type="checkbox" id="excenterC-checkbox" checked> 
         <span id="excenterC" class="point-info">● Excenter opposite to vertex C</span>
+    </p>
+    <p>
+        <input type="checkbox" id="Fermat-checkbox" checked> 
+        <span id="Fermat" class="point-info">● Fermat point</span>
+    </p>
+    <p>Circles</p>
+    <p>
+        <input type="checkbox" id="incircle-checkbox"  unchecked> 
+        <span id="incircle" class="circle-info">○ Incircle</span>
+    </p>
+    <p>
+        <input type="checkbox" id="circumcircle-checkbox" unchecked> 
+        <span id="circumcircle" class="circle-info">○ Circumcircle</span>
     </p>
 </div>
 
 <script>
-// Define styles for centroid, circumcenter, and incenter
+// Define styles for centers
 const pointStyles = {
     centroid: {
         activeColor: 'blue',
@@ -113,6 +133,29 @@ const pointStyles = {
         checkboxId: 'excenterC-checkbox',
         displayElementId: 'excenterC',
     },
+    Fermat: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        pointSymbol: '●',
+        checkboxId: 'Fermat-checkbox',
+        displayElementId: 'Fermat',
+    },
+};
+
+// Define styles for circles
+const circleStyles = {
+    incircle: {
+        activeColor: 'green',
+        inactiveColor: 'lightgray',
+        checkboxId: 'incircle-checkbox',
+        displayElementId: 'incircle',
+    },
+    circumcircle: {
+        activeColor: 'red',
+        inactiveColor: 'lightgray',
+        checkboxId: 'circumcircle-checkbox',
+        displayElementId: 'circumcircle',
+    },
 };
 
 // Triangle vertices
@@ -131,12 +174,15 @@ const ctx = canvas.getContext('2d');
 
 // Initial drawing
 drawTriangle();
+drawCenters();
+drawCircles();
 updateInfo();
 
 // Function to draw the triangle
 function drawTriangle() {
     ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
     ctx.beginPath();
+    ctx.strokeStyle = 'black'
     ctx.moveTo(points[0].x, points[0].y);
     ctx.lineTo(points[1].x, points[1].y);
     ctx.lineTo(points[2].x, points[2].y);
@@ -147,7 +193,9 @@ function drawTriangle() {
     points.forEach((point, index) => {
         drawPoint(point, ['A', 'B', 'C'][index]);
     });
+}
 
+function drawCenters(){
     // Draw points based on checkbox state
     if (document.getElementById('centroid-checkbox').checked) {
         const centroid = calculateCentroid();
@@ -181,6 +229,22 @@ function drawTriangle() {
         const excenter = calculateExcenter(points[2], points[0], points[1]);
         drawPoint(excenter, 'Excenter (C)', pointStyles.excenterC.activeColor);
     }
+    if (document.getElementById('Fermat-checkbox').checked) {
+        const Fermat = calculateFermatPoint();
+        drawPoint(Fermat, 'Fermat', pointStyles.Fermat.activeColor);
+    }
+}
+
+function drawCircles(){
+    // Draw points based on checkbox state
+    if (document.getElementById('incircle-checkbox').checked) {
+        const incircle = calculateIncircle();
+        drawCircle(incircle, 'Incircle', circleStyles.incircle.activeColor);
+    }
+    if (document.getElementById('circumcircle-checkbox').checked) {
+        const circumcircle = calculateCircumcircle();
+        drawCircle(circumcircle, 'Circumcircle', circleStyles.circumcircle.activeColor);
+    }
 }
 
 // Function to draw a point and its label
@@ -195,6 +259,17 @@ function drawPoint(point, label, color = 'black') {
     ctx.fillStyle = color;
     ctx.fillText(label, point.x - 5, point.y + 20); // Adjust position for readability
 }
+
+// Function to draw a circle
+function drawCircle(circle, label, color = 'black') {
+    ctx.beginPath();
+    ctx.arc(circle.center.x, circle.center.y, circle.radius, 0, Math.PI * 2); // Draw a full circle
+    ctx.strokeStyle = color;
+    ctx.stroke();
+    ctx.fillStyle = color;
+    ctx.fillText(label, circle.center.x, circle.center.y);
+}
+
 
 // utils
 function vectorSubtract(p1, p2) {
@@ -211,6 +286,39 @@ function magnitude(v) {
 
 function slope(p1, p2) {
     return (p2.y - p1.y) / (p2.x - p1.x)
+}
+
+// Function to rotate a point P around another point O by d degrees
+// Be careful to consider the coordinates in canvas environment
+function rotate(P, O, d) {
+    const radian = Math.PI*d / 180;
+    const dx = P.x - O.x;
+    const dy = P.y - O.y;
+    return {
+        x: O.x + (dx * Math.cos(radian) - dy * Math.sin(radian)),
+        y: O.y + (dx * Math.sin(radian) + dy * Math.cos(radian))
+    };
+}
+
+// Function to find the intersection of two lines (P1, P2) and (Q1, Q2)
+function lineIntersection(P1, P2, Q1, Q2) {
+    const a1 = P2.y - P1.y;
+    const b1 = P1.x - P2.x;
+    const c1 = a1 * P1.x + b1 * P1.y;
+
+    const a2 = Q2.y - Q1.y;
+    const b2 = Q1.x - Q2.x;
+    const c2 = a2 * Q1.x + b2 * Q1.y;
+
+    const determinant = a1 * b2 - a2 * b1;
+
+    if (determinant === 0) {
+        return null; // Parallel lines
+    } else {
+        const x = (b2 * c1 - b1 * c2) / determinant;
+        const y = (a1 * c2 - a2 * c1) / determinant;
+        return { x, y };
+    }
 }
 
 // Function to calculate the distance between two points
@@ -250,12 +358,38 @@ function calculateCircumcenter() {
     const E = { x: (B.x + C.x) / 2, y: (B.y + C.y) / 2 };
 
     // Slopes of perpendicular bisectors
-    const perpendicularSlopeAB = -1 / slope(A, B);
-    const perpendicularSlopeBC = -1 / slope(B, C);
+    const slopeAB = slope(A, B);
+    const slopeBC = slope(B, C);
+    
+    let perpendicularSlopeAB, perpendicularSlopeBC;
+    if (slopeAB === 0) {
+        perpendicularSlopeAB = Infinity;
+    } else {
+        perpendicularSlopeAB = -1 / slopeAB;
+    }
+
+    if (slopeBC === 0) {
+        perpendicularSlopeBC = Infinity;
+    } else {
+        perpendicularSlopeBC = -1 / slopeBC;
+    }
 
     // Circumcenter calculation
-    const x = (perpendicularSlopeAB * D.x - perpendicularSlopeBC * E.x + E.y - D.y) / (perpendicularSlopeAB - perpendicularSlopeBC);
-    const y = perpendicularSlopeAB * (x - D.x) + D.y;
+    if (perpendicularSlopeAB === Infinity) {
+        // Vertical line case for AB
+        const x = D.x;
+        const y = perpendicularSlopeBC * (x - E.x) + E.y;
+        return { x, y };
+    } else if (perpendicularSlopeBC === Infinity) {
+        // Vertical line case for BC
+        const x = E.x;
+        const y = perpendicularSlopeAB * (x - D.x) + D.y;
+        return { x, y };
+    } else {
+        const x = (perpendicularSlopeAB * D.x - perpendicularSlopeBC * E.x + E.y - D.y) / (perpendicularSlopeAB - perpendicularSlopeBC);
+        const y = perpendicularSlopeAB * (x - D.x) + D.y;
+        return { x, y };
+    }
 
     return { x, y };
 }
@@ -279,18 +413,45 @@ function calculateIncenter() {
 // Function to calculate the orthocenter (intersection of perpendiculars)
 function calculateOrthocenter() {
     const [A, B, C] = points;
-    // Calculate the slopes of the perpendiculars
-    const perpendicularSlopeAB = -1 / slope(A, B);
-    const perpendicularSlopeBC = -1 / slope(B, C);
-
-    // Equation of the perpendicular from C to AB: y - C.y = perpSlopeAB * (x - C.x)
-    // Equation of the perpendicular from A to BC: y - A.y = perpSlopeBC * (x - A.x)
+    // Calculate perpendiculars
+    const slopeAB = slope(A, B);
+    const slopeBC = slope(B, C);
+    let perpendicularSlopeAB, perpendicularSlopeBC;
+    // Handle cases where slopes might be 0 or undefined (vertical or horizontal lines)
+    if (slopeAB === 0) {
+        perpendicularSlopeAB = Infinity; // AB is horizontal, perpendicular is vertical
+    } else if (!isFinite(slopeAB)) {
+        perpendicularSlopeAB = 0; // AB is vertical, perpendicular is horizontal
+    } else {
+        perpendicularSlopeAB = -1 / slopeAB;
+    }
+    if (slopeBC === 0) {
+        perpendicularSlopeBC = Infinity; // BC is horizontal, perpendicular is vertical
+    } else if (!isFinite(slopeBC)) {
+        perpendicularSlopeBC = 0; // BC is vertical, perpendicular is horizontal
+    } else {
+        perpendicularSlopeBC = -1 / slopeBC;
+    }
 
     // Solve for the intersection of the two perpendiculars (Orthocenter)
-    const x = ((perpendicularSlopeAB * C.x - C.y) - (perpendicularSlopeBC * A.x - A.y)) / (perpendicularSlopeAB - perpendicularSlopeBC);
-    const y = perpendicularSlopeAB * (x - C.x) + C.y;
-
-    return {x, y};
+    if (perpendicularSlopeAB === Infinity) {
+        // If the perpendicular to AB is vertical
+        const x = C.x;
+        const y = perpendicularSlopeBC * (x - A.x) + A.y;
+        return { x, y };
+    } else if (perpendicularSlopeBC === Infinity) {
+        // If the perpendicular to BC is vertical
+        const x = A.x;
+        const y = perpendicularSlopeAB * (x - C.x) + C.y;
+        return { x, y };
+    } else {
+        // General case where both perpendiculars are not vertical
+        // Equation of the perpendicular from C to AB: y - C.y = perpSlopeAB * (x - C.x)
+        // Equation of the perpendicular from A to BC: y - A.y = perpSlopeBC * (x - A.x)
+        const x = ((perpendicularSlopeAB * C.x - C.y) - (perpendicularSlopeBC * A.x - A.y)) / (perpendicularSlopeAB - perpendicularSlopeBC);
+        const y = perpendicularSlopeAB * (x - C.x) + C.y;
+        return {x, y};
+    }
 }
 
 // Function to calculate the excenter for the vertex p (intersection of the internal angle bisectors of the vertex and other external angle bisectors)
@@ -307,6 +468,79 @@ function calculateExcenter(A, B, C) {
     return {x, y};
 }
 
+// Function to calculate the Fermat point such that the sum of the distances from three vertices to the point is the smallest
+function calculateFermatPoint() {
+    const [A, B, C] = points;
+    
+    // Check for angles >= 120 degrees
+    if (calculateAngle(B, A, C) >= 120) {
+        return A;
+    } else if (calculateAngle(A, B, C) >= 120) {
+        return B;
+    } else if (calculateAngle(A, C, B) >= 120) {
+        return C;
+    }
+
+    // Determine rotation direction based on the cross product of vectors AB and AC
+    const crossProduct = (B.x - A.x) * (C.y - A.y) - (B.y - A.y) * (C.x - A.x);
+    var rotateRadian = 0;
+    if (crossProduct > 0){
+        rotateRadian = -60;
+    }
+    else {
+        rotateRadian = 60;
+    }
+    // Calculate rotation points for Fermat point
+    const R1 = rotate(B, A, rotateRadian); // Rotate B 60 degrees around A
+    const R2 = rotate(C, A, -rotateRadian); // Rotate C 60 degrees around A
+
+    // Intersection of lines BR2 and CR1 gives the Fermat point
+    return lineIntersection(B, R2, C, R1);
+}
+
+// Function to calculate the incircle
+function calculateIncircle() {
+    const [A, B, C] = points;
+    
+    // Calculate the incenter (already defined)
+    const incenter = calculateIncenter();
+
+    // Calculate the radius of the incircle (using the formula: 2 * area / (a + b + c))
+    const AB = calculateDistance(A, B);
+    const BC = calculateDistance(B, C);
+    const CA = calculateDistance(C, A);
+    const semiPerimeter = (AB + BC + CA) / 2;
+    const area = calculateArea();
+    const radius = area / semiPerimeter;
+
+    // Return the circle object with center and radius
+    return {
+        center: incenter,
+        radius: radius
+    };
+}
+
+
+// Function to calculate the circumcircle
+function calculateCircumcircle() {
+    const [A, B, C] = points;
+    
+    // Calculate the circumcenter (already defined)
+    const center = calculateCircumcenter();
+
+    // Calculate the circumradius using the formula R = (a * b * c) / (4 * area)
+    const a = calculateDistance(B, C);
+    const b = calculateDistance(A, C);
+    const c = calculateDistance(A, B);
+    const area = calculateArea();
+    const radius = (a * b * c) / (4 * area);
+
+    // Return the circle object with center and radius
+    return {
+        center: center,
+        radius: radius
+    };
+}
 
 
 // Function to update the information display
@@ -328,9 +562,22 @@ function updateInfo() {
 }
 
 // Function to apply styles based on checkbox state
-function applyPointStyles() {
+function applyStyles() {
     Object.keys(pointStyles).forEach(key => {
         const style = pointStyles[key];
+        const checkbox = document.getElementById(style.checkboxId);
+        const displayElement = document.getElementById(style.displayElementId);
+
+        if (checkbox.checked) {
+            displayElement.style.color = style.activeColor;
+            displayElement.classList.remove('disabled');
+        } else {
+            displayElement.style.color = style.inactiveColor;
+            displayElement.classList.add('disabled');
+        }
+    });
+    Object.keys(circleStyles).forEach(key => {
+        const style = circleStyles[key];
         const checkbox = document.getElementById(style.checkboxId);
         const displayElement = document.getElementById(style.displayElementId);
 
@@ -356,8 +603,10 @@ canvas.addEventListener('mousemove', (e) => {
         selectedPoint.x = e.offsetX;
         selectedPoint.y = e.offsetY;
         drawTriangle();
+        drawCenters();
+        drawCircles();
         updateInfo();
-        applyPointStyles();
+        applyStyles();
     }
 });
 
@@ -374,37 +623,20 @@ function getSelectedPoint(mouseX, mouseY) {
 }
 
 // Event listeners for checkboxes
-document.getElementById('centroid-checkbox').addEventListener('change', () => {
-    drawTriangle();
-    applyPointStyles();
-});
-document.getElementById('circumcenter-checkbox').addEventListener('change', () => {
-    drawTriangle();
-    applyPointStyles();
-});
-document.getElementById('incenter-checkbox').addEventListener('change', () => {
-    drawTriangle();
-    applyPointStyles();
-});
-document.getElementById('orthocenter-checkbox').addEventListener('change', () => {
-    drawTriangle();
-    applyPointStyles();
-});
-document.getElementById('excenterA-checkbox').addEventListener('change', () => {
-    drawTriangle();
-    applyPointStyles();
-});
-document.getElementById('excenterB-checkbox').addEventListener('change', () => {
-    drawTriangle();
-    applyPointStyles();
-});
-document.getElementById('excenterC-checkbox').addEventListener('change', () => {
-    drawTriangle();
-    applyPointStyles();
+const pointCheckboxIds = Object.values(pointStyles).map(style => style.checkboxId);
+const circleCheckboxIds = Object.values(circleStyles).map(style => style.checkboxId);
+const allCheckboxIds = [...pointCheckboxIds, ...circleCheckboxIds];
+allCheckboxIds.forEach(id => {
+    document.getElementById(id).addEventListener('change', () => {
+        drawTriangle();
+        drawCenters();
+        drawCircles();
+        applyStyles();
+    });
 });
 
 // Initial application of styles
-applyPointStyles();
+applyStyles();
 </script>
 
 </body>
