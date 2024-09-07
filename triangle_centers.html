@@ -91,6 +91,10 @@
         <input type="checkbox" id="excircleC-checkbox" unchecked> 
         <span id="excircleC" class="circle-info">○ Excircle opposite to vertex C</span>
     </p>
+    <p>
+        <input type="checkbox" id="ninePointCircle-checkbox" unchecked> 
+        <span id="ninePointCircle" class="circle-info">○ Nine-point circle</span>
+    </p>
 </div>
 
 <script>
@@ -185,6 +189,12 @@ const circleStyles = {
         inactiveColor: 'lightgray',
         checkboxId: 'excircleC-checkbox',
         displayElementId: 'excircleC',
+    },
+    ninePointCircle: {
+        activeColor: 'lightblue',
+        inactiveColor: 'lightgray',
+        checkboxId: 'ninePointCircle-checkbox',
+        displayElementId: 'ninePointCircle',
     },
 };
 
@@ -286,6 +296,10 @@ function drawCircles(){
     if (document.getElementById('excircleC-checkbox').checked) {
         const excircleC = calculateExcircle(points[2], points[0], points[1]);
         drawCircle(excircleC, 'Excircle (C)', circleStyles.excircleC.activeColor);
+    }
+    if (document.getElementById('ninePointCircle-checkbox').checked) {
+        const ninePointCircle = calculateNinePointCircle();
+        drawCircle(ninePointCircle, 'Nine-point', circleStyles.ninePointCircle.activeColor);
     }
 }
 
@@ -594,6 +608,26 @@ function calculateExcircle(A, B, C) {
     const c = calculateDistance(A, B);
     const area = calculateArea();
     const radius = 2 * area / (-a + b + c);
+
+    // Return the circle object with center and radius
+    return {
+        center: center,
+        radius: radius
+    };
+}
+
+// Function to calculate the nine-point circle
+function calculateNinePointCircle() {
+    const [A, B, C] = points;
+
+    // Calculate the center and radius
+    // The center is the midpoint between the orthocenter and circumcenter.
+    // The radius is half of the circumradius.
+    const orthocenter = calculateOrthocenter();
+    const circumcircle = calculateCircumcircle();
+    const circumcenter = circumcircle.center;
+    const center = {x: (orthocenter.x + circumcenter.x)/2, y: (orthocenter.y + circumcenter.y)/2};
+    const radius = circumcircle.radius / 2;
 
     // Return the circle object with center and radius
     return {
