@@ -79,6 +79,22 @@
         <input type="checkbox" id="circumcircle-checkbox" unchecked> 
         <span id="circumcircle" class="circle-info">○ Circumcircle</span>
     </p>
+    <p>
+        <input type="checkbox" id="excircleA-checkbox" unchecked> 
+        <span id="excircleA" class="circle-info">○ Excircle opposite to vertex A</span>
+    </p>
+    <p>
+        <input type="checkbox" id="excircleB-checkbox" unchecked> 
+        <span id="excircleB" class="circle-info">○ Excircle opposite to vertex B</span>
+    </p>
+    <p>
+        <input type="checkbox" id="excircleC-checkbox" unchecked> 
+        <span id="excircleC" class="circle-info">○ Excircle opposite to vertex C</span>
+    </p>
+    <p>
+        <input type="checkbox" id="ninePointCircle-checkbox" unchecked> 
+        <span id="ninePointCircle" class="circle-info">○ Nine-point circle</span>
+    </p>
 </div>
 
 <script>
@@ -155,6 +171,30 @@ const circleStyles = {
         inactiveColor: 'lightgray',
         checkboxId: 'circumcircle-checkbox',
         displayElementId: 'circumcircle',
+    },
+    excircleA: {
+        activeColor: 'orange',
+        inactiveColor: 'lightgray',
+        checkboxId: 'excircleA-checkbox',
+        displayElementId: 'excircleA',
+    },
+    excircleB: {
+        activeColor: 'orange',
+        inactiveColor: 'lightgray',
+        checkboxId: 'excircleB-checkbox',
+        displayElementId: 'excircleB',
+    },
+    excircleC: {
+        activeColor: 'orange',
+        inactiveColor: 'lightgray',
+        checkboxId: 'excircleC-checkbox',
+        displayElementId: 'excircleC',
+    },
+    ninePointCircle: {
+        activeColor: 'lightblue',
+        inactiveColor: 'lightgray',
+        checkboxId: 'ninePointCircle-checkbox',
+        displayElementId: 'ninePointCircle',
     },
 };
 
@@ -244,6 +284,22 @@ function drawCircles(){
     if (document.getElementById('circumcircle-checkbox').checked) {
         const circumcircle = calculateCircumcircle();
         drawCircle(circumcircle, 'Circumcircle', circleStyles.circumcircle.activeColor);
+    }
+    if (document.getElementById('excircleA-checkbox').checked) {
+        const excircleA = calculateExcircle(points[0], points[1], points[2]);
+        drawCircle(excircleA, 'Excircle (A)', circleStyles.excircleA.activeColor);
+    }
+    if (document.getElementById('excircleB-checkbox').checked) {
+        const excircleB = calculateExcircle(points[1], points[0], points[2]);
+        drawCircle(excircleB, 'Excircle (B)', circleStyles.excircleB.activeColor);
+    }
+    if (document.getElementById('excircleC-checkbox').checked) {
+        const excircleC = calculateExcircle(points[2], points[0], points[1]);
+        drawCircle(excircleC, 'Excircle (C)', circleStyles.excircleC.activeColor);
+    }
+    if (document.getElementById('ninePointCircle-checkbox').checked) {
+        const ninePointCircle = calculateNinePointCircle();
+        drawCircle(ninePointCircle, 'Nine-point', circleStyles.ninePointCircle.activeColor);
     }
 }
 
@@ -454,7 +510,7 @@ function calculateOrthocenter() {
     }
 }
 
-// Function to calculate the excenter for the vertex p (intersection of the internal angle bisectors of the vertex and other external angle bisectors)
+// Function to calculate the excenter for the vertex A (intersection of the internal angle bisectors of the vertex and other external angle bisectors)
 function calculateExcenter(A, B, C) {
     // Lengths of the triangle sides opposite to each vertex
     const a =  calculateDistance(B, C); // Length of side BC
@@ -505,13 +561,12 @@ function calculateIncircle() {
     // Calculate the incenter (already defined)
     const incenter = calculateIncenter();
 
-    // Calculate the radius of the incircle (using the formula: 2 * area / (a + b + c))
-    const AB = calculateDistance(A, B);
-    const BC = calculateDistance(B, C);
-    const CA = calculateDistance(C, A);
-    const semiPerimeter = (AB + BC + CA) / 2;
+    // Calculate the radius of the incircle using the formula: 2 * area / (a + b + c)
+    const a = calculateDistance(B, C);
+    const b = calculateDistance(C, A);
+    const c = calculateDistance(A, B);
     const area = calculateArea();
-    const radius = area / semiPerimeter;
+    const radius = 2 * area / (a + b + c);
 
     // Return the circle object with center and radius
     return {
@@ -534,6 +589,45 @@ function calculateCircumcircle() {
     const c = calculateDistance(A, B);
     const area = calculateArea();
     const radius = (a * b * c) / (4 * area);
+
+    // Return the circle object with center and radius
+    return {
+        center: center,
+        radius: radius
+    };
+}
+
+// Function to calculate the excircle opposite to the vertex A
+function calculateExcircle(A, B, C) {
+    // Calculate the center (already defined)
+    const center = calculateExcenter(A, B, C);
+
+    // Calculate the radius using the formula: 2 * area / (-a + b + c)
+    const a = calculateDistance(B, C);
+    const b = calculateDistance(C, A);
+    const c = calculateDistance(A, B);
+    const area = calculateArea();
+    const radius = 2 * area / (-a + b + c);
+
+    // Return the circle object with center and radius
+    return {
+        center: center,
+        radius: radius
+    };
+}
+
+// Function to calculate the nine-point circle
+function calculateNinePointCircle() {
+    const [A, B, C] = points;
+
+    // Calculate the center and radius
+    // The center is the midpoint between the orthocenter and circumcenter.
+    // The radius is half of the circumradius.
+    const orthocenter = calculateOrthocenter();
+    const circumcircle = calculateCircumcircle();
+    const circumcenter = circumcircle.center;
+    const center = {x: (orthocenter.x + circumcenter.x)/2, y: (orthocenter.y + circumcenter.y)/2};
+    const radius = circumcircle.radius / 2;
 
     // Return the circle object with center and radius
     return {
