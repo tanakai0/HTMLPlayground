@@ -72,8 +72,12 @@
     </p>
     <p>Circles</p>
     <p>
-        <input type="checkbox" id="incircle-checkbox"> 
+        <input type="checkbox" id="incircle-checkbox"  unchecked> 
         <span id="incircle" class="circle-info">○ Incircle</span>
+    </p>
+    <p>
+        <input type="checkbox" id="circumcircle-checkbox" unchecked> 
+        <span id="circumcircle" class="circle-info">○ Circumcircle</span>
     </p>
 </div>
 
@@ -145,6 +149,12 @@ const circleStyles = {
         inactiveColor: 'lightgray',
         checkboxId: 'incircle-checkbox',
         displayElementId: 'incircle',
+    },
+    circumcircle: {
+        activeColor: 'red',
+        inactiveColor: 'lightgray',
+        checkboxId: 'circumcircle-checkbox',
+        displayElementId: 'circumcircle',
     },
 };
 
@@ -230,6 +240,10 @@ function drawCircles(){
     if (document.getElementById('incircle-checkbox').checked) {
         const incircle = calculateIncircle();
         drawCircle(incircle, 'Incircle', circleStyles.incircle.activeColor);
+    }
+    if (document.getElementById('circumcircle-checkbox').checked) {
+        const circumcircle = calculateCircumcircle();
+        drawCircle(circumcircle, 'Circumcircle', circleStyles.circumcircle.activeColor);
     }
 }
 
@@ -344,12 +358,38 @@ function calculateCircumcenter() {
     const E = { x: (B.x + C.x) / 2, y: (B.y + C.y) / 2 };
 
     // Slopes of perpendicular bisectors
-    const perpendicularSlopeAB = -1 / slope(A, B);
-    const perpendicularSlopeBC = -1 / slope(B, C);
+    const slopeAB = slope(A, B);
+    const slopeBC = slope(B, C);
+    
+    let perpendicularSlopeAB, perpendicularSlopeBC;
+    if (slopeAB === 0) {
+        perpendicularSlopeAB = Infinity;
+    } else {
+        perpendicularSlopeAB = -1 / slopeAB;
+    }
+
+    if (slopeBC === 0) {
+        perpendicularSlopeBC = Infinity;
+    } else {
+        perpendicularSlopeBC = -1 / slopeBC;
+    }
 
     // Circumcenter calculation
-    const x = (perpendicularSlopeAB * D.x - perpendicularSlopeBC * E.x + E.y - D.y) / (perpendicularSlopeAB - perpendicularSlopeBC);
-    const y = perpendicularSlopeAB * (x - D.x) + D.y;
+    if (perpendicularSlopeAB === Infinity) {
+        // Vertical line case for AB
+        const x = D.x;
+        const y = perpendicularSlopeBC * (x - E.x) + E.y;
+        return { x, y };
+    } else if (perpendicularSlopeBC === Infinity) {
+        // Vertical line case for BC
+        const x = E.x;
+        const y = perpendicularSlopeAB * (x - D.x) + D.y;
+        return { x, y };
+    } else {
+        const x = (perpendicularSlopeAB * D.x - perpendicularSlopeBC * E.x + E.y - D.y) / (perpendicularSlopeAB - perpendicularSlopeBC);
+        const y = perpendicularSlopeAB * (x - D.x) + D.y;
+        return { x, y };
+    }
 
     return { x, y };
 }
@@ -373,18 +413,45 @@ function calculateIncenter() {
 // Function to calculate the orthocenter (intersection of perpendiculars)
 function calculateOrthocenter() {
     const [A, B, C] = points;
-    // Calculate the slopes of the perpendiculars
-    const perpendicularSlopeAB = -1 / slope(A, B);
-    const perpendicularSlopeBC = -1 / slope(B, C);
-
-    // Equation of the perpendicular from C to AB: y - C.y = perpSlopeAB * (x - C.x)
-    // Equation of the perpendicular from A to BC: y - A.y = perpSlopeBC * (x - A.x)
+    // Calculate perpendiculars
+    const slopeAB = slope(A, B);
+    const slopeBC = slope(B, C);
+    let perpendicularSlopeAB, perpendicularSlopeBC;
+    // Handle cases where slopes might be 0 or undefined (vertical or horizontal lines)
+    if (slopeAB === 0) {
+        perpendicularSlopeAB = Infinity; // AB is horizontal, perpendicular is vertical
+    } else if (!isFinite(slopeAB)) {
+        perpendicularSlopeAB = 0; // AB is vertical, perpendicular is horizontal
+    } else {
+        perpendicularSlopeAB = -1 / slopeAB;
+    }
+    if (slopeBC === 0) {
+        perpendicularSlopeBC = Infinity; // BC is horizontal, perpendicular is vertical
+    } else if (!isFinite(slopeBC)) {
+        perpendicularSlopeBC = 0; // BC is vertical, perpendicular is horizontal
+    } else {
+        perpendicularSlopeBC = -1 / slopeBC;
+    }
 
     // Solve for the intersection of the two perpendiculars (Orthocenter)
-    const x = ((perpendicularSlopeAB * C.x - C.y) - (perpendicularSlopeBC * A.x - A.y)) / (perpendicularSlopeAB - perpendicularSlopeBC);
-    const y = perpendicularSlopeAB * (x - C.x) + C.y;
-
-    return {x, y};
+    if (perpendicularSlopeAB === Infinity) {
+        // If the perpendicular to AB is vertical
+        const x = C.x;
+        const y = perpendicularSlopeBC * (x - A.x) + A.y;
+        return { x, y };
+    } else if (perpendicularSlopeBC === Infinity) {
+        // If the perpendicular to BC is vertical
+        const x = A.x;
+        const y = perpendicularSlopeAB * (x - C.x) + C.y;
+        return { x, y };
+    } else {
+        // General case where both perpendiculars are not vertical
+        // Equation of the perpendicular from C to AB: y - C.y = perpSlopeAB * (x - C.x)
+        // Equation of the perpendicular from A to BC: y - A.y = perpSlopeBC * (x - A.x)
+        const x = ((perpendicularSlopeAB * C.x - C.y) - (perpendicularSlopeBC * A.x - A.y)) / (perpendicularSlopeAB - perpendicularSlopeBC);
+        const y = perpendicularSlopeAB * (x - C.x) + C.y;
+        return {x, y};
+    }
 }
 
 // Function to calculate the excenter for the vertex p (intersection of the internal angle bisectors of the vertex and other external angle bisectors)
@@ -453,6 +520,27 @@ function calculateIncircle() {
     };
 }
 
+
+// Function to calculate the circumcircle
+function calculateCircumcircle() {
+    const [A, B, C] = points;
+    
+    // Calculate the circumcenter (already defined)
+    const center = calculateCircumcenter();
+
+    // Calculate the circumradius using the formula R = (a * b * c) / (4 * area)
+    const a = calculateDistance(B, C);
+    const b = calculateDistance(A, C);
+    const c = calculateDistance(A, B);
+    const area = calculateArea();
+    const radius = (a * b * c) / (4 * area);
+
+    // Return the circle object with center and radius
+    return {
+        center: center,
+        radius: radius
+    };
+}
 
 
 // Function to update the information display
