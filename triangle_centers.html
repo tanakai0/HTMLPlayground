@@ -17,6 +17,12 @@
         .point-info.disabled {
             color: lightgray; /* Disabled state */
         }
+        .circle-info {
+            color: black; /* Default color */
+        }
+        .circle-info.disabled {
+            color: lightgray; /* Disabled state */
+        }
     </style>
 </head>
 <body>
@@ -31,6 +37,7 @@
     <p>Side lengths: AB = <span id="ab-length"></span>, BC = <span id="bc-length"></span>, CA = <span id="ca-length"></span></p>
     <p>Acute angles: ∠A = <span id="a-angle"></span>, ∠B = <span id="b-angle"></span>, ∠C = <span id="c-angle"></span></p>
     <p>Area: <span id="area"></span></p>
+    <p>Centers</p>
     <p>
         <input type="checkbox" id="centroid-checkbox" checked> 
         <span id="centroid" class="point-info">● Centroid</span>
@@ -63,10 +70,15 @@
         <input type="checkbox" id="Fermat-checkbox" checked> 
         <span id="Fermat" class="point-info">● Fermat point</span>
     </p>
+    <p>Circles</p>
+    <p>
+        <input type="checkbox" id="incircle-checkbox"> 
+        <span id="incircle" class="circle-info">○ Incircle</span>
+    </p>
 </div>
 
 <script>
-// Define styles for centroid, circumcenter, and incenter
+// Define styles for centers
 const pointStyles = {
     centroid: {
         activeColor: 'blue',
@@ -126,6 +138,16 @@ const pointStyles = {
     },
 };
 
+// Define styles for circles
+const circleStyles = {
+    incircle: {
+        activeColor: 'green',
+        inactiveColor: 'lightgray',
+        checkboxId: 'incircle-checkbox',
+        displayElementId: 'incircle',
+    },
+};
+
 // Triangle vertices
 let points = [
     { x: 300, y: 100 }, // A
@@ -142,12 +164,15 @@ const ctx = canvas.getContext('2d');
 
 // Initial drawing
 drawTriangle();
+drawCenters();
+drawCircles();
 updateInfo();
 
 // Function to draw the triangle
 function drawTriangle() {
     ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
     ctx.beginPath();
+    ctx.strokeStyle = 'black'
     ctx.moveTo(points[0].x, points[0].y);
     ctx.lineTo(points[1].x, points[1].y);
     ctx.lineTo(points[2].x, points[2].y);
@@ -158,7 +183,9 @@ function drawTriangle() {
     points.forEach((point, index) => {
         drawPoint(point, ['A', 'B', 'C'][index]);
     });
+}
 
+function drawCenters(){
     // Draw points based on checkbox state
     if (document.getElementById('centroid-checkbox').checked) {
         const centroid = calculateCentroid();
@@ -198,6 +225,14 @@ function drawTriangle() {
     }
 }
 
+function drawCircles(){
+    // Draw points based on checkbox state
+    if (document.getElementById('incircle-checkbox').checked) {
+        const incircle = calculateIncircle();
+        drawCircle(incircle, 'Incircle', circleStyles.incircle.activeColor);
+    }
+}
+
 // Function to draw a point and its label
 function drawPoint(point, label, color = 'black') {
     ctx.beginPath();
@@ -210,6 +245,17 @@ function drawPoint(point, label, color = 'black') {
     ctx.fillStyle = color;
     ctx.fillText(label, point.x - 5, point.y + 20); // Adjust position for readability
 }
+
+// Function to draw a circle
+function drawCircle(circle, label, color = 'black') {
+    ctx.beginPath();
+    ctx.arc(circle.center.x, circle.center.y, circle.radius, 0, Math.PI * 2); // Draw a full circle
+    ctx.strokeStyle = color;
+    ctx.stroke();
+    ctx.fillStyle = color;
+    ctx.fillText(label, circle.center.x, circle.center.y);
+}
+
 
 // utils
 function vectorSubtract(p1, p2) {
@@ -385,6 +431,30 @@ function calculateFermatPoint() {
     return lineIntersection(B, R2, C, R1);
 }
 
+// Function to calculate the incircle
+function calculateIncircle() {
+    const [A, B, C] = points;
+    
+    // Calculate the incenter (already defined)
+    const incenter = calculateIncenter();
+
+    // Calculate the radius of the incircle (using the formula: 2 * area / (a + b + c))
+    const AB = calculateDistance(A, B);
+    const BC = calculateDistance(B, C);
+    const CA = calculateDistance(C, A);
+    const semiPerimeter = (AB + BC + CA) / 2;
+    const area = calculateArea();
+    const radius = area / semiPerimeter;
+
+    // Return the circle object with center and radius
+    return {
+        center: incenter,
+        radius: radius
+    };
+}
+
+
+
 // Function to update the information display
 function updateInfo() {
     const [A, B, C] = points;
@@ -404,9 +474,22 @@ function updateInfo() {
 }
 
 // Function to apply styles based on checkbox state
-function applyPointStyles() {
+function applyStyles() {
     Object.keys(pointStyles).forEach(key => {
         const style = pointStyles[key];
+        const checkbox = document.getElementById(style.checkboxId);
+        const displayElement = document.getElementById(style.displayElementId);
+
+        if (checkbox.checked) {
+            displayElement.style.color = style.activeColor;
+            displayElement.classList.remove('disabled');
+        } else {
+            displayElement.style.color = style.inactiveColor;
+            displayElement.classList.add('disabled');
+        }
+    });
+    Object.keys(circleStyles).forEach(key => {
+        const style = circleStyles[key];
         const checkbox = document.getElementById(style.checkboxId);
         const displayElement = document.getElementById(style.displayElementId);
 
@@ -432,8 +515,10 @@ canvas.addEventListener('mousemove', (e) => {
         selectedPoint.x = e.offsetX;
         selectedPoint.y = e.offsetY;
         drawTriangle();
+        drawCenters();
+        drawCircles();
         updateInfo();
-        applyPointStyles();
+        applyStyles();
     }
 });
 
@@ -450,16 +535,20 @@ function getSelectedPoint(mouseX, mouseY) {
 }
 
 // Event listeners for checkboxes
-const checkboxIds = Object.values(pointStyles).map(style => style.checkboxId);
-checkboxIds.forEach(id => {
+const pointCheckboxIds = Object.values(pointStyles).map(style => style.checkboxId);
+const circleCheckboxIds = Object.values(circleStyles).map(style => style.checkboxId);
+const allCheckboxIds = [...pointCheckboxIds, ...circleCheckboxIds];
+allCheckboxIds.forEach(id => {
     document.getElementById(id).addEventListener('change', () => {
         drawTriangle();
-        applyPointStyles();
+        drawCenters();
+        drawCircles();
+        applyStyles();
     });
 });
 
 // Initial application of styles
-applyPointStyles();
+applyStyles();
 </script>
 
 </body>
