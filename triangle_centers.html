@@ -250,11 +250,7 @@ const canvas = document.getElementById('triangleCanvas');
 const ctx = canvas.getContext('2d');
 
 // Initial drawing
-drawOriginalTriangle();
-drawCenters();
-drawCircles();
-drawTriangles();
-updateInfo();
+reDraw();
 
 // Function to draw the triangle
 function drawOriginalTriangle() {
@@ -817,6 +813,16 @@ function applyStyles() {
     });
 }
 
+// Function to redraw the canvas
+function reDraw(){
+    drawOriginalTriangle();
+    drawCenters();
+    drawCircles();
+    drawTriangles();
+    updateInfo();
+    applyStyles();
+}
+
 // Mouse events
 canvas.addEventListener('mousedown', (e) => {
     const mouseX = e.offsetX;
@@ -828,12 +834,7 @@ canvas.addEventListener('mousemove', (e) => {
     if (selectedPoint) {
         selectedPoint.x = e.offsetX;
         selectedPoint.y = e.offsetY;
-        drawOriginalTriangle();
-        drawCenters();
-        drawCircles();
-        drawTriangles();
-        updateInfo();
-        applyStyles();
+        requestAnimationFrame(reDraw);
     }
 });
 
@@ -849,6 +850,33 @@ function getSelectedPoint(mouseX, mouseY) {
     });
 }
 
+
+// Touch events
+canvas.addEventListener('touchstart', (e) => {
+    e.preventDefault(); // Prevent page scroll on touch start
+    const touch = e.touches[0]; // First touch point
+    const rect = canvas.getBoundingClientRect();
+    const touchX = touch.clientX - rect.left;
+    const touchY = touch.clientY - rect.top;
+    selectedPoint = getSelectedPoint(touchX, touchY);
+});
+
+canvas.addEventListener('touchmove', (e) => {
+    if (selectedPoint) {
+        const touch = e.touches[0];
+        const rect = canvas.getBoundingClientRect();
+        selectedPoint.x = touch.clientX - rect.left;
+        selectedPoint.y = touch.clientY - rect.top;
+        requestAnimationFrame(reDraw); // Use requestAnimationFrame for smoother updates
+    }
+    e.preventDefault(); // Prevent scrolling while dragging
+});
+
+canvas.addEventListener('touchend', () => {
+    selectedPoint = null;
+});
+
+
 // Event listeners for checkboxes
 const pointCheckboxIds = Object.values(pointStyles).map(style => style.checkboxId);
 const circleCheckboxIds = Object.values(circleStyles).map(style => style.checkboxId);
@@ -856,11 +884,7 @@ const triangleCheckboxIds = Object.values(triangleStyles).map(style => style.che
 const allCheckboxIds = [...pointCheckboxIds, ...circleCheckboxIds, ...triangleCheckboxIds];
 allCheckboxIds.forEach(id => {
     document.getElementById(id).addEventListener('change', () => {
-        drawOriginalTriangle();
-        drawCenters();
-        drawCircles();
-        drawTriangles();
-        applyStyles();
+        reDraw();
     });
 });
 
