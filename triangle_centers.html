@@ -67,9 +67,14 @@
         <span id="excenterC" class="point-info">● Excenter opposite to vertex C</span>
     </p>
     <p>
-        <input type="checkbox" id="Fermat-checkbox" checked> 
+        <input type="checkbox" id="Fermat-checkbox" unchecked> 
         <span id="Fermat" class="point-info">● Fermat point</span>
     </p>
+    <p>
+        <input type="checkbox" id="deLongchampsPoint-checkbox" unchecked> 
+        <span id="deLongchampsPoint" class="point-info">● de Longchamps point</span>
+    </p>
+
     <p>Circles</p>
     <p>
         <input type="checkbox" id="incircle-checkbox"  unchecked> 
@@ -164,6 +169,13 @@ const pointStyles = {
         pointSymbol: '●',
         checkboxId: 'Fermat-checkbox',
         displayElementId: 'Fermat',
+    },
+    deLongchampsPoint: {
+        activeColor: '#c54ea0',
+        inactiveColor: 'lightgray',
+        pointSymbol: '●',
+        checkboxId: 'deLongchampsPoint-checkbox',
+        displayElementId: 'deLongchampsPoint',
     },
 };
 
@@ -294,6 +306,10 @@ function drawCenters(){
     if (document.getElementById('Fermat-checkbox').checked) {
         const Fermat = calculateFermatPoint();
         drawPoint(Fermat, 'Fermat', pointStyles.Fermat.activeColor);
+    }
+    if (document.getElementById('deLongchampsPoint-checkbox').checked) {
+        const deLongchampsPoint = calculateDeLongchampsPoint();
+        drawPoint(deLongchampsPoint, 'deLongchampsPoint', pointStyles.deLongchampsPoint.activeColor);
     }
 }
 
@@ -611,6 +627,19 @@ function calculateFermatPoint() {
     // Intersection of lines BR2 and CR1 gives the Fermat point
     return lineIntersection(B, R2, C, R1);
 }
+
+// Function to calculate the de Longchamps point that is the reflection of the orthocenter of the triangle about the circumcenter
+function calculateDeLongchampsPoint() {
+    const [A, B, C] = points;
+    const orthocenter = calculateOrthocenter();
+    const circumcenter = calculateCircumcenter();
+    return {
+        x: 2 * circumcenter.x - orthocenter.x,
+        y: 2 * circumcenter.y - orthocenter.y,
+    }
+}
+
+
 
 // Function to calculate the incircle
 function calculateIncircle() {
