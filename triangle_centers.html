@@ -55,9 +55,13 @@
         <input type="checkbox" id="excenterB-checkbox" checked> 
         <span id="excenterB" class="point-info">● Excenter opposite to vertex B</span>
     </p>
-    <p></p>
+    <p>
         <input type="checkbox" id="excenterC-checkbox" checked> 
         <span id="excenterC" class="point-info">● Excenter opposite to vertex C</span>
+    </p>
+    <p>
+        <input type="checkbox" id="Fermat-checkbox" checked> 
+        <span id="Fermat" class="point-info">● Fermat point</span>
     </p>
 </div>
 
@@ -112,6 +116,13 @@ const pointStyles = {
         pointSymbol: '●',
         checkboxId: 'excenterC-checkbox',
         displayElementId: 'excenterC',
+    },
+    Fermat: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        pointSymbol: '●',
+        checkboxId: 'Fermat-checkbox',
+        displayElementId: 'Fermat',
     },
 };
 
@@ -181,6 +192,10 @@ function drawTriangle() {
         const excenter = calculateExcenter(points[2], points[0], points[1]);
         drawPoint(excenter, 'Excenter (C)', pointStyles.excenterC.activeColor);
     }
+    if (document.getElementById('Fermat-checkbox').checked) {
+        const Fermat = calculateFermatPoint();
+        drawPoint(Fermat, 'Fermat', pointStyles.Fermat.activeColor);
+    }
 }
 
 // Function to draw a point and its label
@@ -211,6 +226,39 @@ function magnitude(v) {
 
 function slope(p1, p2) {
     return (p2.y - p1.y) / (p2.x - p1.x)
+}
+
+// Function to rotate a point P around another point O by d degrees
+// Be careful to consider the coordinates in canvas environment
+function rotate(P, O, d) {
+    const radian = Math.PI*d / 180;
+    const dx = P.x - O.x;
+    const dy = P.y - O.y;
+    return {
+        x: O.x + (dx * Math.cos(radian) - dy * Math.sin(radian)),
+        y: O.y + (dx * Math.sin(radian) + dy * Math.cos(radian))
+    };
+}
+
+// Function to find the intersection of two lines (P1, P2) and (Q1, Q2)
+function lineIntersection(P1, P2, Q1, Q2) {
+    const a1 = P2.y - P1.y;
+    const b1 = P1.x - P2.x;
+    const c1 = a1 * P1.x + b1 * P1.y;
+
+    const a2 = Q2.y - Q1.y;
+    const b2 = Q1.x - Q2.x;
+    const c2 = a2 * Q1.x + b2 * Q1.y;
+
+    const determinant = a1 * b2 - a2 * b1;
+
+    if (determinant === 0) {
+        return null; // Parallel lines
+    } else {
+        const x = (b2 * c1 - b1 * c2) / determinant;
+        const y = (a1 * c2 - a2 * c1) / determinant;
+        return { x, y };
+    }
 }
 
 // Function to calculate the distance between two points
@@ -307,7 +355,35 @@ function calculateExcenter(A, B, C) {
     return {x, y};
 }
 
+// Function to calculate the Fermat point such that the sum of the distances from three vertices to the point is the smallest
+function calculateFermatPoint() {
+    const [A, B, C] = points;
+    
+    // Check for angles >= 120 degrees
+    if (calculateAngle(B, A, C) >= 120) {
+        return A;
+    } else if (calculateAngle(A, B, C) >= 120) {
+        return B;
+    } else if (calculateAngle(A, C, B) >= 120) {
+        return C;
+    }
 
+    // Determine rotation direction based on the cross product of vectors AB and AC
+    const crossProduct = (B.x - A.x) * (C.y - A.y) - (B.y - A.y) * (C.x - A.x);
+    var rotateRadian = 0;
+    if (crossProduct > 0){
+        rotateRadian = -60;
+    }
+    else {
+        rotateRadian = 60;
+    }
+    // Calculate rotation points for Fermat point
+    const R1 = rotate(B, A, rotateRadian); // Rotate B 60 degrees around A
+    const R2 = rotate(C, A, -rotateRadian); // Rotate C 60 degrees around A
+
+    // Intersection of lines BR2 and CR1 gives the Fermat point
+    return lineIntersection(B, R2, C, R1);
+}
 
 // Function to update the information display
 function updateInfo() {
@@ -374,33 +450,12 @@ function getSelectedPoint(mouseX, mouseY) {
 }
 
 // Event listeners for checkboxes
-document.getElementById('centroid-checkbox').addEventListener('change', () => {
-    drawTriangle();
-    applyPointStyles();
-});
-document.getElementById('circumcenter-checkbox').addEventListener('change', () => {
-    drawTriangle();
-    applyPointStyles();
-});
-document.getElementById('incenter-checkbox').addEventListener('change', () => {
-    drawTriangle();
-    applyPointStyles();
-});
-document.getElementById('orthocenter-checkbox').addEventListener('change', () => {
-    drawTriangle();
-    applyPointStyles();
-});
-document.getElementById('excenterA-checkbox').addEventListener('change', () => {
-    drawTriangle();
-    applyPointStyles();
-});
-document.getElementById('excenterB-checkbox').addEventListener('change', () => {
-    drawTriangle();
-    applyPointStyles();
-});
-document.getElementById('excenterC-checkbox').addEventListener('change', () => {
-    drawTriangle();
-    applyPointStyles();
+const checkboxIds = Object.values(pointStyles).map(style => style.checkboxId);
+checkboxIds.forEach(id => {
+    document.getElementById(id).addEventListener('change', () => {
+        drawTriangle();
+        applyPointStyles();
+    });
 });
 
 // Initial application of styles
