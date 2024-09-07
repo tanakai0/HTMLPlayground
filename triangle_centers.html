@@ -74,7 +74,18 @@
         <input type="checkbox" id="deLongchampsPoint-checkbox" unchecked> 
         <span id="deLongchampsPoint" class="point-info">● de Longchamps point</span>
     </p>
-
+    <p>
+        <input type="checkbox" id="ninePointCenter-checkbox" unchecked> 
+        <span id="ninePointCenter" class="point-info">● Nine-point center</span>
+    </p>
+    <p>
+        <input type="checkbox" id="firstNapoleonPoint-checkbox" unchecked> 
+        <span id="firstNapoleonPoint" class="point-info">● First Napoleon point</span>
+    </p>
+    <p>
+        <input type="checkbox" id="secondNapoleonPoint-checkbox" unchecked> 
+        <span id="secondNapoleonPoint" class="point-info">● Second Napoleon point</span>
+    </p>
     <p>Circles</p>
     <p>
         <input type="checkbox" id="incircle-checkbox"  unchecked> 
@@ -177,6 +188,27 @@ const pointStyles = {
         checkboxId: 'deLongchampsPoint-checkbox',
         displayElementId: 'deLongchampsPoint',
     },
+    ninePointCenter: {
+        activeColor: 'lightblue',
+        inactiveColor: 'lightgray',
+        pointSymbol: '●',
+        checkboxId: 'ninePointCenter-checkbox',
+        displayElementId: 'ninePointCenter',
+    },
+    firstNapoleonPoint: {
+        activeColor: 'brown',
+        inactiveColor: 'lightgray',
+        pointSymbol: '●',
+        checkboxId: 'firstNapoleonPoint-checkbox',
+        displayElementId: 'firstNapoleonPoint',
+    },
+    secondNapoleonPoint: {
+        activeColor: '#c5956b',
+        inactiveColor: 'lightgray',
+        pointSymbol: '●',
+        checkboxId: 'secondNapoleonPoint-checkbox',
+        displayElementId: 'secondNapoleonPoint',
+    },
 };
 
 // Define styles for circles
@@ -228,7 +260,7 @@ const triangleStyles = {
         displayElementId: 'outerNapoleonTriangle',
     },
     innerNapoleonTriangle: {
-        activeColor: 'brown',
+        activeColor: '#c5956b',
         inactiveColor: 'lightgray',
         checkboxId: 'innerNapoleonTriangle-checkbox',
         displayElementId: 'innerNapoleonTriangle',
@@ -306,6 +338,18 @@ function drawCenters(){
     if (document.getElementById('deLongchampsPoint-checkbox').checked) {
         const deLongchampsPoint = calculateDeLongchampsPoint();
         drawPoint(deLongchampsPoint, 'deLongchampsPoint', pointStyles.deLongchampsPoint.activeColor);
+    }
+    if (document.getElementById('ninePointCenter-checkbox').checked) {
+        const ninePointCenter = calculateNinePointCenter();
+        drawPoint(ninePointCenter, 'Nine-point', pointStyles.ninePointCenter.activeColor);
+    }
+    if (document.getElementById('firstNapoleonPoint-checkbox').checked) {
+        const firstNapoleonPoint = calculateNapoleonPoint(outer = true);
+        drawPoint(firstNapoleonPoint, '1st Napoleon', pointStyles.firstNapoleonPoint.activeColor);
+    }
+    if (document.getElementById('secondNapoleonPoint-checkbox').checked) {
+        const secondNapoleonPoint = calculateNapoleonPoint(outer = false);
+        drawPoint(secondNapoleonPoint, '2nd Napoleon', pointStyles.secondNapoleonPoint.activeColor);
     }
 }
 
@@ -635,7 +679,26 @@ function calculateDeLongchampsPoint() {
     }
 }
 
+// Function to calculate the nine point center
+function calculateNinePointCenter() {
+    // Calculate the center and radius
+    // The center is the midpoint between the orthocenter and circumcenter.
+    // The radius is half of the circumradius.
+    const orthocenter = calculateOrthocenter();
+    const circumcircle = calculateCircumcircle();
+    const circumcenter = circumcircle.center;
+    return {
+        x: (orthocenter.x + circumcenter.x)/2,
+        y: (orthocenter.y + circumcenter.y)/2
+    };
+}
 
+// Function to calculate the Napoleon points
+function calculateNapoleonPoint(outer = true) {
+    const [A, B, C] = points;
+    const [D, E, F] = calculateNapoleonTriangle(outer = outer);
+    return lineIntersection(A, D, B, E);
+}
 
 // Function to calculate the incircle
 function calculateIncircle() {
@@ -706,16 +769,12 @@ function calculateNinePointCircle() {
     // Calculate the center and radius
     // The center is the midpoint between the orthocenter and circumcenter.
     // The radius is half of the circumradius.
-    const orthocenter = calculateOrthocenter();
     const circumcircle = calculateCircumcircle();
-    const circumcenter = circumcircle.center;
-    const center = {x: (orthocenter.x + circumcenter.x)/2, y: (orthocenter.y + circumcenter.y)/2};
-    const radius = circumcircle.radius / 2;
 
     // Return the circle object with center and radius
     return {
-        center: center,
-        radius: radius
+        center: calculateNinePointCenter(),
+        radius: circumcircle.radius / 2
     };
 }
 
@@ -745,9 +804,9 @@ function calculateNapoleonTriangle(outer = true) {
 
     // Return the points of the outer Napoleon triangle
     return [
-        calculateCentroid(A, B, R1),
         calculateCentroid(B, C, R2),
-        calculateCentroid(C, A, R3)
+        calculateCentroid(C, A, R3),
+        calculateCentroid(A, B, R1)
     ];
 }
 
