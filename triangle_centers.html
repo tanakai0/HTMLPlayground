@@ -67,8 +67,8 @@
         <span id="excenterC" class="point-info">● Excenter opposite to vertex C</span>
     </p>
     <p>
-        <input type="checkbox" id="Fermat-checkbox" unchecked> 
-        <span id="Fermat" class="point-info">● Fermat point</span>
+        <input type="checkbox" id="FermatPoint-checkbox" unchecked> 
+        <span id="FermatPoint" class="point-info">● Fermat point</span>
     </p>
     <p>
         <input type="checkbox" id="deLongchampsPoint-checkbox" unchecked> 
@@ -163,12 +163,12 @@ const pointStyles = {
         checkboxId: 'excenterC-checkbox',
         displayElementId: 'excenterC',
     },
-    Fermat: {
+    FermatPoint: {
         activeColor: 'gray',
         inactiveColor: 'lightgray',
         pointSymbol: '●',
-        checkboxId: 'Fermat-checkbox',
-        displayElementId: 'Fermat',
+        checkboxId: 'FermatPoint-checkbox',
+        displayElementId: 'FermatPoint',
     },
     deLongchampsPoint: {
         activeColor: '#c54ea0',
@@ -299,9 +299,9 @@ function drawCenters(){
         const excenter = calculateExcenter(points[2], points[0], points[1]);
         drawPoint(excenter, 'Excenter (C)', pointStyles.excenterC.activeColor);
     }
-    if (document.getElementById('Fermat-checkbox').checked) {
-        const Fermat = calculateFermatPoint();
-        drawPoint(Fermat, 'Fermat', pointStyles.Fermat.activeColor);
+    if (document.getElementById('FermatPoint-checkbox').checked) {
+        const FermatPoint = calculateFermatPoint();
+        drawPoint(FermatPoint, 'Fermat', pointStyles.FermatPoint.activeColor);
     }
     if (document.getElementById('deLongchampsPoint-checkbox').checked) {
         const deLongchampsPoint = calculateDeLongchampsPoint();
