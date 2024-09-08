@@ -135,6 +135,7 @@ const pointStyles = {
         pointSymbol: '●',
         checkboxId: 'centroid-checkbox',
         displayElementId: 'centroid',
+        annotationLabel: 'Centroid',
     },
     circumcenter: {
         activeColor: 'red',
@@ -142,6 +143,7 @@ const pointStyles = {
         pointSymbol: '●',
         checkboxId: 'circumcenter-checkbox',
         displayElementId: 'circumcenter',
+        annotationLabel: 'Circumcenter',
     },
     incenter: {
         activeColor: 'green',
@@ -149,6 +151,7 @@ const pointStyles = {
         pointSymbol: '●',
         checkboxId: 'incenter-checkbox',
         displayElementId: 'incenter',
+        annotationLabel: 'Incenter'
     },
     orthocenter: {
         activeColor: 'purple',
@@ -156,6 +159,7 @@ const pointStyles = {
         pointSymbol: '●',
         checkboxId: 'orthocenter-checkbox',
         displayElementId: 'orthocenter',
+        annotationLabel: 'Orthocenter'
     },
     excenterA: {
         activeColor: 'orange',
@@ -163,6 +167,7 @@ const pointStyles = {
         pointSymbol: '●',
         checkboxId: 'excenterA-checkbox',
         displayElementId: 'excenterA',
+        annotationLabel: 'Excenter (A)'
     },
     excenterB: {
         activeColor: 'orange',
@@ -170,6 +175,7 @@ const pointStyles = {
         pointSymbol: '●',
         checkboxId: 'excenterB-checkbox',
         displayElementId: 'excenterB',
+        annotationLabel: 'Excenter (B)'
     },
     excenterC: {
         activeColor: 'orange',
@@ -177,6 +183,7 @@ const pointStyles = {
         pointSymbol: '●',
         checkboxId: 'excenterC-checkbox',
         displayElementId: 'excenterC',
+        annotationLabel: 'Excenter (C)'
     },
     FermatPoint: {
         activeColor: 'gray',
@@ -184,6 +191,7 @@ const pointStyles = {
         pointSymbol: '●',
         checkboxId: 'FermatPoint-checkbox',
         displayElementId: 'FermatPoint',
+        annotationLabel: 'Fermat'
     },
     deLongchampsPoint: {
         activeColor: '#c54ea0',
@@ -191,6 +199,7 @@ const pointStyles = {
         pointSymbol: '●',
         checkboxId: 'deLongchampsPoint-checkbox',
         displayElementId: 'deLongchampsPoint',
+        annotationLabel: 'de Longchamps'
     },
     ninePointCenter: {
         activeColor: 'lightblue',
@@ -198,6 +207,7 @@ const pointStyles = {
         pointSymbol: '●',
         checkboxId: 'ninePointCenter-checkbox',
         displayElementId: 'ninePointCenter',
+        annotationLabel: 'Nine-point'
     },
     firstNapoleonPoint: {
         activeColor: 'brown',
@@ -205,6 +215,7 @@ const pointStyles = {
         pointSymbol: '●',
         checkboxId: 'firstNapoleonPoint-checkbox',
         displayElementId: 'firstNapoleonPoint',
+        annotationLabel: '1st Napoleon'
     },
     secondNapoleonPoint: {
         activeColor: '#c5956b',
@@ -212,6 +223,7 @@ const pointStyles = {
         pointSymbol: '●',
         checkboxId: 'secondNapoleonPoint-checkbox',
         displayElementId: 'secondNapoleonPoint',
+        annotationLabel: '2nd Napoleon'
     },
     LemoinePoint: {
         activeColor: 'gold',
@@ -219,6 +231,7 @@ const pointStyles = {
         pointSymbol: '●',
         checkboxId: 'LemoinePoint-checkbox',
         displayElementId: 'LemoinePoint',
+        annotationLabel: 'Lemoine'
     },
 };
 
@@ -229,36 +242,42 @@ const circleStyles = {
         inactiveColor: 'lightgray',
         checkboxId: 'incircle-checkbox',
         displayElementId: 'incircle',
+        annotationLabel: 'Incircle'
     },
     circumcircle: {
         activeColor: 'red',
         inactiveColor: 'lightgray',
         checkboxId: 'circumcircle-checkbox',
         displayElementId: 'circumcircle',
+        annotationLabel: 'Circumcircle'
     },
     excircleA: {
         activeColor: 'orange',
         inactiveColor: 'lightgray',
         checkboxId: 'excircleA-checkbox',
         displayElementId: 'excircleA',
+        annotationLabel: 'Excircle (A)'
     },
     excircleB: {
         activeColor: 'orange',
         inactiveColor: 'lightgray',
         checkboxId: 'excircleB-checkbox',
         displayElementId: 'excircleB',
+        annotationLabel: 'Excircle (B)'
     },
     excircleC: {
         activeColor: 'orange',
         inactiveColor: 'lightgray',
         checkboxId: 'excircleC-checkbox',
         displayElementId: 'excircleC',
+        annotationLabel: 'Excircle (C)'
     },
     ninePointCircle: {
         activeColor: 'lightblue',
         inactiveColor: 'lightgray',
         checkboxId: 'ninePointCircle-checkbox',
         displayElementId: 'ninePointCircle',
+        annotationLabel: 'Nine-point'
     },
 };
 
@@ -269,12 +288,14 @@ const triangleStyles = {
         inactiveColor: 'lightgray',
         checkboxId: 'outerNapoleonTriangle-checkbox',
         displayElementId: 'outerNapoleonTriangle',
+        annotationLabel: 'Outer Napoleon'
     },
     innerNapoleonTriangle: {
         activeColor: '#c5956b',
         inactiveColor: 'lightgray',
         checkboxId: 'innerNapoleonTriangle-checkbox',
         displayElementId: 'innerNapoleonTriangle',
+        annotationLabel: 'Inner Napoleon'
     },
 };
 
@@ -316,55 +337,55 @@ function drawCenters(){
     // Draw points based on checkbox state
     if (document.getElementById('centroid-checkbox').checked) {
         const centroid = calculateCentroid(points[0], points[1], points[2]);
-        drawPoint(centroid, 'Centroid', pointStyles.centroid.activeColor);
+        drawPoint(centroid, pointStyles.centroid.annotationLabel, pointStyles.centroid.activeColor);
     }
     if (document.getElementById('circumcenter-checkbox').checked) {
         const circumcenter = calculateCircumcenter();
-        drawPoint(circumcenter, 'Circumcenter', pointStyles.circumcenter.activeColor);
+        drawPoint(circumcenter, pointStyles.circumcenter.annotationLabel, pointStyles.circumcenter.activeColor);
     }
     if (document.getElementById('incenter-checkbox').checked) {
         const incenter = calculateIncenter();
-        drawPoint(incenter, 'Incenter', pointStyles.incenter.activeColor);
+        drawPoint(incenter, pointStyles.incenter.annotationLabel, pointStyles.incenter.activeColor);
     }
     if (document.getElementById('orthocenter-checkbox').checked) {
         const orthocenter = calculateOrthocenter();
-        drawPoint(orthocenter, 'Orthocenter', pointStyles.orthocenter.activeColor);
+        drawPoint(orthocenter, pointStyles.orthocenter.annotationLabel, pointStyles.orthocenter.activeColor);
     }
     if (document.getElementById('excenterA-checkbox').checked) {
         const excenter = calculateExcenter(points[0], points[1], points[2]);
-        drawPoint(excenter, 'Excenter (A)', pointStyles.excenterA.activeColor);
+        drawPoint(excenter, pointStyles.excenterA.annotationLabel, pointStyles.excenterA.activeColor);
     }
     if (document.getElementById('excenterB-checkbox').checked) {
         const excenter = calculateExcenter(points[1], points[0], points[2]);
-        drawPoint(excenter, 'Excenter (B)', pointStyles.excenterB.activeColor);
+        drawPoint(excenter, pointStyles.excenterB.annotationLabel, pointStyles.excenterB.activeColor);
     }
     if (document.getElementById('excenterC-checkbox').checked) {
         const excenter = calculateExcenter(points[2], points[0], points[1]);
-        drawPoint(excenter, 'Excenter (C)', pointStyles.excenterC.activeColor);
+        drawPoint(excenter, pointStyles.excenterC.annotationLabel, pointStyles.excenterC.activeColor);
     }
     if (document.getElementById('FermatPoint-checkbox').checked) {
         const FermatPoint = calculateFermatPoint();
-        drawPoint(FermatPoint, 'Fermat', pointStyles.FermatPoint.activeColor);
+        drawPoint(FermatPoint, pointStyles.FermatPoint.annotationLabel, pointStyles.FermatPoint.activeColor);
     }
     if (document.getElementById('deLongchampsPoint-checkbox').checked) {
         const deLongchampsPoint = calculateDeLongchampsPoint();
-        drawPoint(deLongchampsPoint, 'deLongchampsPoint', pointStyles.deLongchampsPoint.activeColor);
+        drawPoint(deLongchampsPoint, pointStyles.deLongchampsPoint.annotationLabel, pointStyles.deLongchampsPoint.activeColor);
     }
     if (document.getElementById('ninePointCenter-checkbox').checked) {
         const ninePointCenter = calculateNinePointCenter();
-        drawPoint(ninePointCenter, 'Nine-point', pointStyles.ninePointCenter.activeColor);
+        drawPoint(ninePointCenter, pointStyles.ninePointCenter.annotationLabel, pointStyles.ninePointCenter.activeColor);
     }
     if (document.getElementById('firstNapoleonPoint-checkbox').checked) {
         const firstNapoleonPoint = calculateNapoleonPoint(outer = true);
-        drawPoint(firstNapoleonPoint, '1st Napoleon', pointStyles.firstNapoleonPoint.activeColor);
+        drawPoint(firstNapoleonPoint, pointStyles.firstNapoleonPoint.annotationLabel, pointStyles.firstNapoleonPoint.activeColor);
     }
     if (document.getElementById('secondNapoleonPoint-checkbox').checked) {
         const secondNapoleonPoint = calculateNapoleonPoint(outer = false);
-        drawPoint(secondNapoleonPoint, '2nd Napoleon', pointStyles.secondNapoleonPoint.activeColor);
+        drawPoint(secondNapoleonPoint, pointStyles.secondNapoleonPoint.annotationLabel, pointStyles.secondNapoleonPoint.activeColor);
     }
     if (document.getElementById('LemoinePoint-checkbox').checked) {
         const LemoinePoint = calculateLemoinePoint();
-        drawPoint(LemoinePoint, 'Lemoine', pointStyles.LemoinePoint.activeColor);
+        drawPoint(LemoinePoint, pointStyles.LemoinePoint.annotationLabel, pointStyles.LemoinePoint.activeColor);
     }
 }
 
@@ -372,27 +393,27 @@ function drawCircles(){
     // Draw points based on checkbox state
     if (document.getElementById('incircle-checkbox').checked) {
         const incircle = calculateIncircle();
-        drawCircle(incircle, 'Incircle', circleStyles.incircle.activeColor);
+        drawCircle(incircle, circleStyles.incircle.annotationLabel, circleStyles.incircle.activeColor);
     }
     if (document.getElementById('circumcircle-checkbox').checked) {
         const circumcircle = calculateCircumcircle();
-        drawCircle(circumcircle, 'Circumcircle', circleStyles.circumcircle.activeColor);
+        drawCircle(circumcircle, circleStyles.circumcircle.annotationLabel, circleStyles.circumcircle.activeColor);
     }
     if (document.getElementById('excircleA-checkbox').checked) {
         const excircleA = calculateExcircle(points[0], points[1], points[2]);
-        drawCircle(excircleA, 'Excircle (A)', circleStyles.excircleA.activeColor);
+        drawCircle(excircleA, circleStyles.excircleA.annotationLabel, circleStyles.excircleA.activeColor);
     }
     if (document.getElementById('excircleB-checkbox').checked) {
         const excircleB = calculateExcircle(points[1], points[0], points[2]);
-        drawCircle(excircleB, 'Excircle (B)', circleStyles.excircleB.activeColor);
+        drawCircle(excircleB, circleStyles.excircleB.annotationLabel, circleStyles.excircleB.activeColor);
     }
     if (document.getElementById('excircleC-checkbox').checked) {
         const excircleC = calculateExcircle(points[2], points[0], points[1]);
-        drawCircle(excircleC, 'Excircle (C)', circleStyles.excircleC.activeColor);
+        drawCircle(excircleC, circleStyles.excircleC.annotationLabel, circleStyles.excircleC.activeColor);
     }
     if (document.getElementById('ninePointCircle-checkbox').checked) {
         const ninePointCircle = calculateNinePointCircle();
-        drawCircle(ninePointCircle, 'Nine-point', circleStyles.ninePointCircle.activeColor);
+        drawCircle(ninePointCircle, circleStyles.ninePointCircle.annotationLabel, circleStyles.ninePointCircle.activeColor);
     }
 }
 
@@ -400,11 +421,11 @@ function drawTriangles(){
     // Draw points based on checkbox state
     if (document.getElementById('outerNapoleonTriangle-checkbox').checked) {
         const outerNapoleonTriangle = calculateNapoleonTriangle(outer = true);
-        drawTriangle(outerNapoleonTriangle, 'Outer Napoleon', triangleStyles.outerNapoleonTriangle.activeColor);
+        drawTriangle(outerNapoleonTriangle, triangleStyles.outerNapoleonTriangle.annotationLabel, triangleStyles.outerNapoleonTriangle.activeColor);
     }
     if (document.getElementById('innerNapoleonTriangle-checkbox').checked) {
         const innerNapoleonTriangle = calculateNapoleonTriangle(outer = false);
-        drawTriangle(innerNapoleonTriangle, 'Inner Napoleon', triangleStyles.innerNapoleonTriangle.activeColor);
+        drawTriangle(innerNapoleonTriangle, triangleStyles.innerNapoleonTriangle.annotationLabel, triangleStyles.innerNapoleonTriangle.activeColor);
     }
 } 
 
