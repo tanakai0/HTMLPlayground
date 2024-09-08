@@ -86,6 +86,10 @@
         <input type="checkbox" id="secondNapoleonPoint-checkbox" unchecked> 
         <span id="secondNapoleonPoint" class="point-info">● Second Napoleon point</span>
     </p>
+    <p>
+        <input type="checkbox" id="LemoinePoint-checkbox" unchecked> 
+        <span id="LemoinePoint" class="point-info">● Lemoine point</span>
+    </p>
     <p>Circles</p>
     <p>
         <input type="checkbox" id="incircle-checkbox"  unchecked> 
@@ -208,6 +212,13 @@ const pointStyles = {
         pointSymbol: '●',
         checkboxId: 'secondNapoleonPoint-checkbox',
         displayElementId: 'secondNapoleonPoint',
+    },
+    LemoinePoint: {
+        activeColor: 'gold',
+        inactiveColor: 'lightgray',
+        pointSymbol: '●',
+        checkboxId: 'LemoinePoint-checkbox',
+        displayElementId: 'LemoinePoint',
     },
 };
 
@@ -351,6 +362,10 @@ function drawCenters(){
         const secondNapoleonPoint = calculateNapoleonPoint(outer = false);
         drawPoint(secondNapoleonPoint, '2nd Napoleon', pointStyles.secondNapoleonPoint.activeColor);
     }
+    if (document.getElementById('LemoinePoint-checkbox').checked) {
+        const LemoinePoint = calculateLemoinePoint();
+        drawPoint(LemoinePoint, 'Lemoine', pointStyles.LemoinePoint.activeColor);
+    }
 }
 
 function drawCircles(){
@@ -459,6 +474,17 @@ function slope(p1, p2) {
     return (p2.y - p1.y) / (p2.x - p1.x)
 }
 
+function perpendicularSlope(slope) {
+    // Handle cases where slopes might be 0 or undefined (vertical or horizontal lines)
+    if (slope === 0) {
+        return Infinity; // slope is horizontal, perpendicular is vertical
+    } else if (!isFinite(slope)) {
+        return 0; // slope is vertical, perpendicular is horizontal
+    } else {
+        return -1 / slope;
+    }
+}
+
 // Function to rotate a point P around another point O by d degrees
 // Be careful to consider the coordinates in canvas environment
 function rotate(P, O, d) {
@@ -488,6 +514,43 @@ function lineIntersection(P1, P2, Q1, Q2) {
     } else {
         const x = (b2 * c1 - b1 * c2) / determinant;
         const y = (a1 * c2 - a2 * c1) / determinant;
+        return { x, y };
+    }
+}
+
+/**
+ * This function calculates the intersection point of two lines, given their slopes and a point on each line.
+ * The equations of the lines are derived using the point-slope form of a line equation: 
+ * (y - y1) = m(x - x1), where m is the slope and (x1, y1) is a point on the line.
+ * 
+ * Parameters:
+ *  - slope1: The slope of the first line.
+ *  - point1: An object representing a point {x, y} on the first line.
+ *  - slope2: The slope of the second line.
+ *  - point2: An object representing a point {x, y} on the second line.
+ * 
+ * Returns:
+ *  - An object {x, y} representing the intersection point of the two lines.
+ *  - If the lines are parallel (i.e., the slopes are the same), the function returns null.
+ */
+ function lineIntersectionGivenSlopesAndPoints(slope1, point1, slope2, point2) {
+    // Check if the lines are parallel by comparing the slopes
+    if (slope1 === slope2) {
+        return null; // Parallel lines do not intersect
+    } else if (slope1 === Infinity) {
+        // If the line1 is vertical
+        const x = point1.x;
+        const y = slope2 * (x - point2.x) + point2.y;
+        return { x, y };
+    } else if (slope2 === Infinity) {
+        // If the line2 is vertical
+        const x = point2.x;
+        const y = slope1 * (x - point1.x) + point1.y;
+        return { x, y };
+    } else {
+        // Calculate the intersection point using the point-slope formula
+        const x = (slope1 * point1.x - point1.y - slope2 * point2.x + point2.y) / (slope1 - slope2);
+        const y = slope1 * (x - point1.x) + point1.y;
         return { x, y };
     }
 }
@@ -528,40 +591,11 @@ function calculateCircumcenter() {
     const E = { x: (B.x + C.x) / 2, y: (B.y + C.y) / 2 };
 
     // Slopes of perpendicular bisectors
-    const slopeAB = slope(A, B);
-    const slopeBC = slope(B, C);
-    
-    let perpendicularSlopeAB, perpendicularSlopeBC;
-    if (slopeAB === 0) {
-        perpendicularSlopeAB = Infinity;
-    } else {
-        perpendicularSlopeAB = -1 / slopeAB;
-    }
-
-    if (slopeBC === 0) {
-        perpendicularSlopeBC = Infinity;
-    } else {
-        perpendicularSlopeBC = -1 / slopeBC;
-    }
+    const perpendicularSlopeAB = perpendicularSlope(slope(A, B));
+    const perpendicularSlopeBC = perpendicularSlope(slope(B, C));
 
     // Circumcenter calculation
-    if (perpendicularSlopeAB === Infinity) {
-        // Vertical line case for AB
-        const x = D.x;
-        const y = perpendicularSlopeBC * (x - E.x) + E.y;
-        return { x, y };
-    } else if (perpendicularSlopeBC === Infinity) {
-        // Vertical line case for BC
-        const x = E.x;
-        const y = perpendicularSlopeAB * (x - D.x) + D.y;
-        return { x, y };
-    } else {
-        const x = (perpendicularSlopeAB * D.x - perpendicularSlopeBC * E.x + E.y - D.y) / (perpendicularSlopeAB - perpendicularSlopeBC);
-        const y = perpendicularSlopeAB * (x - D.x) + D.y;
-        return { x, y };
-    }
-
-    return { x, y };
+    return lineIntersectionGivenSlopesAndPoints(perpendicularSlopeAB, D, perpendicularSlopeBC, E);
 }
 
 // Function to calculate the incenter (intersection of angle bisectors)
@@ -584,44 +618,11 @@ function calculateIncenter() {
 function calculateOrthocenter() {
     const [A, B, C] = points;
     // Calculate perpendiculars
-    const slopeAB = slope(A, B);
-    const slopeBC = slope(B, C);
-    let perpendicularSlopeAB, perpendicularSlopeBC;
-    // Handle cases where slopes might be 0 or undefined (vertical or horizontal lines)
-    if (slopeAB === 0) {
-        perpendicularSlopeAB = Infinity; // AB is horizontal, perpendicular is vertical
-    } else if (!isFinite(slopeAB)) {
-        perpendicularSlopeAB = 0; // AB is vertical, perpendicular is horizontal
-    } else {
-        perpendicularSlopeAB = -1 / slopeAB;
-    }
-    if (slopeBC === 0) {
-        perpendicularSlopeBC = Infinity; // BC is horizontal, perpendicular is vertical
-    } else if (!isFinite(slopeBC)) {
-        perpendicularSlopeBC = 0; // BC is vertical, perpendicular is horizontal
-    } else {
-        perpendicularSlopeBC = -1 / slopeBC;
-    }
+    const perpendicularSlopeAB = perpendicularSlope(slope(A, B));
+    const perpendicularSlopeBC = perpendicularSlope(slope(B, C));
 
     // Solve for the intersection of the two perpendiculars (Orthocenter)
-    if (perpendicularSlopeAB === Infinity) {
-        // If the perpendicular to AB is vertical
-        const x = C.x;
-        const y = perpendicularSlopeBC * (x - A.x) + A.y;
-        return { x, y };
-    } else if (perpendicularSlopeBC === Infinity) {
-        // If the perpendicular to BC is vertical
-        const x = A.x;
-        const y = perpendicularSlopeAB * (x - C.x) + C.y;
-        return { x, y };
-    } else {
-        // General case where both perpendiculars are not vertical
-        // Equation of the perpendicular from C to AB: y - C.y = perpSlopeAB * (x - C.x)
-        // Equation of the perpendicular from A to BC: y - A.y = perpSlopeBC * (x - A.x)
-        const x = ((perpendicularSlopeAB * C.x - C.y) - (perpendicularSlopeBC * A.x - A.y)) / (perpendicularSlopeAB - perpendicularSlopeBC);
-        const y = perpendicularSlopeAB * (x - C.x) + C.y;
-        return {x, y};
-    }
+    return lineIntersectionGivenSlopesAndPoints(perpendicularSlopeAB, C, perpendicularSlopeBC, A);
 }
 
 // Function to calculate the excenter for the vertex A (intersection of the internal angle bisectors of the vertex and other external angle bisectors)
@@ -699,6 +700,21 @@ function calculateNapoleonPoint(outer = true) {
     const [D, E, F] = calculateNapoleonTriangle(outer = outer);
     return lineIntersection(A, D, B, E);
 }
+
+// Function to calculate the Lemoine point
+function calculateLemoinePoint() {
+    const [A, B, C] = points;
+    // The circumcircle of triangle ABC and the tangents at each vertex.
+    const circumcenter = calculateCircumcenter();
+    const tangentSlopeA = perpendicularSlope(slope(circumcenter, A));
+    const tangentSlopeB = perpendicularSlope(slope(circumcenter, B));
+    const tangentSlopeC = perpendicularSlope(slope(circumcenter, C));
+    // calculate symmedians
+    const P1 = lineIntersectionGivenSlopesAndPoints(tangentSlopeB, B, tangentSlopeC, C);
+    const P2 = lineIntersectionGivenSlopesAndPoints(tangentSlopeA, A, tangentSlopeC, C);
+    return lineIntersection(A, P1, B, P2);
+}
+
 
 // Function to calculate the incircle
 function calculateIncircle() {
@@ -795,12 +811,6 @@ function calculateNapoleonTriangle(outer = true) {
     const R1 = rotate(B, A, rotationRadian);
     const R2 = rotate(C, B, rotationRadian);
     const R3 = rotate(A, C, rotationRadian);
-
-    // return [
-    //     {x: 100, y: 100},
-    //     {x: 200, y: 200},
-    //     {x: 100, y: 300},
-    // ];
 
     // Return the points of the outer Napoleon triangle
     return [
