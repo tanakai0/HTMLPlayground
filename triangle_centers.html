@@ -675,16 +675,11 @@ function calculateFermatPoint() {
 
     // Determine rotation direction based on the cross product of vectors AB and AC
     const crossProduct = (B.x - A.x) * (C.y - A.y) - (B.y - A.y) * (C.x - A.x);
-    var rotateRadian = 0;
-    if (crossProduct > 0){
-        rotateRadian = -60;
-    }
-    else {
-        rotateRadian = 60;
-    }
+    let rotationRadian = crossProduct > 0 ? -60 : 60;
+
     // Calculate rotation points for Fermat point
-    const R1 = rotate(B, A, rotateRadian); // Rotate B 60 degrees around A
-    const R2 = rotate(C, A, -rotateRadian); // Rotate C 60 degrees around A
+    const R1 = rotate(B, A, rotationRadian); // Rotate B 60 degrees around A
+    const R2 = rotate(C, A, -rotationRadian); // Rotate C 60 degrees around A
 
     // Intersection of lines BR2 and CR1 gives the Fermat point
     return lineIntersection(B, R2, C, R1);
