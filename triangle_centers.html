@@ -134,8 +134,7 @@
 const pointStyles = {
     centroid: {
         activeColor: 'blue',
-        inactiveColor: 'lightgray',
-        pointSymbol: '●',
+        inactiveColor: 'lightgray', 
         checkboxId: 'centroid-checkbox',
         displayElementId: 'centroid',
         annotationLabel: 'Centroid',
@@ -143,8 +142,7 @@ const pointStyles = {
     },
     circumcenter: {
         activeColor: 'red',
-        inactiveColor: 'lightgray',
-        pointSymbol: '●',
+        inactiveColor: 'lightgray', 
         checkboxId: 'circumcenter-checkbox',
         displayElementId: 'circumcenter',
         annotationLabel: 'Circumcenter',
@@ -152,8 +150,7 @@ const pointStyles = {
     },
     incenter: {
         activeColor: 'green',
-        inactiveColor: 'lightgray',
-        pointSymbol: '●',
+        inactiveColor: 'lightgray', 
         checkboxId: 'incenter-checkbox',
         displayElementId: 'incenter',
         annotationLabel: 'Incenter',
@@ -161,8 +158,7 @@ const pointStyles = {
     },
     orthocenter: {
         activeColor: 'purple',
-        inactiveColor: 'lightgray',
-        pointSymbol: '●',
+        inactiveColor: 'lightgray', 
         checkboxId: 'orthocenter-checkbox',
         displayElementId: 'orthocenter',
         annotationLabel: 'Orthocenter',
@@ -170,8 +166,7 @@ const pointStyles = {
     },
     excenterA: {
         activeColor: 'orange',
-        inactiveColor: 'lightgray',
-        pointSymbol: '●',
+        inactiveColor: 'lightgray', 
         checkboxId: 'excenterA-checkbox',
         displayElementId: 'excenterA',
         annotationLabel: 'Excenter (A)',
@@ -179,8 +174,7 @@ const pointStyles = {
     },
     excenterB: {
         activeColor: 'orange',
-        inactiveColor: 'lightgray',
-        pointSymbol: '●',
+        inactiveColor: 'lightgray', 
         checkboxId: 'excenterB-checkbox',
         displayElementId: 'excenterB',
         annotationLabel: 'Excenter (B)',
@@ -188,8 +182,7 @@ const pointStyles = {
     },
     excenterC: {
         activeColor: 'orange',
-        inactiveColor: 'lightgray',
-        pointSymbol: '●',
+        inactiveColor: 'lightgray', 
         checkboxId: 'excenterC-checkbox',
         displayElementId: 'excenterC',
         annotationLabel: 'Excenter (C)',
@@ -197,8 +190,7 @@ const pointStyles = {
     },
     FermatPoint: {
         activeColor: 'gray',
-        inactiveColor: 'lightgray',
-        pointSymbol: '●',
+        inactiveColor: 'lightgray', 
         checkboxId: 'FermatPoint-checkbox',
         displayElementId: 'FermatPoint',
         annotationLabel: 'Fermat',
@@ -206,8 +198,7 @@ const pointStyles = {
     },
     deLongchampsPoint: {
         activeColor: '#c54ea0',
-        inactiveColor: 'lightgray',
-        pointSymbol: '●',
+        inactiveColor: 'lightgray', 
         checkboxId: 'deLongchampsPoint-checkbox',
         displayElementId: 'deLongchampsPoint',
         annotationLabel: 'de Longchamps',
@@ -215,8 +206,7 @@ const pointStyles = {
     },
     ninePointCenter: {
         activeColor: 'lightblue',
-        inactiveColor: 'lightgray',
-        pointSymbol: '●',
+        inactiveColor: 'lightgray', 
         checkboxId: 'ninePointCenter-checkbox',
         displayElementId: 'ninePointCenter',
         annotationLabel: 'Nine-point',
@@ -224,8 +214,7 @@ const pointStyles = {
     },
     firstNapoleonPoint: {
         activeColor: 'brown',
-        inactiveColor: 'lightgray',
-        pointSymbol: '●',
+        inactiveColor: 'lightgray', 
         checkboxId: 'firstNapoleonPoint-checkbox',
         displayElementId: 'firstNapoleonPoint',
         annotationLabel: '1st Napoleon',
@@ -233,8 +222,7 @@ const pointStyles = {
     },
     secondNapoleonPoint: {
         activeColor: '#c5956b',
-        inactiveColor: 'lightgray',
-        pointSymbol: '●',
+        inactiveColor: 'lightgray', 
         checkboxId: 'secondNapoleonPoint-checkbox',
         displayElementId: 'secondNapoleonPoint',
         annotationLabel: '2nd Napoleon',
@@ -242,8 +230,7 @@ const pointStyles = {
     },
     LemoinePoint: {
         activeColor: 'gold',
-        inactiveColor: 'lightgray',
-        pointSymbol: '●',
+        inactiveColor: 'lightgray', 
         checkboxId: 'LemoinePoint-checkbox',
         displayElementId: 'LemoinePoint',
         annotationLabel: 'Lemoine',
@@ -643,7 +630,7 @@ function drawCircle(circle, label = '', color = 'black') {
     ctx.stroke();
     if (label){
         ctx.fillStyle = color;
-        ctx.fillText(label, circle.center.x, circle.center.y);
+        ctx.fillText(label, circle.center.x, circle.center.y + circle.radius + 15);
     }
 }
 
