@@ -37,92 +37,95 @@
     <p>Side lengths: AB = <span id="ab-length"></span>, BC = <span id="bc-length"></span>, CA = <span id="ca-length"></span></p>
     <p>Acute angles: ∠A = <span id="a-angle"></span>, ∠B = <span id="b-angle"></span>, ∠C = <span id="c-angle"></span></p>
     <p>Area: <span id="area"></span></p>
+    <p>
+        <button id="uncheck-all-btn">Uncheck all checkboxes</button>
+    </p>
     <p>Centers</p>
     <p>
         <input type="checkbox" id="centroid-checkbox" checked> 
-        <span id="centroid" class="point-info">● Centroid</span>
+        <span id="centroid" class="point-info"></span>
     </p>
     <p>
         <input type="checkbox" id="circumcenter-checkbox" checked> 
-        <span id="circumcenter" class="point-info">● Circumcenter</span>
+        <span id="circumcenter" class="point-info"></span>
     </p>
     <p>
         <input type="checkbox" id="incenter-checkbox" checked> 
-        <span id="incenter" class="point-info">● Incenter</span>
+        <span id="incenter" class="point-info"></span>
     </p>
     <p>
         <input type="checkbox" id="orthocenter-checkbox" checked> 
-        <span id="orthocenter" class="point-info">● Orthocenter</span>
+        <span id="orthocenter" class="point-info"></span>
     </p>
     <p>
         <input type="checkbox" id="excenterA-checkbox" checked> 
-        <span id="excenterA" class="point-info">● Excenter opposite to vertex A</span>
+        <span id="excenterA" class="point-info"></span>
     </p>
     <p>
         <input type="checkbox" id="excenterB-checkbox" checked> 
-        <span id="excenterB" class="point-info">● Excenter opposite to vertex B</span>
+        <span id="excenterB" class="point-info"></span>
     </p>
     <p>
         <input type="checkbox" id="excenterC-checkbox" checked> 
-        <span id="excenterC" class="point-info">● Excenter opposite to vertex C</span>
+        <span id="excenterC" class="point-info"></span>
     </p>
     <p>
         <input type="checkbox" id="FermatPoint-checkbox" unchecked> 
-        <span id="FermatPoint" class="point-info">● Fermat point</span>
+        <span id="FermatPoint" class="point-info"></span>
     </p>
     <p>
         <input type="checkbox" id="deLongchampsPoint-checkbox" unchecked> 
-        <span id="deLongchampsPoint" class="point-info">● de Longchamps point</span>
+        <span id="deLongchampsPoint" class="point-info"></span>
     </p>
     <p>
         <input type="checkbox" id="ninePointCenter-checkbox" unchecked> 
-        <span id="ninePointCenter" class="point-info">● Nine-point center</span>
+        <span id="ninePointCenter" class="point-info"></span>
     </p>
     <p>
         <input type="checkbox" id="firstNapoleonPoint-checkbox" unchecked> 
-        <span id="firstNapoleonPoint" class="point-info">● First Napoleon point</span>
+        <span id="firstNapoleonPoint" class="point-info"></span>
     </p>
     <p>
         <input type="checkbox" id="secondNapoleonPoint-checkbox" unchecked> 
-        <span id="secondNapoleonPoint" class="point-info">● Second Napoleon point</span>
+        <span id="secondNapoleonPoint" class="point-info"></span>
     </p>
     <p>
         <input type="checkbox" id="LemoinePoint-checkbox" unchecked> 
-        <span id="LemoinePoint" class="point-info">● Lemoine point</span>
+        <span id="LemoinePoint" class="point-info"></span>
     </p>
     <p>Circles</p>
     <p>
         <input type="checkbox" id="incircle-checkbox"  unchecked> 
-        <span id="incircle" class="circle-info">○ Incircle</span>
+        <span id="incircle" class="circle-info"></span>
     </p>
     <p>
         <input type="checkbox" id="circumcircle-checkbox" unchecked> 
-        <span id="circumcircle" class="circle-info">○ Circumcircle</span>
+        <span id="circumcircle" class="circle-info"></span>
     </p>
     <p>
         <input type="checkbox" id="excircleA-checkbox" unchecked> 
-        <span id="excircleA" class="circle-info">○ Excircle opposite to vertex A</span>
+        <span id="excircleA" class="circle-info"></span>
     </p>
     <p>
         <input type="checkbox" id="excircleB-checkbox" unchecked> 
-        <span id="excircleB" class="circle-info">○ Excircle opposite to vertex B</span>
+        <span id="excircleB" class="circle-info"></span>
     </p>
     <p>
         <input type="checkbox" id="excircleC-checkbox" unchecked> 
-        <span id="excircleC" class="circle-info">○ Excircle opposite to vertex C</span>
+        <span id="excircleC" class="circle-info"></span>
     </p>
     <p>
         <input type="checkbox" id="ninePointCircle-checkbox" unchecked> 
-        <span id="ninePointCircle" class="circle-info">○ Nine-point circle</span>
+        <span id="ninePointCircle" class="circle-info"></span>
     </p>
     <p>Triangles</p>
     <p>
         <input type="checkbox" id="outerNapoleonTriangle-checkbox" unchecked> 
-        <span id="outerNapoleonTriangle" class="circle-info">△ Outer Napoleon triangle</span>
+        <span id="outerNapoleonTriangle" class="circle-info"></span>
     </p>
     <p>
         <input type="checkbox" id="innerNapoleonTriangle-checkbox" unchecked> 
-        <span id="innerNapoleonTriangle" class="circle-info">△ Inner Napoleon triangle</span>
+        <span id="innerNapoleonTriangle" class="circle-info"></span>
     </p>    
 </div>
 
@@ -136,6 +139,7 @@ const pointStyles = {
         checkboxId: 'centroid-checkbox',
         displayElementId: 'centroid',
         annotationLabel: 'Centroid',
+        informationText: '● Centroid'
     },
     circumcenter: {
         activeColor: 'red',
@@ -144,6 +148,7 @@ const pointStyles = {
         checkboxId: 'circumcenter-checkbox',
         displayElementId: 'circumcenter',
         annotationLabel: 'Circumcenter',
+        informationText: '● Circumcenter'
     },
     incenter: {
         activeColor: 'green',
@@ -151,7 +156,8 @@ const pointStyles = {
         pointSymbol: '●',
         checkboxId: 'incenter-checkbox',
         displayElementId: 'incenter',
-        annotationLabel: 'Incenter'
+        annotationLabel: 'Incenter',
+        informationText: '● Incenter',
     },
     orthocenter: {
         activeColor: 'purple',
@@ -159,7 +165,8 @@ const pointStyles = {
         pointSymbol: '●',
         checkboxId: 'orthocenter-checkbox',
         displayElementId: 'orthocenter',
-        annotationLabel: 'Orthocenter'
+        annotationLabel: 'Orthocenter',
+        informationText: '● Orthocenter',
     },
     excenterA: {
         activeColor: 'orange',
@@ -167,7 +174,8 @@ const pointStyles = {
         pointSymbol: '●',
         checkboxId: 'excenterA-checkbox',
         displayElementId: 'excenterA',
-        annotationLabel: 'Excenter (A)'
+        annotationLabel: 'Excenter (A)',
+        informationText: '● Excenter opposite to vertex A',
     },
     excenterB: {
         activeColor: 'orange',
@@ -175,7 +183,8 @@ const pointStyles = {
         pointSymbol: '●',
         checkboxId: 'excenterB-checkbox',
         displayElementId: 'excenterB',
-        annotationLabel: 'Excenter (B)'
+        annotationLabel: 'Excenter (B)',
+        informationText: '● Excenter opposite to vertex B',
     },
     excenterC: {
         activeColor: 'orange',
@@ -183,7 +192,8 @@ const pointStyles = {
         pointSymbol: '●',
         checkboxId: 'excenterC-checkbox',
         displayElementId: 'excenterC',
-        annotationLabel: 'Excenter (C)'
+        annotationLabel: 'Excenter (C)',
+        informationText: '● Excenter opposite to vertex C',
     },
     FermatPoint: {
         activeColor: 'gray',
@@ -191,7 +201,8 @@ const pointStyles = {
         pointSymbol: '●',
         checkboxId: 'FermatPoint-checkbox',
         displayElementId: 'FermatPoint',
-        annotationLabel: 'Fermat'
+        annotationLabel: 'Fermat',
+        informationText: '● Fermat point',
     },
     deLongchampsPoint: {
         activeColor: '#c54ea0',
@@ -199,7 +210,8 @@ const pointStyles = {
         pointSymbol: '●',
         checkboxId: 'deLongchampsPoint-checkbox',
         displayElementId: 'deLongchampsPoint',
-        annotationLabel: 'de Longchamps'
+        annotationLabel: 'de Longchamps',
+        informationText: '● de Longchamps point',
     },
     ninePointCenter: {
         activeColor: 'lightblue',
@@ -207,7 +219,8 @@ const pointStyles = {
         pointSymbol: '●',
         checkboxId: 'ninePointCenter-checkbox',
         displayElementId: 'ninePointCenter',
-        annotationLabel: 'Nine-point'
+        annotationLabel: 'Nine-point',
+        informationText: '● Nine-point center',
     },
     firstNapoleonPoint: {
         activeColor: 'brown',
@@ -215,7 +228,8 @@ const pointStyles = {
         pointSymbol: '●',
         checkboxId: 'firstNapoleonPoint-checkbox',
         displayElementId: 'firstNapoleonPoint',
-        annotationLabel: '1st Napoleon'
+        annotationLabel: '1st Napoleon',
+        informationText: '● First Napoleon point',
     },
     secondNapoleonPoint: {
         activeColor: '#c5956b',
@@ -223,7 +237,8 @@ const pointStyles = {
         pointSymbol: '●',
         checkboxId: 'secondNapoleonPoint-checkbox',
         displayElementId: 'secondNapoleonPoint',
-        annotationLabel: '2nd Napoleon'
+        annotationLabel: '2nd Napoleon',
+        informationText: '● Second Napoleon point',
     },
     LemoinePoint: {
         activeColor: 'gold',
@@ -231,7 +246,8 @@ const pointStyles = {
         pointSymbol: '●',
         checkboxId: 'LemoinePoint-checkbox',
         displayElementId: 'LemoinePoint',
-        annotationLabel: 'Lemoine'
+        annotationLabel: 'Lemoine',
+        informationText: '● Lemoine point',
     },
 };
 
@@ -242,42 +258,48 @@ const circleStyles = {
         inactiveColor: 'lightgray',
         checkboxId: 'incircle-checkbox',
         displayElementId: 'incircle',
-        annotationLabel: 'Incircle'
+        annotationLabel: 'Incircle',
+        informationText: '○ Incircle',
     },
     circumcircle: {
         activeColor: 'red',
         inactiveColor: 'lightgray',
         checkboxId: 'circumcircle-checkbox',
         displayElementId: 'circumcircle',
-        annotationLabel: 'Circumcircle'
+        annotationLabel: 'Circumcircle',
+        informationText: '○ Circumcircle',
     },
     excircleA: {
         activeColor: 'orange',
         inactiveColor: 'lightgray',
         checkboxId: 'excircleA-checkbox',
         displayElementId: 'excircleA',
-        annotationLabel: 'Excircle (A)'
+        annotationLabel: 'Excircle (A)',
+        informationText: '○ Excircle opposite to vertex A',
     },
     excircleB: {
         activeColor: 'orange',
         inactiveColor: 'lightgray',
         checkboxId: 'excircleB-checkbox',
         displayElementId: 'excircleB',
-        annotationLabel: 'Excircle (B)'
+        annotationLabel: 'Excircle (B)',
+        informationText: '○ Excircle opposite to vertex B',
     },
     excircleC: {
         activeColor: 'orange',
         inactiveColor: 'lightgray',
         checkboxId: 'excircleC-checkbox',
         displayElementId: 'excircleC',
-        annotationLabel: 'Excircle (C)'
+        annotationLabel: 'Excircle (C)',
+        informationText: '○ Excircle opposite to vertex C',
     },
     ninePointCircle: {
         activeColor: 'lightblue',
         inactiveColor: 'lightgray',
         checkboxId: 'ninePointCircle-checkbox',
         displayElementId: 'ninePointCircle',
-        annotationLabel: 'Nine-point'
+        annotationLabel: 'Nine-point',
+        informationText: '○ Nine-point circle',
     },
 };
 
@@ -288,14 +310,16 @@ const triangleStyles = {
         inactiveColor: 'lightgray',
         checkboxId: 'outerNapoleonTriangle-checkbox',
         displayElementId: 'outerNapoleonTriangle',
-        annotationLabel: 'Outer Napoleon'
+        annotationLabel: 'Outer Napoleon',
+        informationText: '△ Outer Napoleon triangle',
     },
     innerNapoleonTriangle: {
         activeColor: '#c5956b',
         inactiveColor: 'lightgray',
         checkboxId: 'innerNapoleonTriangle-checkbox',
         displayElementId: 'innerNapoleonTriangle',
-        annotationLabel: 'Inner Napoleon'
+        annotationLabel: 'Inner Napoleon',
+        informationText: '△ Inner Napoleon triangle',
     },
 };
 
@@ -313,10 +337,177 @@ const scaleFactor = 0.01; // Factor to scale down distances
 const canvas = document.getElementById('triangleCanvas');
 const ctx = canvas.getContext('2d');
 
+const allCheckboxIds = [
+        ...Object.values(pointStyles).map(style => style.checkboxId),
+        ...Object.values(circleStyles).map(style => style.checkboxId),
+        ...Object.values(triangleStyles).map(style => style.checkboxId)
+    ];
+
 // Initial drawing
+initializeStyles();
 reDraw();
 
-// Function to draw the triangle
+// Function to initialize styles (run once at the start)
+function initializeStyles() {
+    // Combine pointStyles, circleStyles, triangleStyles into one array of style objects
+    const allStyles = [...Object.values(pointStyles), ...Object.values(circleStyles), ...Object.values(triangleStyles)];
+
+    allStyles.forEach(style => {
+        const displayElement = document.getElementById(style.displayElementId); // Get the element
+        // Update the display text using informationText
+        if (style.informationText && displayElement) {
+            displayElement.textContent = style.informationText;
+        }
+    });
+}
+
+// Function to redraw the canvas
+function reDraw(){
+    drawOriginalTriangle();
+    drawCenters();
+    drawCircles();
+    drawTriangles();
+    updateInfo();
+    applyStyles();
+}
+
+// Function to update the information display
+function updateInfo() {
+    const [A, B, C] = points;
+
+    // Side lengths
+    document.getElementById('ab-length').textContent = (calculateDistance(A, B) * scaleFactor).toFixed(2);
+    document.getElementById('bc-length').textContent = (calculateDistance(B, C) * scaleFactor).toFixed(2);
+    document.getElementById('ca-length').textContent = (calculateDistance(C, A) * scaleFactor).toFixed(2);
+
+    // Acute angles
+    document.getElementById('a-angle').textContent = calculateAngle(B, A, C).toFixed(2);
+    document.getElementById('b-angle').textContent = calculateAngle(A, B, C).toFixed(2);
+    document.getElementById('c-angle').textContent = calculateAngle(A, C, B).toFixed(2);
+
+    // Area
+    document.getElementById('area').textContent = (calculateArea() * scaleFactor**2).toFixed(2);
+}
+
+// Function to apply styles based on checkbox state
+function applyStyles() {
+    Object.keys(pointStyles).forEach(key => {
+        const style = pointStyles[key];
+        const checkbox = document.getElementById(style.checkboxId);
+        const displayElement = document.getElementById(style.displayElementId);
+
+        if (checkbox.checked) {
+            displayElement.style.color = style.activeColor;
+            displayElement.classList.remove('disabled');
+        } else {
+            displayElement.style.color = style.inactiveColor;
+            displayElement.classList.add('disabled');
+        }
+    // Update the display text using informationText
+    if (style.informationText) {
+    displayElement.textContent = style.informationText;
+    }
+    });
+    Object.keys(circleStyles).forEach(key => {
+        const style = circleStyles[key];
+        const checkbox = document.getElementById(style.checkboxId);
+        const displayElement = document.getElementById(style.displayElementId);
+
+        if (checkbox.checked) {
+            displayElement.style.color = style.activeColor;
+            displayElement.classList.remove('disabled');
+        } else {
+            displayElement.style.color = style.inactiveColor;
+            displayElement.classList.add('disabled');
+        }
+    });
+    Object.keys(triangleStyles).forEach(key => {
+        const style = triangleStyles[key];
+        const checkbox = document.getElementById(style.checkboxId);
+        const displayElement = document.getElementById(style.displayElementId);
+
+        if (checkbox.checked) {
+            displayElement.style.color = style.activeColor;
+            displayElement.classList.remove('disabled');
+        } else {
+            displayElement.style.color = style.inactiveColor;
+            displayElement.classList.add('disabled');
+        }
+    });
+}
+
+// Mouse events
+canvas.addEventListener('mousedown', (e) => {
+    const mouseX = e.offsetX;
+    const mouseY = e.offsetY;
+    selectedPoint = getSelectedPoint(mouseX, mouseY);
+});
+
+canvas.addEventListener('mousemove', (e) => {
+    if (selectedPoint) {
+        selectedPoint.x = e.offsetX;
+        selectedPoint.y = e.offsetY;
+        requestAnimationFrame(reDraw);
+    }
+});
+
+canvas.addEventListener('mouseup', () => {
+    selectedPoint = null;
+});
+
+// Function to check if a point is being dragged
+function getSelectedPoint(mouseX, mouseY) {
+    return points.find(point => {
+        const dist = Math.sqrt((point.x - mouseX) ** 2 + (point.y - mouseY) ** 2);
+        return dist < 10; // If within 10px, select the point
+    });
+}
+
+// Touch events
+canvas.addEventListener('touchstart', (e) => {
+    e.preventDefault(); // Prevent page scroll on touch start
+    const touch = e.touches[0]; // First touch point
+    const rect = canvas.getBoundingClientRect();
+    const touchX = touch.clientX - rect.left;
+    const touchY = touch.clientY - rect.top;
+    selectedPoint = getSelectedPoint(touchX, touchY);
+});
+
+canvas.addEventListener('touchmove', (e) => {
+    if (selectedPoint) {
+        const touch = e.touches[0];
+        const rect = canvas.getBoundingClientRect();
+        selectedPoint.x = touch.clientX - rect.left;
+        selectedPoint.y = touch.clientY - rect.top;
+        requestAnimationFrame(reDraw); // Use requestAnimationFrame for smoother updates
+    }
+    e.preventDefault(); // Prevent scrolling while dragging
+});
+
+canvas.addEventListener('touchend', () => {
+    selectedPoint = null;
+});
+
+// Event listeners for checkboxes
+allCheckboxIds.forEach(id => {
+    document.getElementById(id).addEventListener('change', () => {
+        reDraw();
+    });
+});
+
+// Event listener for unchecking all checkboxes
+document.getElementById('uncheck-all-btn').addEventListener('click', () => {
+    // Uncheck all checkboxes
+    allCheckboxIds.forEach(id => {
+        const checkbox = document.getElementById(id);
+        if (checkbox) {
+            checkbox.checked = false; // Set the checkbox to unchecked
+        }
+    });
+    reDraw();
+});
+
+// Function to draw the original triangle
 function drawOriginalTriangle() {
     ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
     ctx.beginPath();
@@ -336,55 +527,55 @@ function drawOriginalTriangle() {
 function drawCenters(){
     // Draw points based on checkbox state
     if (document.getElementById('centroid-checkbox').checked) {
-        const centroid = calculateCentroid(points[0], points[1], points[2]);
+        const centroid = calculateCentroid(points);
         drawPoint(centroid, pointStyles.centroid.annotationLabel, pointStyles.centroid.activeColor);
     }
     if (document.getElementById('circumcenter-checkbox').checked) {
-        const circumcenter = calculateCircumcenter();
+        const circumcenter = calculateCircumcenter(points);
         drawPoint(circumcenter, pointStyles.circumcenter.annotationLabel, pointStyles.circumcenter.activeColor);
     }
     if (document.getElementById('incenter-checkbox').checked) {
-        const incenter = calculateIncenter();
+        const incenter = calculateIncenter(points);
         drawPoint(incenter, pointStyles.incenter.annotationLabel, pointStyles.incenter.activeColor);
     }
     if (document.getElementById('orthocenter-checkbox').checked) {
-        const orthocenter = calculateOrthocenter();
+        const orthocenter = calculateOrthocenter(points);
         drawPoint(orthocenter, pointStyles.orthocenter.annotationLabel, pointStyles.orthocenter.activeColor);
     }
     if (document.getElementById('excenterA-checkbox').checked) {
-        const excenter = calculateExcenter(points[0], points[1], points[2]);
+        const excenter = calculateExcenter([points[0], points[1], points[2]]);
         drawPoint(excenter, pointStyles.excenterA.annotationLabel, pointStyles.excenterA.activeColor);
     }
     if (document.getElementById('excenterB-checkbox').checked) {
-        const excenter = calculateExcenter(points[1], points[0], points[2]);
+        const excenter = calculateExcenter([points[1], points[0], points[2]]);
         drawPoint(excenter, pointStyles.excenterB.annotationLabel, pointStyles.excenterB.activeColor);
     }
     if (document.getElementById('excenterC-checkbox').checked) {
-        const excenter = calculateExcenter(points[2], points[0], points[1]);
+        const excenter = calculateExcenter([points[2], points[0], points[1]]);
         drawPoint(excenter, pointStyles.excenterC.annotationLabel, pointStyles.excenterC.activeColor);
     }
     if (document.getElementById('FermatPoint-checkbox').checked) {
-        const FermatPoint = calculateFermatPoint();
+        const FermatPoint = calculateFermatPoint(points);
         drawPoint(FermatPoint, pointStyles.FermatPoint.annotationLabel, pointStyles.FermatPoint.activeColor);
     }
     if (document.getElementById('deLongchampsPoint-checkbox').checked) {
-        const deLongchampsPoint = calculateDeLongchampsPoint();
+        const deLongchampsPoint = calculateDeLongchampsPoint(points);
         drawPoint(deLongchampsPoint, pointStyles.deLongchampsPoint.annotationLabel, pointStyles.deLongchampsPoint.activeColor);
     }
     if (document.getElementById('ninePointCenter-checkbox').checked) {
-        const ninePointCenter = calculateNinePointCenter();
+        const ninePointCenter = calculateNinePointCenter(points);
         drawPoint(ninePointCenter, pointStyles.ninePointCenter.annotationLabel, pointStyles.ninePointCenter.activeColor);
     }
     if (document.getElementById('firstNapoleonPoint-checkbox').checked) {
-        const firstNapoleonPoint = calculateNapoleonPoint(outer = true);
+        const firstNapoleonPoint = calculateNapoleonPoint(points, outer = true);
         drawPoint(firstNapoleonPoint, pointStyles.firstNapoleonPoint.annotationLabel, pointStyles.firstNapoleonPoint.activeColor);
     }
     if (document.getElementById('secondNapoleonPoint-checkbox').checked) {
-        const secondNapoleonPoint = calculateNapoleonPoint(outer = false);
+        const secondNapoleonPoint = calculateNapoleonPoint(points, outer = false);
         drawPoint(secondNapoleonPoint, pointStyles.secondNapoleonPoint.annotationLabel, pointStyles.secondNapoleonPoint.activeColor);
     }
     if (document.getElementById('LemoinePoint-checkbox').checked) {
-        const LemoinePoint = calculateLemoinePoint();
+        const LemoinePoint = calculateLemoinePoint(points);
         drawPoint(LemoinePoint, pointStyles.LemoinePoint.annotationLabel, pointStyles.LemoinePoint.activeColor);
     }
 }
@@ -392,27 +583,27 @@ function drawCenters(){
 function drawCircles(){
     // Draw points based on checkbox state
     if (document.getElementById('incircle-checkbox').checked) {
-        const incircle = calculateIncircle();
+        const incircle = calculateIncircle(points);
         drawCircle(incircle, circleStyles.incircle.annotationLabel, circleStyles.incircle.activeColor);
     }
     if (document.getElementById('circumcircle-checkbox').checked) {
-        const circumcircle = calculateCircumcircle();
+        const circumcircle = calculateCircumcircle(points);
         drawCircle(circumcircle, circleStyles.circumcircle.annotationLabel, circleStyles.circumcircle.activeColor);
     }
     if (document.getElementById('excircleA-checkbox').checked) {
-        const excircleA = calculateExcircle(points[0], points[1], points[2]);
+        const excircleA = calculateExcircle([points[0], points[1], points[2]]);
         drawCircle(excircleA, circleStyles.excircleA.annotationLabel, circleStyles.excircleA.activeColor);
     }
     if (document.getElementById('excircleB-checkbox').checked) {
-        const excircleB = calculateExcircle(points[1], points[0], points[2]);
+        const excircleB = calculateExcircle([points[1], points[0], points[2]]);
         drawCircle(excircleB, circleStyles.excircleB.annotationLabel, circleStyles.excircleB.activeColor);
     }
     if (document.getElementById('excircleC-checkbox').checked) {
-        const excircleC = calculateExcircle(points[2], points[0], points[1]);
+        const excircleC = calculateExcircle([points[2], points[0], points[1]]);
         drawCircle(excircleC, circleStyles.excircleC.annotationLabel, circleStyles.excircleC.activeColor);
     }
     if (document.getElementById('ninePointCircle-checkbox').checked) {
-        const ninePointCircle = calculateNinePointCircle();
+        const ninePointCircle = calculateNinePointCircle(points);
         drawCircle(ninePointCircle, circleStyles.ninePointCircle.annotationLabel, circleStyles.ninePointCircle.activeColor);
     }
 }
@@ -420,11 +611,11 @@ function drawCircles(){
 function drawTriangles(){
     // Draw points based on checkbox state
     if (document.getElementById('outerNapoleonTriangle-checkbox').checked) {
-        const outerNapoleonTriangle = calculateNapoleonTriangle(outer = true);
+        const outerNapoleonTriangle = calculateNapoleonTriangle(points, outer = true);
         drawTriangle(outerNapoleonTriangle, triangleStyles.outerNapoleonTriangle.annotationLabel, triangleStyles.outerNapoleonTriangle.activeColor);
     }
     if (document.getElementById('innerNapoleonTriangle-checkbox').checked) {
-        const innerNapoleonTriangle = calculateNapoleonTriangle(outer = false);
+        const innerNapoleonTriangle = calculateNapoleonTriangle(points, outer = false);
         drawTriangle(innerNapoleonTriangle, triangleStyles.innerNapoleonTriangle.annotationLabel, triangleStyles.innerNapoleonTriangle.activeColor);
     }
 } 
@@ -478,7 +669,6 @@ function drawTriangle(triangle, label = '', color = 'black') {
     }
 }
 
-// utils
 function vectorSubtract(p1, p2) {
     return { x: p1.x - p2.x, y: p1.y - p2.y };
 }
@@ -597,14 +787,15 @@ function calculateArea() {
 }
 
 // Function to calculate the centroid of the triangle
-function calculateCentroid(A, B, C) {
+function calculateCentroid(points) {
+    const [A, B, C] = points;
     const x = ((A.x + B.x + C.x) / 3);
     const y = ((A.y + B.y + C.y) / 3);
     return { x, y };
 }
 
 // Function to calculate the circumcenter (intersection of perpendicular bisectors)
-function calculateCircumcenter() {
+function calculateCircumcenter(points) {
     const [A, B, C] = points;
 
     // Midpoints of sides
@@ -620,7 +811,7 @@ function calculateCircumcenter() {
 }
 
 // Function to calculate the incenter (intersection of angle bisectors)
-function calculateIncenter() {
+function calculateIncenter(points) {
     const [A, B, C] = points;
 
     // Lengths of the sides
@@ -636,7 +827,7 @@ function calculateIncenter() {
 }
 
 // Function to calculate the orthocenter (intersection of perpendiculars)
-function calculateOrthocenter() {
+function calculateOrthocenter(points) {
     const [A, B, C] = points;
     // Calculate perpendiculars
     const perpendicularSlopeAB = perpendicularSlope(slope(A, B));
@@ -647,7 +838,8 @@ function calculateOrthocenter() {
 }
 
 // Function to calculate the excenter for the vertex A (intersection of the internal angle bisectors of the vertex and other external angle bisectors)
-function calculateExcenter(A, B, C) {
+function calculateExcenter(points) {
+    const [A, B, C] = points;
     // Lengths of the triangle sides opposite to each vertex
     const a =  calculateDistance(B, C); // Length of side BC
     const b =  calculateDistance(A, C); // Length of side CA
@@ -661,7 +853,7 @@ function calculateExcenter(A, B, C) {
 }
 
 // Function to calculate the Fermat point such that the sum of the distances from three vertices to the point is the smallest
-function calculateFermatPoint() {
+function calculateFermatPoint(points) {
     const [A, B, C] = points;
     
     // Check for angles >= 120 degrees
@@ -686,10 +878,10 @@ function calculateFermatPoint() {
 }
 
 // Function to calculate the de Longchamps point that is the reflection of the orthocenter of the triangle about the circumcenter
-function calculateDeLongchampsPoint() {
+function calculateDeLongchampsPoint(points) {
     const [A, B, C] = points;
-    const orthocenter = calculateOrthocenter();
-    const circumcenter = calculateCircumcenter();
+    const orthocenter = calculateOrthocenter(points);
+    const circumcenter = calculateCircumcenter(points);
     return {
         x: 2 * circumcenter.x - orthocenter.x,
         y: 2 * circumcenter.y - orthocenter.y,
@@ -697,12 +889,12 @@ function calculateDeLongchampsPoint() {
 }
 
 // Function to calculate the nine point center
-function calculateNinePointCenter() {
+function calculateNinePointCenter(points) {
     // Calculate the center and radius
     // The center is the midpoint between the orthocenter and circumcenter.
     // The radius is half of the circumradius.
-    const orthocenter = calculateOrthocenter();
-    const circumcircle = calculateCircumcircle();
+    const orthocenter = calculateOrthocenter(points);
+    const circumcircle = calculateCircumcircle(points);
     const circumcenter = circumcircle.center;
     return {
         x: (orthocenter.x + circumcenter.x)/2,
@@ -711,17 +903,17 @@ function calculateNinePointCenter() {
 }
 
 // Function to calculate the Napoleon points
-function calculateNapoleonPoint(outer = true) {
+function calculateNapoleonPoint(points, outer = true) {
     const [A, B, C] = points;
-    const [D, E, F] = calculateNapoleonTriangle(outer = outer);
+    const [D, E, F] = calculateNapoleonTriangle(points, outer = outer);
     return lineIntersection(A, D, B, E);
 }
 
 // Function to calculate the Lemoine point
-function calculateLemoinePoint() {
+function calculateLemoinePoint(points) {
     const [A, B, C] = points;
     // The circumcircle of triangle ABC and the tangents at each vertex.
-    const circumcenter = calculateCircumcenter();
+    const circumcenter = calculateCircumcenter(points);
     const tangentSlopeA = perpendicularSlope(slope(circumcenter, A));
     const tangentSlopeB = perpendicularSlope(slope(circumcenter, B));
     const tangentSlopeC = perpendicularSlope(slope(circumcenter, C));
@@ -733,11 +925,11 @@ function calculateLemoinePoint() {
 
 
 // Function to calculate the incircle
-function calculateIncircle() {
+function calculateIncircle(points) {
     const [A, B, C] = points;
     
     // Calculate the incenter (already defined)
-    const incenter = calculateIncenter();
+    const incenter = calculateIncenter(points);
 
     // Calculate the radius of the incircle using the formula: 2 * area / (a + b + c)
     const a = calculateDistance(B, C);
@@ -755,11 +947,11 @@ function calculateIncircle() {
 
 
 // Function to calculate the circumcircle
-function calculateCircumcircle() {
+function calculateCircumcircle(points) {
     const [A, B, C] = points;
     
     // Calculate the circumcenter (already defined)
-    const center = calculateCircumcenter();
+    const center = calculateCircumcenter(points);
 
     // Calculate the circumradius using the formula R = (a * b * c) / (4 * area)
     const a = calculateDistance(B, C);
@@ -776,9 +968,11 @@ function calculateCircumcircle() {
 }
 
 // Function to calculate the excircle opposite to the vertex A
-function calculateExcircle(A, B, C) {
+function calculateExcircle(points) {
+    const [A, B, C] = points;
+
     // Calculate the center (already defined)
-    const center = calculateExcenter(A, B, C);
+    const center = calculateExcenter([A, B, C]);
 
     // Calculate the radius using the formula: 2 * area / (-a + b + c)
     const a = calculateDistance(B, C);
@@ -795,23 +989,21 @@ function calculateExcircle(A, B, C) {
 }
 
 // Function to calculate the nine-point circle
-function calculateNinePointCircle() {
-    const [A, B, C] = points;
-
+function calculateNinePointCircle(points) {
     // Calculate the center and radius
     // The center is the midpoint between the orthocenter and circumcenter.
     // The radius is half of the circumradius.
-    const circumcircle = calculateCircumcircle();
+    const circumcircle = calculateCircumcircle(points);
 
     // Return the circle object with center and radius
     return {
-        center: calculateNinePointCenter(),
+        center: calculateNinePointCenter(points),
         radius: circumcircle.radius / 2
     };
 }
 
 // Function to calculate the outer Napoleon triangle
-function calculateNapoleonTriangle(outer = true) {
+function calculateNapoleonTriangle(points, outer = true) {
     const [A, B, C] = points;
 
     // Calculate the outer equilateral triangle on each side
@@ -830,152 +1022,12 @@ function calculateNapoleonTriangle(outer = true) {
 
     // Return the points of the outer Napoleon triangle
     return [
-        calculateCentroid(B, C, R2),
-        calculateCentroid(C, A, R3),
-        calculateCentroid(A, B, R1)
+        calculateCentroid([B, C, R2]),
+        calculateCentroid([C, A, R3]),
+        calculateCentroid([A, B, R1])
     ];
 }
 
-
-// Function to update the information display
-function updateInfo() {
-    const [A, B, C] = points;
-
-    // Side lengths
-    document.getElementById('ab-length').textContent = (calculateDistance(A, B) * scaleFactor).toFixed(2);
-    document.getElementById('bc-length').textContent = (calculateDistance(B, C) * scaleFactor).toFixed(2);
-    document.getElementById('ca-length').textContent = (calculateDistance(C, A) * scaleFactor).toFixed(2);
-
-    // Acute angles
-    document.getElementById('a-angle').textContent = calculateAngle(B, A, C).toFixed(2);
-    document.getElementById('b-angle').textContent = calculateAngle(A, B, C).toFixed(2);
-    document.getElementById('c-angle').textContent = calculateAngle(A, C, B).toFixed(2);
-
-    // Area
-    document.getElementById('area').textContent = (calculateArea() * scaleFactor**2).toFixed(2);
-}
-
-// Function to apply styles based on checkbox state
-function applyStyles() {
-    Object.keys(pointStyles).forEach(key => {
-        const style = pointStyles[key];
-        const checkbox = document.getElementById(style.checkboxId);
-        const displayElement = document.getElementById(style.displayElementId);
-
-        if (checkbox.checked) {
-            displayElement.style.color = style.activeColor;
-            displayElement.classList.remove('disabled');
-        } else {
-            displayElement.style.color = style.inactiveColor;
-            displayElement.classList.add('disabled');
-        }
-    });
-    Object.keys(circleStyles).forEach(key => {
-        const style = circleStyles[key];
-        const checkbox = document.getElementById(style.checkboxId);
-        const displayElement = document.getElementById(style.displayElementId);
-
-        if (checkbox.checked) {
-            displayElement.style.color = style.activeColor;
-            displayElement.classList.remove('disabled');
-        } else {
-            displayElement.style.color = style.inactiveColor;
-            displayElement.classList.add('disabled');
-        }
-    });
-    Object.keys(triangleStyles).forEach(key => {
-        const style = triangleStyles[key];
-        const checkbox = document.getElementById(style.checkboxId);
-        const displayElement = document.getElementById(style.displayElementId);
-
-        if (checkbox.checked) {
-            displayElement.style.color = style.activeColor;
-            displayElement.classList.remove('disabled');
-        } else {
-            displayElement.style.color = style.inactiveColor;
-            displayElement.classList.add('disabled');
-        }
-    });
-}
-
-// Function to redraw the canvas
-function reDraw(){
-    drawOriginalTriangle();
-    drawCenters();
-    drawCircles();
-    drawTriangles();
-    updateInfo();
-    applyStyles();
-}
-
-// Mouse events
-canvas.addEventListener('mousedown', (e) => {
-    const mouseX = e.offsetX;
-    const mouseY = e.offsetY;
-    selectedPoint = getSelectedPoint(mouseX, mouseY);
-});
-
-canvas.addEventListener('mousemove', (e) => {
-    if (selectedPoint) {
-        selectedPoint.x = e.offsetX;
-        selectedPoint.y = e.offsetY;
-        requestAnimationFrame(reDraw);
-    }
-});
-
-canvas.addEventListener('mouseup', () => {
-    selectedPoint = null;
-});
-
-// Function to check if a point is being dragged
-function getSelectedPoint(mouseX, mouseY) {
-    return points.find(point => {
-        const dist = Math.sqrt((point.x - mouseX) ** 2 + (point.y - mouseY) ** 2);
-        return dist < 10; // If within 10px, select the point
-    });
-}
-
-
-// Touch events
-canvas.addEventListener('touchstart', (e) => {
-    e.preventDefault(); // Prevent page scroll on touch start
-    const touch = e.touches[0]; // First touch point
-    const rect = canvas.getBoundingClientRect();
-    const touchX = touch.clientX - rect.left;
-    const touchY = touch.clientY - rect.top;
-    selectedPoint = getSelectedPoint(touchX, touchY);
-});
-
-canvas.addEventListener('touchmove', (e) => {
-    if (selectedPoint) {
-        const touch = e.touches[0];
-        const rect = canvas.getBoundingClientRect();
-        selectedPoint.x = touch.clientX - rect.left;
-        selectedPoint.y = touch.clientY - rect.top;
-        requestAnimationFrame(reDraw); // Use requestAnimationFrame for smoother updates
-    }
-    e.preventDefault(); // Prevent scrolling while dragging
-});
-
-canvas.addEventListener('touchend', () => {
-    selectedPoint = null;
-});
-
-
-// Event listeners for checkboxes
-const pointCheckboxIds = Object.values(pointStyles).map(style => style.checkboxId);
-const circleCheckboxIds = Object.values(circleStyles).map(style => style.checkboxId);
-const triangleCheckboxIds = Object.values(triangleStyles).map(style => style.checkboxId);
-const allCheckboxIds = [...pointCheckboxIds, ...circleCheckboxIds, ...triangleCheckboxIds];
-allCheckboxIds.forEach(id => {
-    document.getElementById(id).addEventListener('change', () => {
-        reDraw();
-    });
-});
-
-// Initial application of styles
-applyStyles();
 </script>
-
 </body>
 </html>
