@@ -118,6 +118,10 @@
         <input type="checkbox" id="ninePointCircle-checkbox" unchecked> 
         <span id="ninePointCircle" class="circle-info"></span>
     </p>
+    <p>
+        <input type="checkbox" id="smallestCircle-checkbox" unchecked> 
+        <span id="smallestCircle" class="circle-info"></span>
+    </p>
     <p>Triangles</p>
     <p>
         <input type="checkbox" id="outerNapoleonTriangle-checkbox" unchecked> 
@@ -287,6 +291,14 @@ const circleStyles = {
         displayElementId: 'ninePointCircle',
         annotationLabel: 'Nine-point',
         informationText: '○ Nine-point circle',
+    },
+    smallestCircle: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'smallestCircle-checkbox',
+        displayElementId: 'smallestCircle',
+        annotationLabel: 'Smallest-circle',
+        informationText: '○ Smallest-circle that contains all vertices of the triangle',
     },
 };
 
@@ -593,6 +605,10 @@ function drawCircles(){
         const ninePointCircle = calculateNinePointCircle(points);
         drawCircle(ninePointCircle, circleStyles.ninePointCircle.annotationLabel, circleStyles.ninePointCircle.activeColor);
     }
+    if (document.getElementById('smallestCircle-checkbox').checked) {
+        const smallestCircle = calculateSmallestCircle(points);
+        drawCircle(smallestCircle, circleStyles.smallestCircle.annotationLabel, circleStyles.smallestCircle.activeColor);
+    }
 }
 
 function drawTriangles(){
@@ -670,6 +686,13 @@ function magnitude(v) {
 
 function slope(p1, p2) {
     return (p2.y - p1.y) / (p2.x - p1.x)
+}
+
+function midpoint(p1, p2){
+    return {
+        x: (p1.x + p2.x) / 2,
+        y: (p1.y + p2.y) / 2
+    }
 }
 
 function perpendicularSlope(slope) {
@@ -987,6 +1010,35 @@ function calculateNinePointCircle(points) {
         center: calculateNinePointCenter(points),
         radius: circumcircle.radius / 2
     };
+}
+
+// Function to calculate the smallest circle that contains all vertices of the original triangle
+function calculateSmallestCircle(points) {
+    const [A, B, C] = points;
+    const a = calculateDistance(B, C);
+    const b = calculateDistance(C, A);
+    const c = calculateDistance(A, B);
+    if (b**2 + c**2 < a **2){ // when the angle A is obtuse 
+        return{
+            center: midpoint(B, C),
+            radius: a / 2
+        }
+    }
+    else if (a**2 + c**2 < b **2){ // when the angle B is obtuse 
+        return{
+            center: midpoint(A, C),
+            radius: b / 2
+        }
+    }
+    else if (a**2 + b**2 < c **2){ // when the angle C is obtuse 
+        return{
+            center: midpoint(A, B),
+            radius: c / 2
+        }
+    }
+    else{
+        return calculateCircumcircle(points);
+    }
 }
 
 // Function to calculate the outer Napoleon triangle
