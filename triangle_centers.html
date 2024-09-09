@@ -355,6 +355,7 @@ let points = [
 
 let selectedPoint = null;
 const scaleFactor = 0.01; // Factor to scale down distances
+const epsilon = 1e-6; // Small tolerance value
 
 // Canvas and context for drawing
 const canvas = document.getElementById('triangleCanvas');
@@ -727,6 +728,18 @@ function midpoint(p1, p2){
     }
 }
 
+// Check if a triangle is equilateral
+function isEquilateralTriangle(points) {
+    const [A, B, C] = points;
+    // Calculate the lengths of the sides of the triangle
+    const a = calculateDistance(B, C); // Length of side BC
+    const b = calculateDistance(A, C); // Length of side CA
+    const c = calculateDistance(A, B); // Length of side AB
+    
+    // Check if all sides are approximately equal
+    return (Math.abs(a - b) < epsilon) && (Math.abs(b - c) < epsilon);
+}
+
 function perpendicularSlope(slope) {
     // Handle cases where slopes might be 0 or undefined (vertical or horizontal lines)
     if (slope === 0) {
@@ -898,10 +911,16 @@ function calculateExcenter(points) {
 function calculateIsogonicCenter(points, outer = true) {
     const [A, B, C] = points;
 
+    if (!outer){
+        if (isEquilateralTriangle(points)){
+            return null;
+        } 
+    }
+
     // Determine rotation direction based on the cross product of vectors AB and AC
     const crossProduct = (B.x - A.x) * (C.y - A.y) - (B.y - A.y) * (C.x - A.x);
     let rotationRadian = crossProduct > 0 ? -60 : 60;
-    if (outer == false){
+    if (!outer){
         rotationRadian = -rotationRadian;
     }
 
