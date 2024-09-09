@@ -101,6 +101,10 @@
         <input type="checkbox" id="LemoinePoint-checkbox" unchecked> 
         <span id="LemoinePoint" class="point-info"></span>
     </p>
+    <p></p>
+        <input type="checkbox" id="CenterOfTheLesterCircle-checkbox" unchecked> 
+        <span id="CenterOfTheLesterCircle" class="point-info"></span>
+    </p>
     <p>Circles</p>
     <p>
         <input type="checkbox" id="incircle-checkbox"  unchecked> 
@@ -129,6 +133,10 @@
     <p>
         <input type="checkbox" id="smallestCircle-checkbox" unchecked> 
         <span id="smallestCircle" class="circle-info"></span>
+    </p>
+    <p></p>
+        <input type="checkbox" id="LesterCircle-checkbox" unchecked> 
+        <span id="LesterCircle" class="circle-info"></span>
     </p>
     <p>Triangles</p>
     <p>
@@ -264,6 +272,14 @@ const pointStyles = {
         annotationLabel: 'Lemoine',
         informationText: '● Lemoine point',
     },
+    CenterOfTheLesterCircle: {
+        activeColor: 'gold',
+        inactiveColor: 'lightgray', 
+        checkboxId: 'CenterOfTheLesterCircle-checkbox',
+        displayElementId: 'CenterOfTheLesterCircle',
+        annotationLabel: 'Center of the Lester circle',
+        informationText: '● Center of the Lester circle',
+    },
 };
 
 // Define styles for circles
@@ -323,6 +339,14 @@ const circleStyles = {
         displayElementId: 'smallestCircle',
         annotationLabel: 'Smallest-circle',
         informationText: '○ Smallest-circle that contains all vertices of the triangle',
+    },
+    LesterCircle: {
+        activeColor: 'gold',
+        inactiveColor: 'lightgray',
+        checkboxId: 'LesterCircle-checkbox',
+        displayElementId: 'LesterCircle',
+        annotationLabel: 'Lester',
+        informationText: '○ Lester circle',
     },
 };
 
@@ -410,7 +434,7 @@ function updateInfo() {
     document.getElementById('c-angle').textContent = calculateAngle(A, C, B).toFixed(2);
 
     // Area
-    document.getElementById('area').textContent = (calculateArea() * scaleFactor**2).toFixed(2);
+    document.getElementById('area').textContent = (calculateArea(points) * scaleFactor**2).toFixed(2);
 }
 
 // Function to apply styles based on checkbox state
@@ -610,6 +634,10 @@ function drawCenters(){
         const LemoinePoint = calculateLemoinePoint(points);
         drawPoint(LemoinePoint, pointStyles.LemoinePoint.annotationLabel, pointStyles.LemoinePoint.activeColor);
     }
+    if (document.getElementById('CenterOfTheLesterCircle-checkbox').checked) {
+        const CenterOfTheLesterCircle = calculateLesterCircle(points).center;
+        drawPoint(CenterOfTheLesterCircle, pointStyles.CenterOfTheLesterCircle.annotationLabel, pointStyles.CenterOfTheLesterCircle.activeColor);
+    }
 }
 
 function drawCircles(){
@@ -641,6 +669,10 @@ function drawCircles(){
     if (document.getElementById('smallestCircle-checkbox').checked) {
         const smallestCircle = calculateSmallestCircle(points);
         drawCircle(smallestCircle, circleStyles.smallestCircle.annotationLabel, circleStyles.smallestCircle.activeColor);
+    }
+    if (document.getElementById('LesterCircle-checkbox').checked) {
+        const LesterCircle = calculateLesterCircle(points);
+        drawCircle(LesterCircle, circleStyles.LesterCircle.annotationLabel, circleStyles.LesterCircle.activeColor);
     }
 }
 
@@ -705,6 +737,27 @@ function drawTriangle(triangle, label = '', color = 'black') {
     }
 }
 
+
+// Function to calculate the distance between two points
+function calculateDistance(p1, p2) {
+    return Math.sqrt((p2.x - p1.x) ** 2 + (p2.y - p1.y) ** 2);
+}
+
+// Function to calculate the acute angle at the middle point (B) given three points A, B, and C.
+function calculateAngle(p1, p2, p3) {
+    const v21 = vectorSubtract(p1, p2);
+    const v23 = vectorSubtract(p3, p2);
+    const cosTheta = dotProduct(v21, v23) / (magnitude(v21) * (magnitude(v23)));
+    const thetaRad = Math.acos(cosTheta);
+    return thetaRad * (180 / Math.PI);
+}
+
+// Function to calculate the area of the triangle
+function calculateArea(points) {
+    const [A, B, C] = points;
+    return Math.abs((A.x * (B.y - C.y) + B.x * (C.y - A.y) + C.x * (A.y - B.y))) / 2;
+}
+
 function vectorSubtract(p1, p2) {
     return { x: p1.x - p2.x, y: p1.y - p2.y };
 }
@@ -728,6 +781,14 @@ function midpoint(p1, p2){
     }
 }
 
+function closeEnoughScalars(val1, val2) {
+    return Math.abs(val1 - val2) < epsilon;
+}
+
+function closeEnoughPoints(p1, p2) {
+    return calculateDistance(p1, p2) < epsilon;
+}
+
 // Check if a triangle is equilateral
 function isEquilateralTriangle(points) {
     const [A, B, C] = points;
@@ -737,7 +798,16 @@ function isEquilateralTriangle(points) {
     const c = calculateDistance(A, B); // Length of side AB
     
     // Check if all sides are approximately equal
-    return (Math.abs(a - b) < epsilon) && (Math.abs(b - c) < epsilon);
+    return closeEnoughScalars(a, b) && closeEnoughScalars(b, c);
+}
+
+// Check if a triangle is scalene
+function isScaleneTriangle(points) {
+    const [A, B, C] = points;
+    const a = calculateDistance(B, C); // Length of side BC
+    const b = calculateDistance(A, C); // Length of side CA
+    const c = calculateDistance(A, B); // Length of side AB
+    return !closeEnoughScalars(a, b) && !closeEnoughScalars(b, c) && !closeEnoughScalars(c, a);
 }
 
 function perpendicularSlope(slope) {
@@ -819,26 +889,6 @@ function lineIntersection(P1, P2, Q1, Q2) {
         const y = slope1 * (x - point1.x) + point1.y;
         return { x, y };
     }
-}
-
-// Function to calculate the distance between two points
-function calculateDistance(p1, p2) {
-    return Math.sqrt((p2.x - p1.x) ** 2 + (p2.y - p1.y) ** 2);
-}
-
-// Function to calculate the acute angle at the middle point (B) given three points A, B, and C.
-function calculateAngle(p1, p2, p3) {
-    const v21 = vectorSubtract(p1, p2);
-    const v23 = vectorSubtract(p3, p2);
-    const cosTheta = dotProduct(v21, v23) / (magnitude(v21) * (magnitude(v23)));
-    const thetaRad = Math.acos(cosTheta);
-    return thetaRad * (180 / Math.PI);
-}
-
-// Function to calculate the area of the triangle
-function calculateArea() {
-    const [A, B, C] = points;
-    return Math.abs((A.x * (B.y - C.y) + B.x * (C.y - A.y) + C.x * (A.y - B.y))) / 2;
 }
 
 // Function to calculate the centroid of the triangle
@@ -1008,7 +1058,7 @@ function calculateIncircle(points) {
     const a = calculateDistance(B, C);
     const b = calculateDistance(C, A);
     const c = calculateDistance(A, B);
-    const area = calculateArea();
+    const area = calculateArea(points);
     const radius = 2 * area / (a + b + c);
 
     // Return the circle object with center and radius
@@ -1030,7 +1080,7 @@ function calculateCircumcircle(points) {
     const a = calculateDistance(B, C);
     const b = calculateDistance(A, C);
     const c = calculateDistance(A, B);
-    const area = calculateArea();
+    const area = calculateArea(points);
     const radius = (a * b * c) / (4 * area);
 
     // Return the circle object with center and radius
@@ -1051,7 +1101,7 @@ function calculateExcircle(points) {
     const a = calculateDistance(B, C);
     const b = calculateDistance(C, A);
     const c = calculateDistance(A, B);
-    const area = calculateArea();
+    const area = calculateArea(points);
     const radius = 2 * area / (-a + b + c);
 
     // Return the circle object with center and radius
@@ -1103,6 +1153,21 @@ function calculateSmallestCircle(points) {
         return calculateCircumcircle(points);
     }
 }
+
+// Function to calculate the Lester circle
+function calculateLesterCircle(points) {
+    const firstIsogonicCenter = calculateIsogonicCenter(points, outer = true);
+    const secondIsogonicCenter = calculateIsogonicCenter(points, outer = false);
+    const circumcenter = calculateCircumcenter(points);
+    if (isScaleneTriangle(points)){
+        // When the triangle is scalene
+        return calculateCircumcircle([firstIsogonicCenter, secondIsogonicCenter, circumcenter]);
+    }
+    else{
+        return null;
+    }
+}
+
 
 // Function to calculate the outer Napoleon triangle
 function calculateNapoleonTriangle(points, outer = true) {
