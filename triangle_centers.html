@@ -70,8 +70,16 @@
         <span id="excenterC" class="point-info"></span>
     </p>
     <p>
+        <input type="checkbox" id="firstIsogonicCenter-checkbox" unchecked> 
+        <span id="firstIsogonicCenter" class="point-info"></span>
+    </p>
+    <p>
         <input type="checkbox" id="FermatPoint-checkbox" unchecked> 
         <span id="FermatPoint" class="point-info"></span>
+    </p>
+    <p>
+        <input type="checkbox" id="secondIsogonicCenter-checkbox" unchecked> 
+        <span id="secondIsogonicCenter" class="point-info"></span>
     </p>
     <p>
         <input type="checkbox" id="deLongchampsPoint-checkbox" unchecked> 
@@ -192,6 +200,14 @@ const pointStyles = {
         annotationLabel: 'Excenter (C)',
         informationText: '● Excenter opposite to vertex C',
     },
+    firstIsogonicCenter: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray', 
+        checkboxId: 'firstIsogonicCenter-checkbox',
+        displayElementId: 'firstIsogonicCenter',
+        annotationLabel: '1st isogonic',
+        informationText: '● First isogonic center',
+    },
     FermatPoint: {
         activeColor: 'gray',
         inactiveColor: 'lightgray', 
@@ -199,6 +215,14 @@ const pointStyles = {
         displayElementId: 'FermatPoint',
         annotationLabel: 'Fermat',
         informationText: '● Fermat point',
+    },
+    secondIsogonicCenter: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray', 
+        checkboxId: 'secondIsogonicCenter-checkbox',
+        displayElementId: 'secondIsogonicCenter',
+        annotationLabel: '2nd isogonic',
+        informationText: '● Second isogonic center',
     },
     deLongchampsPoint: {
         activeColor: '#c54ea0',
@@ -553,9 +577,17 @@ function drawCenters(){
         const excenter = calculateExcenter([points[2], points[0], points[1]]);
         drawPoint(excenter, pointStyles.excenterC.annotationLabel, pointStyles.excenterC.activeColor);
     }
+    if (document.getElementById('firstIsogonicCenter-checkbox').checked) {
+        const firstIsogonicCenter = calculateIsogonicCenter(points, outer = true);
+        drawPoint(firstIsogonicCenter, pointStyles.firstIsogonicCenter.annotationLabel, pointStyles.firstIsogonicCenter.activeColor);
+    }
     if (document.getElementById('FermatPoint-checkbox').checked) {
         const FermatPoint = calculateFermatPoint(points);
         drawPoint(FermatPoint, pointStyles.FermatPoint.annotationLabel, pointStyles.FermatPoint.activeColor);
+    }
+    if (document.getElementById('secondIsogonicCenter-checkbox').checked) {
+        const secondIsogonicCenter = calculateIsogonicCenter(points, outer = false);
+        drawPoint(secondIsogonicCenter, pointStyles.secondIsogonicCenter.annotationLabel, pointStyles.secondIsogonicCenter.activeColor);
     }
     if (document.getElementById('deLongchampsPoint-checkbox').checked) {
         const deLongchampsPoint = calculateDeLongchampsPoint(points);
@@ -862,7 +894,26 @@ function calculateExcenter(points) {
     return {x, y};
 }
 
-// Function to calculate the Fermat point such that the sum of the distances from three vertices to the point is the smallest
+// Function to calculate the isogonic center
+function calculateIsogonicCenter(points, outer = true) {
+    const [A, B, C] = points;
+
+    // Determine rotation direction based on the cross product of vectors AB and AC
+    const crossProduct = (B.x - A.x) * (C.y - A.y) - (B.y - A.y) * (C.x - A.x);
+    let rotationRadian = crossProduct > 0 ? -60 : 60;
+    if (outer == false){
+        rotationRadian = -rotationRadian;
+    }
+
+    // Calculate rotation points for Fermat point
+    const R1 = rotate(B, A, rotationRadian); // Rotate B 60 degrees around A
+    const R2 = rotate(C, A, -rotationRadian); // Rotate C 60 degrees around A
+
+    // Intersection of lines BR2 and CR1 gives the Fermat point
+    return lineIntersection(B, R2, C, R1);
+}
+
+// Function to calculate the isogonic center
 function calculateFermatPoint(points) {
     const [A, B, C] = points;
     
@@ -874,18 +925,11 @@ function calculateFermatPoint(points) {
     } else if (calculateAngle(A, C, B) >= 120) {
         return C;
     }
-
-    // Determine rotation direction based on the cross product of vectors AB and AC
-    const crossProduct = (B.x - A.x) * (C.y - A.y) - (B.y - A.y) * (C.x - A.x);
-    let rotationRadian = crossProduct > 0 ? -60 : 60;
-
-    // Calculate rotation points for Fermat point
-    const R1 = rotate(B, A, rotationRadian); // Rotate B 60 degrees around A
-    const R2 = rotate(C, A, -rotationRadian); // Rotate C 60 degrees around A
-
-    // Intersection of lines BR2 and CR1 gives the Fermat point
-    return lineIntersection(B, R2, C, R1);
+    else{
+        return calculateIsogonicCenter(points, outer = true);
+    }
 }
+
 
 // Function to calculate the de Longchamps point that is the reflection of the orthocenter of the triangle about the circumcenter
 function calculateDeLongchampsPoint(points) {
