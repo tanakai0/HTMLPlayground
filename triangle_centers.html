@@ -12,15 +12,27 @@
             margin-top: 10px;
         }
         .point-info {
-            color: red; /* Default color */
+            color: black; /* Default color */
         }
         .point-info.disabled {
+            color: lightgray; /* Disabled state */
+        }
+        .line-info {
+            color: black; /* Default color */
+        }
+        .line-info.disabled {
             color: lightgray; /* Disabled state */
         }
         .circle-info {
             color: black; /* Default color */
         }
         .circle-info.disabled {
+            color: lightgray; /* Disabled state */
+        }
+        .triangle-info {
+            color: black; /* Default color */
+        }
+        .triangle-info.disabled {
             color: lightgray; /* Disabled state */
         }
     </style>
@@ -30,7 +42,7 @@
 <h2>Triangle Centers</h2>
 
 <!-- Drawing area -->
-<canvas id="triangleCanvas" width="1000" height="500"></canvas>
+<canvas id="triangleCanvas"></canvas>
 
 <!-- Information display -->
 <div class="info">
@@ -105,9 +117,14 @@
         <input type="checkbox" id="CenterOfTheLesterCircle-checkbox" unchecked> 
         <span id="CenterOfTheLesterCircle" class="point-info"></span>
     </p>
+    <p>Lines</p>
+    <p>
+        <input type="checkbox" id="EulerLine-checkbox" unchecked> 
+        <span id="EulerLine" class="line-info"></span>
+    </p>
     <p>Circles</p>
     <p>
-        <input type="checkbox" id="incircle-checkbox"  unchecked> 
+        <input type="checkbox" id="incircle-checkbox" unchecked> 
         <span id="incircle" class="circle-info"></span>
     </p>
     <p>
@@ -141,11 +158,11 @@
     <p>Triangles</p>
     <p>
         <input type="checkbox" id="outerNapoleonTriangle-checkbox" unchecked> 
-        <span id="outerNapoleonTriangle" class="circle-info"></span>
+        <span id="outerNapoleonTriangle" class="triangle-info"></span>
     </p>
     <p>
         <input type="checkbox" id="innerNapoleonTriangle-checkbox" unchecked> 
-        <span id="innerNapoleonTriangle" class="circle-info"></span>
+        <span id="innerNapoleonTriangle" class="triangle-info"></span>
     </p>    
 </div>
 
@@ -282,6 +299,18 @@ const pointStyles = {
     },
 };
 
+// Define styles for lines
+const lineStyles = {
+    EulerLine: {
+        activeColor: 'blue',
+        inactiveColor: 'lightgray',
+        checkboxId: 'EulerLine-checkbox',
+        displayElementId: 'EulerLine',
+        annotationLabel: 'Euler',
+        informationText: '- Euler line',
+    },
+};
+
 // Define styles for circles
 const circleStyles = {
     incircle: {
@@ -382,11 +411,14 @@ const scaleFactor = 0.01; // Factor to scale down distances
 const epsilon = 1e-6; // Small tolerance value
 
 // Canvas and context for drawing
+const CANVAS_WIDTH = 1000;
+const CANVAS_HEIGHT = 500;
 const canvas = document.getElementById('triangleCanvas');
 const ctx = canvas.getContext('2d');
 
 const allCheckboxIds = [
         ...Object.values(pointStyles).map(style => style.checkboxId),
+        ...Object.values(lineStyles).map(style => style.checkboxId),
         ...Object.values(circleStyles).map(style => style.checkboxId),
         ...Object.values(triangleStyles).map(style => style.checkboxId)
     ];
@@ -397,8 +429,18 @@ reDraw();
 
 // Function to initialize styles (run once at the start)
 function initializeStyles() {
+    // Set canvas width and height using the constants
+    const canvas = document.getElementById('triangleCanvas');
+    canvas.width = CANVAS_WIDTH;
+    canvas.height = CANVAS_HEIGHT;
+
     // Combine pointStyles, circleStyles, triangleStyles into one array of style objects
-    const allStyles = [...Object.values(pointStyles), ...Object.values(circleStyles), ...Object.values(triangleStyles)];
+    const allStyles = [
+        ...Object.values(pointStyles),
+        ...Object.values(lineStyles),
+        ...Object.values(circleStyles),
+        ...Object.values(triangleStyles)
+    ];
 
     allStyles.forEach(style => {
         const displayElement = document.getElementById(style.displayElementId); // Get the element
@@ -413,6 +455,7 @@ function initializeStyles() {
 function reDraw(){
     drawOriginalTriangle();
     drawCenters();
+    drawLines();
     drawCircles();
     drawTriangles();
     updateInfo();
@@ -451,10 +494,19 @@ function applyStyles() {
             displayElement.style.color = style.inactiveColor;
             displayElement.classList.add('disabled');
         }
-    // Update the display text using informationText
-    if (style.informationText) {
-    displayElement.textContent = style.informationText;
-    }
+    });
+    Object.keys(lineStyles).forEach(key => {
+        const style = lineStyles[key];
+        const checkbox = document.getElementById(style.checkboxId);
+        const displayElement = document.getElementById(style.displayElementId);
+
+        if (checkbox.checked) {
+            displayElement.style.color = style.activeColor;
+            displayElement.classList.remove('disabled');
+        } else {
+            displayElement.style.color = style.inactiveColor;
+            displayElement.classList.add('disabled');
+        }
     });
     Object.keys(circleStyles).forEach(key => {
         const style = circleStyles[key];
@@ -640,6 +692,14 @@ function drawCenters(){
     }
 }
 
+function drawLines(){
+    // Draw points based on checkbox state
+    if (document.getElementById('EulerLine-checkbox').checked) {
+        const EulerLine = calculateEulerLine(points);
+        drawLine(EulerLine, lineStyles.EulerLine.annotationLabel, lineStyles.EulerLine.activeColor);
+    }
+}
+
 function drawCircles(){
     // Draw points based on checkbox state
     if (document.getElementById('incircle-checkbox').checked) {
@@ -702,6 +762,85 @@ function drawPoint(point, label = '', color = 'black') {
         ctx.fillText(label, point.x - 5, point.y + 20); // Adjust position for readability
     }
 }
+
+// Function to draw a line between two points within the canvas bounds
+function drawLine(line, label = '', color = 'black') {
+    const [point1, point2] = line;
+    if (closeEnoughPoints(point1, point2)) {
+        return null;
+    }
+    const slope = calculateSlope(point1, point2);
+
+    // Function to calculate y for a given x using the equation y = slope * x + b
+    function calculateY(x) {
+        if (isFinite(slope)) {
+            return slope * (x - point1.x) + point1.y;
+        } else {
+            return null; // Vertical line, no y value for a given x
+        }
+    }
+
+    // Function to calculate x for a given y using the equation x = (y - b) / slope
+    function calculateX(y) {
+        if (isFinite(slope)) {
+            return (y - point1.y) / slope + point1.x;
+        } else {
+            return point1.x; // Vertical line, x is constant
+        }
+    }
+
+    // Find the intersection points of the line with the canvas bounds
+    let points = [];
+
+    // When the line is vertical
+    if (!isFinite(slope)) {
+        // 垂直線の場合は x は固定
+        if (0 <= point1.x && point1.x <= CANVAS_WIDTH) {
+            points.push({ x: point1.x, y: 0 });
+            points.push({ x: point1.x, y: CANVAS_HEIGHT });
+        }
+    } else {
+        // Check for intersection with the left (x = 0) and right (x = CANVAS_WIDTH) boundaries
+        let yAtX0 = calculateY(0);
+        if (0 <= yAtX0 && yAtX0 <= CANVAS_HEIGHT) {
+            points.push({ x: 0, y: yAtX0 });
+        }
+        let yAtXMax = calculateY(CANVAS_WIDTH);
+        if (0 <= yAtXMax && yAtXMax <= CANVAS_HEIGHT) {
+            points.push({ x: CANVAS_WIDTH, y: yAtXMax });
+        }
+
+        // Check for intersection with the top (y = 0) and bottom (y = CANVAS_HEIGHT) boundaries
+        let xAtY0 = calculateX(0);
+        if (0 < xAtY0 && xAtY0 < CANVAS_WIDTH) {
+            points.push({ x: xAtY0, y: 0 });
+        }
+        let xAtYMax = calculateX(CANVAS_HEIGHT);
+        if (0 < xAtYMax && xAtYMax < CANVAS_WIDTH) {
+            points.push({ x: xAtYMax, y: CANVAS_HEIGHT });
+        }
+    }
+
+
+    // If we have exactly two points, draw the line segment
+    if (points.length === 2) {
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, points[0].y);
+        ctx.lineTo(points[1].x, points[1].y);
+        ctx.strokeStyle = color;
+        ctx.stroke();
+
+        // Draw the label near the midpoint of the line
+        if (label) {
+            const midX = (points[0].x + points[1].x) / 2;
+            const midY = (points[0].y + points[1].y) / 2;
+            ctx.font = '16px Arial';
+            ctx.fillStyle = color;
+            ctx.fillText(label, midX - 5, midY - 10); // Adjust position for readability
+        }
+    }
+}
+
 
 // Function to draw a circle
 function drawCircle(circle, label = '', color = 'black') {
@@ -770,7 +909,7 @@ function magnitude(v) {
     return Math.sqrt(v.x * v.x + v.y * v.y);
 }
 
-function slope(p1, p2) {
+function calculateSlope(p1, p2) {
     return (p2.y - p1.y) / (p2.x - p1.x)
 }
 
@@ -873,12 +1012,12 @@ function lineIntersection(P1, P2, Q1, Q2) {
     // Check if the lines are parallel by comparing the slopes
     if (slope1 === slope2) {
         return null; // Parallel lines do not intersect
-    } else if (slope1 === Infinity) {
+    } else if (!isFinite(slope1)) {
         // If the line1 is vertical
         const x = point1.x;
         const y = slope2 * (x - point2.x) + point2.y;
         return { x, y };
-    } else if (slope2 === Infinity) {
+    } else if (!isFinite(slope2)) {
         // If the line2 is vertical
         const x = point2.x;
         const y = slope1 * (x - point1.x) + point1.y;
@@ -908,8 +1047,8 @@ function calculateCircumcenter(points) {
     const E = { x: (B.x + C.x) / 2, y: (B.y + C.y) / 2 };
 
     // Slopes of perpendicular bisectors
-    const perpendicularSlopeAB = perpendicularSlope(slope(A, B));
-    const perpendicularSlopeBC = perpendicularSlope(slope(B, C));
+    const perpendicularSlopeAB = perpendicularSlope(calculateSlope(A, B));
+    const perpendicularSlopeBC = perpendicularSlope(calculateSlope(B, C));
 
     // Circumcenter calculation
     return lineIntersectionGivenSlopesAndPoints(perpendicularSlopeAB, D, perpendicularSlopeBC, E);
@@ -935,8 +1074,8 @@ function calculateIncenter(points) {
 function calculateOrthocenter(points) {
     const [A, B, C] = points;
     // Calculate perpendiculars
-    const perpendicularSlopeAB = perpendicularSlope(slope(A, B));
-    const perpendicularSlopeBC = perpendicularSlope(slope(B, C));
+    const perpendicularSlopeAB = perpendicularSlope(calculateSlope(A, B));
+    const perpendicularSlopeBC = perpendicularSlope(calculateSlope(B, C));
 
     // Solve for the intersection of the two perpendiculars (Orthocenter)
     return lineIntersectionGivenSlopesAndPoints(perpendicularSlopeAB, C, perpendicularSlopeBC, A);
@@ -1037,15 +1176,21 @@ function calculateLemoinePoint(points) {
     const [A, B, C] = points;
     // The circumcircle of triangle ABC and the tangents at each vertex.
     const circumcenter = calculateCircumcenter(points);
-    const tangentSlopeA = perpendicularSlope(slope(circumcenter, A));
-    const tangentSlopeB = perpendicularSlope(slope(circumcenter, B));
-    const tangentSlopeC = perpendicularSlope(slope(circumcenter, C));
+    const tangentSlopeA = perpendicularSlope(calculateSlope(circumcenter, A));
+    const tangentSlopeB = perpendicularSlope(calculateSlope(circumcenter, B));
+    const tangentSlopeC = perpendicularSlope(calculateSlope(circumcenter, C));
     // calculate symmedians
     const P1 = lineIntersectionGivenSlopesAndPoints(tangentSlopeB, B, tangentSlopeC, C);
     const P2 = lineIntersectionGivenSlopesAndPoints(tangentSlopeA, A, tangentSlopeC, C);
     return lineIntersection(A, P1, B, P2);
 }
 
+
+function calculateEulerLine(points) {
+    const orthocenter = calculateOrthocenter(points);
+    const circumcenter = calculateCircumcenter(points);
+    return [orthocenter, circumcenter];
+}
 
 // Function to calculate the incircle
 function calculateIncircle(points) {
