@@ -416,12 +416,19 @@ const CANVAS_HEIGHT = 500;
 const canvas = document.getElementById('triangleCanvas');
 const ctx = canvas.getContext('2d');
 
+// Combine all styles into one array of style objects
+const allStyles = [
+    ...Object.values(pointStyles),
+    ...Object.values(lineStyles),
+    ...Object.values(circleStyles),
+    ...Object.values(triangleStyles)
+];
 const allCheckboxIds = [
-        ...Object.values(pointStyles).map(style => style.checkboxId),
-        ...Object.values(lineStyles).map(style => style.checkboxId),
-        ...Object.values(circleStyles).map(style => style.checkboxId),
-        ...Object.values(triangleStyles).map(style => style.checkboxId)
-    ];
+    ...Object.values(pointStyles).map(style => style.checkboxId),
+    ...Object.values(lineStyles).map(style => style.checkboxId),
+    ...Object.values(circleStyles).map(style => style.checkboxId),
+    ...Object.values(triangleStyles).map(style => style.checkboxId)
+];
 
 // Initial drawing
 initializeStyles();
@@ -433,14 +440,6 @@ function initializeStyles() {
     const canvas = document.getElementById('triangleCanvas');
     canvas.width = CANVAS_WIDTH;
     canvas.height = CANVAS_HEIGHT;
-
-    // Combine pointStyles, circleStyles, triangleStyles into one array of style objects
-    const allStyles = [
-        ...Object.values(pointStyles),
-        ...Object.values(lineStyles),
-        ...Object.values(circleStyles),
-        ...Object.values(triangleStyles)
-    ];
 
     allStyles.forEach(style => {
         const displayElement = document.getElementById(style.displayElementId); // Get the element
@@ -482,56 +481,18 @@ function updateInfo() {
 
 // Function to apply styles based on checkbox state
 function applyStyles() {
-    Object.keys(pointStyles).forEach(key => {
-        const style = pointStyles[key];
+    allStyles.forEach(style => {
         const checkbox = document.getElementById(style.checkboxId);
         const displayElement = document.getElementById(style.displayElementId);
 
-        if (checkbox.checked) {
-            displayElement.style.color = style.activeColor;
-            displayElement.classList.remove('disabled');
-        } else {
-            displayElement.style.color = style.inactiveColor;
-            displayElement.classList.add('disabled');
-        }
-    });
-    Object.keys(lineStyles).forEach(key => {
-        const style = lineStyles[key];
-        const checkbox = document.getElementById(style.checkboxId);
-        const displayElement = document.getElementById(style.displayElementId);
-
-        if (checkbox.checked) {
-            displayElement.style.color = style.activeColor;
-            displayElement.classList.remove('disabled');
-        } else {
-            displayElement.style.color = style.inactiveColor;
-            displayElement.classList.add('disabled');
-        }
-    });
-    Object.keys(circleStyles).forEach(key => {
-        const style = circleStyles[key];
-        const checkbox = document.getElementById(style.checkboxId);
-        const displayElement = document.getElementById(style.displayElementId);
-
-        if (checkbox.checked) {
-            displayElement.style.color = style.activeColor;
-            displayElement.classList.remove('disabled');
-        } else {
-            displayElement.style.color = style.inactiveColor;
-            displayElement.classList.add('disabled');
-        }
-    });
-    Object.keys(triangleStyles).forEach(key => {
-        const style = triangleStyles[key];
-        const checkbox = document.getElementById(style.checkboxId);
-        const displayElement = document.getElementById(style.displayElementId);
-
-        if (checkbox.checked) {
-            displayElement.style.color = style.activeColor;
-            displayElement.classList.remove('disabled');
-        } else {
-            displayElement.style.color = style.inactiveColor;
-            displayElement.classList.add('disabled');
+        if (checkbox && displayElement) {
+            if (checkbox.checked) {
+                displayElement.style.color = style.activeColor;
+                displayElement.classList.remove('disabled');
+            } else {
+                displayElement.style.color = style.inactiveColor;
+                displayElement.classList.add('disabled');
+            }
         }
     });
 }
@@ -624,129 +585,183 @@ function drawOriginalTriangle() {
     });
 }
 
-function drawCenters(){
-    // Draw points based on checkbox state
-    if (document.getElementById('centroid-checkbox').checked) {
-        const centroid = calculateCentroid(points);
-        drawPoint(centroid, pointStyles.centroid.annotationLabel, pointStyles.centroid.activeColor);
-    }
-    if (document.getElementById('circumcenter-checkbox').checked) {
-        const circumcenter = calculateCircumcenter(points);
-        drawPoint(circumcenter, pointStyles.circumcenter.annotationLabel, pointStyles.circumcenter.activeColor);
-    }
-    if (document.getElementById('incenter-checkbox').checked) {
-        const incenter = calculateIncenter(points);
-        drawPoint(incenter, pointStyles.incenter.annotationLabel, pointStyles.incenter.activeColor);
-    }
-    if (document.getElementById('orthocenter-checkbox').checked) {
-        const orthocenter = calculateOrthocenter(points);
-        drawPoint(orthocenter, pointStyles.orthocenter.annotationLabel, pointStyles.orthocenter.activeColor);
-    }
-    if (document.getElementById('excenterA-checkbox').checked) {
-        const excenter = calculateExcenter([points[0], points[1], points[2]]);
-        drawPoint(excenter, pointStyles.excenterA.annotationLabel, pointStyles.excenterA.activeColor);
-    }
-    if (document.getElementById('excenterB-checkbox').checked) {
-        const excenter = calculateExcenter([points[1], points[0], points[2]]);
-        drawPoint(excenter, pointStyles.excenterB.annotationLabel, pointStyles.excenterB.activeColor);
-    }
-    if (document.getElementById('excenterC-checkbox').checked) {
-        const excenter = calculateExcenter([points[2], points[0], points[1]]);
-        drawPoint(excenter, pointStyles.excenterC.annotationLabel, pointStyles.excenterC.activeColor);
-    }
-    if (document.getElementById('firstIsogonicCenter-checkbox').checked) {
-        const firstIsogonicCenter = calculateIsogonicCenter(points, outer = true);
-        drawPoint(firstIsogonicCenter, pointStyles.firstIsogonicCenter.annotationLabel, pointStyles.firstIsogonicCenter.activeColor);
-    }
-    if (document.getElementById('FermatPoint-checkbox').checked) {
-        const FermatPoint = calculateFermatPoint(points);
-        drawPoint(FermatPoint, pointStyles.FermatPoint.annotationLabel, pointStyles.FermatPoint.activeColor);
-    }
-    if (document.getElementById('secondIsogonicCenter-checkbox').checked) {
-        const secondIsogonicCenter = calculateIsogonicCenter(points, outer = false);
-        drawPoint(secondIsogonicCenter, pointStyles.secondIsogonicCenter.annotationLabel, pointStyles.secondIsogonicCenter.activeColor);
-    }
-    if (document.getElementById('deLongchampsPoint-checkbox').checked) {
-        const deLongchampsPoint = calculateDeLongchampsPoint(points);
-        drawPoint(deLongchampsPoint, pointStyles.deLongchampsPoint.annotationLabel, pointStyles.deLongchampsPoint.activeColor);
-    }
-    if (document.getElementById('ninePointCenter-checkbox').checked) {
-        const ninePointCenter = calculateNinePointCenter(points);
-        drawPoint(ninePointCenter, pointStyles.ninePointCenter.annotationLabel, pointStyles.ninePointCenter.activeColor);
-    }
-    if (document.getElementById('firstNapoleonPoint-checkbox').checked) {
-        const firstNapoleonPoint = calculateNapoleonPoint(points, outer = true);
-        drawPoint(firstNapoleonPoint, pointStyles.firstNapoleonPoint.annotationLabel, pointStyles.firstNapoleonPoint.activeColor);
-    }
-    if (document.getElementById('secondNapoleonPoint-checkbox').checked) {
-        const secondNapoleonPoint = calculateNapoleonPoint(points, outer = false);
-        drawPoint(secondNapoleonPoint, pointStyles.secondNapoleonPoint.annotationLabel, pointStyles.secondNapoleonPoint.activeColor);
-    }
-    if (document.getElementById('LemoinePoint-checkbox').checked) {
-        const LemoinePoint = calculateLemoinePoint(points);
-        drawPoint(LemoinePoint, pointStyles.LemoinePoint.annotationLabel, pointStyles.LemoinePoint.activeColor);
-    }
-    if (document.getElementById('CenterOfTheLesterCircle-checkbox').checked) {
-        const CenterOfTheLesterCircle = calculateLesterCircle(points).center;
-        drawPoint(CenterOfTheLesterCircle, pointStyles.CenterOfTheLesterCircle.annotationLabel, pointStyles.CenterOfTheLesterCircle.activeColor);
-    }
+
+// Draw centers or points based on checkbox states
+function drawCenters() {
+    Object.keys(pointStyles).forEach(key => {
+        const style = pointStyles[key];
+        const checkbox = document.getElementById(style.checkboxId);
+
+        if (checkbox && checkbox.checked) {
+            let center;
+
+            // Switch statement to handle different center calculations
+            switch (key) {
+                case 'centroid':
+                    center = calculateCentroid(points);
+                    break;
+                case 'circumcenter':
+                    center = calculateCircumcenter(points);
+                    break;
+                case 'incenter':
+                    center = calculateIncenter(points);
+                    break;
+                case 'orthocenter':
+                    center = calculateOrthocenter(points);
+                    break;
+                case 'excenterA':
+                    center = calculateExcenter([points[0], points[1], points[2]]);
+                    break;
+                case 'excenterB':
+                    center = calculateExcenter([points[1], points[0], points[2]]);
+                    break;
+                case 'excenterC':
+                    center = calculateExcenter([points[2], points[0], points[1]]);
+                    break;
+                case 'firstIsogonicCenter':
+                    center = calculateIsogonicCenter(points, outer = true);
+                    break;
+                case 'FermatPoint':
+                    center = calculateFermatPoint(points);
+                    break;
+                case 'secondIsogonicCenter':
+                    center = calculateIsogonicCenter(points, outer = false);
+                    break;
+                case 'deLongchampsPoint':
+                    center = calculateDeLongchampsPoint(points);
+                    break;
+                case 'ninePointCenter':
+                    center = calculateNinePointCenter(points);
+                    break;
+                case 'firstNapoleonPoint':
+                    center = calculateNapoleonPoint(points, outer = true);
+                    break;
+                case 'secondNapoleonPoint':
+                    center = calculateNapoleonPoint(points, outer = false);
+                    break;
+                case 'LemoinePoint':
+                    center = calculateLemoinePoint(points);
+                    break;
+                case 'CenterOfTheLesterCircle':
+                    center = calculateLesterCircle(points).center;
+                    break;
+                default:
+                    console.error(`Unknown center key: ${key}`);
+                    return;
+            }
+
+            // Draw the center point if it was calculated
+            if (center) {
+                drawPoint(center, style.annotationLabel, style.activeColor);
+            }
+        }
+    });
 }
 
-function drawLines(){
-    // Draw points based on checkbox state
-    if (document.getElementById('EulerLine-checkbox').checked) {
-        const EulerLine = calculateEulerLine(points);
-        drawLine(EulerLine, lineStyles.EulerLine.annotationLabel, lineStyles.EulerLine.activeColor);
-    }
+// Draw lines based on checkbox states
+function drawLines() {
+    Object.keys(lineStyles).forEach(key => {
+        const style = lineStyles[key];
+        const checkbox = document.getElementById(style.checkboxId);
+
+        if (checkbox && checkbox.checked) {
+            let line;
+
+            // Switch statement to handle different line calculations
+            switch (key) {
+                case 'EulerLine':
+                    line = calculateEulerLine(points);
+                    break;
+                default:
+                    console.error(`Unknown line key: ${key}`);
+                    return;
+            }
+
+            // Draw the line if it was calculated
+            if (line) {
+                drawLine(line, style.annotationLabel, style.activeColor);
+            }
+        }
+    });
 }
 
-function drawCircles(){
-    // Draw points based on checkbox state
-    if (document.getElementById('incircle-checkbox').checked) {
-        const incircle = calculateIncircle(points);
-        drawCircle(incircle, circleStyles.incircle.annotationLabel, circleStyles.incircle.activeColor);
-    }
-    if (document.getElementById('circumcircle-checkbox').checked) {
-        const circumcircle = calculateCircumcircle(points);
-        drawCircle(circumcircle, circleStyles.circumcircle.annotationLabel, circleStyles.circumcircle.activeColor);
-    }
-    if (document.getElementById('excircleA-checkbox').checked) {
-        const excircleA = calculateExcircle([points[0], points[1], points[2]]);
-        drawCircle(excircleA, circleStyles.excircleA.annotationLabel, circleStyles.excircleA.activeColor);
-    }
-    if (document.getElementById('excircleB-checkbox').checked) {
-        const excircleB = calculateExcircle([points[1], points[0], points[2]]);
-        drawCircle(excircleB, circleStyles.excircleB.annotationLabel, circleStyles.excircleB.activeColor);
-    }
-    if (document.getElementById('excircleC-checkbox').checked) {
-        const excircleC = calculateExcircle([points[2], points[0], points[1]]);
-        drawCircle(excircleC, circleStyles.excircleC.annotationLabel, circleStyles.excircleC.activeColor);
-    }
-    if (document.getElementById('ninePointCircle-checkbox').checked) {
-        const ninePointCircle = calculateNinePointCircle(points);
-        drawCircle(ninePointCircle, circleStyles.ninePointCircle.annotationLabel, circleStyles.ninePointCircle.activeColor);
-    }
-    if (document.getElementById('smallestCircle-checkbox').checked) {
-        const smallestCircle = calculateSmallestCircle(points);
-        drawCircle(smallestCircle, circleStyles.smallestCircle.annotationLabel, circleStyles.smallestCircle.activeColor);
-    }
-    if (document.getElementById('LesterCircle-checkbox').checked) {
-        const LesterCircle = calculateLesterCircle(points);
-        drawCircle(LesterCircle, circleStyles.LesterCircle.annotationLabel, circleStyles.LesterCircle.activeColor);
-    }
+// Draw circles based on checkbox states
+function drawCircles() {
+    Object.keys(circleStyles).forEach(key => {
+        const style = circleStyles[key];
+        const checkbox = document.getElementById(style.checkboxId);
+
+        if (checkbox && checkbox.checked) {
+            let circle;
+
+            // Switch statement to handle different circle calculations
+            switch (key) {
+                case 'incircle':
+                    circle = calculateIncircle(points);
+                    break;
+                case 'circumcircle':
+                    circle = calculateCircumcircle(points);
+                    break;
+                case 'excircleA':
+                    circle = calculateExcircle([points[0], points[1], points[2]]);
+                    break;
+                case 'excircleB':
+                    circle = calculateExcircle([points[1], points[0], points[2]]);
+                    break;
+                case 'excircleC':
+                    circle = calculateExcircle([points[2], points[0], points[1]]);
+                    break;
+                case 'ninePointCircle':
+                    circle = calculateNinePointCircle(points);
+                    break;
+                case 'smallestCircle':
+                    circle = calculateSmallestCircle(points);
+                    break;
+                case 'LesterCircle':
+                    circle = calculateLesterCircle(points);
+                    break;
+                default:
+                    console.error(`Unknown circle key: ${key}`);
+                    return;
+            }
+
+            // Draw the circle if it was calculated
+            if (circle) {
+                drawCircle(circle, style.annotationLabel, style.activeColor);
+            }
+        }
+    });
 }
 
-function drawTriangles(){
-    // Draw points based on checkbox state
-    if (document.getElementById('outerNapoleonTriangle-checkbox').checked) {
-        const outerNapoleonTriangle = calculateNapoleonTriangle(points, outer = true);
-        drawTriangle(outerNapoleonTriangle, triangleStyles.outerNapoleonTriangle.annotationLabel, triangleStyles.outerNapoleonTriangle.activeColor);
-    }
-    if (document.getElementById('innerNapoleonTriangle-checkbox').checked) {
-        const innerNapoleonTriangle = calculateNapoleonTriangle(points, outer = false);
-        drawTriangle(innerNapoleonTriangle, triangleStyles.innerNapoleonTriangle.annotationLabel, triangleStyles.innerNapoleonTriangle.activeColor);
-    }
-} 
+// Draw triangles based on checkbox states
+function drawTriangles() {
+    Object.keys(triangleStyles).forEach(key => {
+        const style = triangleStyles[key];
+        const checkbox = document.getElementById(style.checkboxId);
+        
+        if (checkbox && checkbox.checked) {
+            let triangle;
+            
+            // Switch statement to handle different triangle calculations
+            switch (key) {
+                case 'outerNapoleonTriangle':
+                    triangle = calculateNapoleonTriangle(points, outer = true);
+                    break;
+                case 'innerNapoleonTriangle':
+                    triangle = calculateNapoleonTriangle(points, outer = false);
+                    break;
+                default:
+                    console.error(`Unknown triangle key: ${key}`);
+                    return;
+            }
+
+            // Draw the triangle if it was calculated
+            if (triangle) {
+                drawTriangle(triangle, style.annotationLabel, style.activeColor);
+            }
+        }
+    });
+}
 
 // Function to draw a point and its label
 function drawPoint(point, label = '', color = 'black') {
