@@ -133,6 +133,10 @@
         <input type="checkbox" id="Mittenpunkt-checkbox" unchecked> 
         <span id="Mittenpunkt" class="point-info"></span>
     </p>
+    <p>
+        <input type="checkbox" id="SpiekerCenter-checkbox" unchecked> 
+        <span id="SpiekerCenter" class="point-info"></span>
+    </p>
     <p>Lines</p>
     <p>
         <input type="checkbox" id="EulerLine-checkbox" unchecked> 
@@ -386,6 +390,15 @@ const pointStyles = {
         annotationLabel: 'Mittenpunkt',
         informationText: '● Mittenpunkt',
         ETCReference: 9,
+    },
+    SpiekerCenter: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'SpiekerCenter-checkbox',
+        displayElementId: 'SpiekerCenter',
+        annotationLabel: 'Spieker',
+        informationText: '● Spieker center',
+        ETCReference: 10,
     },
 };
 
@@ -794,7 +807,10 @@ function drawCenters() {
                     break;
                 case 'Mittenpunkt':
                     center = calculateMittenpunkt(points);
-                    break;  
+                    break;
+                case 'SpiekerCenter':
+                    center = calculateSpiekerCenter(points);
+                    break; 
                 default:
                     console.error(`Unknown center key: ${key}`);
                     return;
@@ -1390,6 +1406,12 @@ function calculateBevanPoint(points) {
 function calculateMittenpunkt(points) {
     const excentralTriangle = calculateExcentralTriangle(points);
     return calculateSymmedianPoint(excentralTriangle);
+}
+
+// Function to calculate the Spieker center
+function calculateSpiekerCenter(points) {
+    const medialTriangle = calculateMedialTriangle(points);
+    return calculateIncenter(medialTriangle);
 }
 
 // Function to calculate the Euler line
