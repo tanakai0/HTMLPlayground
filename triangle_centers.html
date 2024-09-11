@@ -121,6 +121,10 @@
         <input type="checkbox" id="GergonnePoint-checkbox" unchecked> 
         <span id="GergonnePoint" class="point-info"></span>
     </p>
+    <p>
+        <input type="checkbox" id="NagelPoint-checkbox" unchecked> 
+        <span id="NagelPoint" class="point-info"></span>
+    </p>
     <p>Lines</p>
     <p>
         <input type="checkbox" id="EulerLine-checkbox" unchecked> 
@@ -175,6 +179,10 @@
     <p>
         <input type="checkbox" id="GergonneTriangle-checkbox" unchecked> 
         <span id="GergonneTriangle" class="triangle-info"></span>
+    </p>
+    <p>
+        <input type="checkbox" id="extouchTriangle-checkbox" unchecked> 
+        <span id="extouchTriangle" class="triangle-info"></span>
     </p>    
 </div>
 
@@ -332,6 +340,15 @@ const pointStyles = {
         informationText: '● Gergonne point',
         ETCReference: 7,
     },
+    NagelPoint: {
+        activeColor: 'brown',
+        inactiveColor: 'lightgray', 
+        checkboxId: 'NagelPoint-checkbox',
+        displayElementId: 'NagelPoint',
+        annotationLabel: 'Nagel',
+        informationText: '● Nagel point',
+        ETCReference: 8,
+    },
 };
 
 // Define styles for lines
@@ -447,6 +464,14 @@ const triangleStyles = {
         displayElementId: 'GergonneTriangle',
         annotationLabel: 'Gergonne',
         informationText: '△ Gergonne triangle',
+    },
+    extouchTriangle: {
+        activeColor: 'brown',
+        inactiveColor: 'lightgray',
+        checkboxId: 'extouchTriangle-checkbox',
+        displayElementId: 'extouchTriangle',
+        annotationLabel: 'Extouch',
+        informationText: '△ Extouch triangle',
     },
 };
 
@@ -698,7 +723,10 @@ function drawCenters() {
                     break;
                 case 'GergonnePoint':
                     center = calculateGergonnePoint(points);
-                    break;     
+                    break;
+                case 'NagelPoint':
+                    center = calculateNagelPoint(points);
+                    break;   
                 default:
                     console.error(`Unknown center key: ${key}`);
                     return;
@@ -809,6 +837,9 @@ function drawTriangles() {
                     break;
                 case 'GergonneTriangle':
                     triangle = calculateGergonneTriangle(points);
+                    break;
+                case 'extouchTriangle':
+                    triangle = calculateExtouchTriangle(points);
                     break;
                 default:
                     console.error(`Unknown triangle key: ${key}`);
@@ -1267,6 +1298,13 @@ function calculateGergonnePoint(points) {
     return lineIntersection(points[0], GergonneTriangle[0], points[1], GergonneTriangle[1]);
 }
 
+// Function to calculate the Nagel point
+function calculateNagelPoint(points) {
+    const extouchTriangle = calculateExtouchTriangle(points);
+    return lineIntersection(points[0], extouchTriangle[0], points[1], extouchTriangle[1]);
+
+}
+
 
 function calculateEulerLine(points) {
     const orthocenter = calculateOrthocenter(points);
@@ -1449,6 +1487,28 @@ function calculateGergonneTriangle(points) {
         lineIntersectionGivenSlopesAndPoints(slopeBC, B, perpendicularSlopeBC, incenter),
         lineIntersectionGivenSlopesAndPoints(slopeCA, C, perpendicularSlopeCA, incenter),
         lineIntersectionGivenSlopesAndPoints(slopeAB, A, perpendicularSlopeAB, incenter)
+    ];
+}
+
+// Function to calculate the extouch triangle
+function calculateExtouchTriangle(points) {
+    const [A, B, C] = points;
+    const excenterA = calculateExcenter(points);
+    const excenterB = calculateExcenter([B, A, C]);
+    const excenterC = calculateExcenter([C, A, B]);
+
+    // Slopes of perpendicular bisectors
+    const slopeAB = calculateSlope(A, B);
+    const slopeBC = calculateSlope(B, C);
+    const slopeCA = calculateSlope(C, A);
+    const perpendicularSlopeAB = perpendicularSlope(slopeAB);
+    const perpendicularSlopeBC = perpendicularSlope(slopeBC);
+    const perpendicularSlopeCA = perpendicularSlope(slopeCA);
+
+    return [
+        lineIntersectionGivenSlopesAndPoints(slopeBC, B, perpendicularSlopeBC, excenterA),
+        lineIntersectionGivenSlopesAndPoints(slopeCA, C, perpendicularSlopeCA, excenterB),
+        lineIntersectionGivenSlopesAndPoints(slopeAB, A, perpendicularSlopeAB, excenterC)
     ];
 }
 
