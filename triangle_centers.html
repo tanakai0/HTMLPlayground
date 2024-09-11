@@ -180,6 +180,7 @@
 
 <script>
 // Define styles for centers
+// ETCReference is the reference number of the encyclopedia of triangle centers (ETC)
 const pointStyles = {
     centroid: {
         activeColor: 'blue',
@@ -187,7 +188,8 @@ const pointStyles = {
         checkboxId: 'centroid-checkbox',
         displayElementId: 'centroid',
         annotationLabel: 'Centroid',
-        informationText: '● Centroid'
+        informationText: '● Centroid',
+        ETCReference: 2,
     },
     circumcenter: {
         activeColor: 'red',
@@ -195,7 +197,8 @@ const pointStyles = {
         checkboxId: 'circumcenter-checkbox',
         displayElementId: 'circumcenter',
         annotationLabel: 'Circumcenter',
-        informationText: '● Circumcenter'
+        informationText: '● Circumcenter',
+        ETCReference: 3,
     },
     incenter: {
         activeColor: 'green',
@@ -204,6 +207,7 @@ const pointStyles = {
         displayElementId: 'incenter',
         annotationLabel: 'Incenter',
         informationText: '● Incenter',
+        ETCReference: 1,
     },
     orthocenter: {
         activeColor: 'purple',
@@ -212,6 +216,7 @@ const pointStyles = {
         displayElementId: 'orthocenter',
         annotationLabel: 'Orthocenter',
         informationText: '● Orthocenter',
+        ETCReference: 4,
     },
     excenterA: {
         activeColor: 'orange',
@@ -244,6 +249,7 @@ const pointStyles = {
         displayElementId: 'firstIsogonicCenter',
         annotationLabel: '1st isogonic',
         informationText: '● First isogonic center',
+        ETCReference: 13,
     },
     FermatPoint: {
         activeColor: 'gray',
@@ -252,6 +258,7 @@ const pointStyles = {
         displayElementId: 'FermatPoint',
         annotationLabel: 'Fermat',
         informationText: '● Fermat point',
+        ETCReference: 13,
     },
     secondIsogonicCenter: {
         activeColor: 'gray',
@@ -260,6 +267,7 @@ const pointStyles = {
         displayElementId: 'secondIsogonicCenter',
         annotationLabel: '2nd isogonic',
         informationText: '● Second isogonic center',
+        ETCReference: 14,
     },
     deLongchampsPoint: {
         activeColor: '#c54ea0',
@@ -268,6 +276,7 @@ const pointStyles = {
         displayElementId: 'deLongchampsPoint',
         annotationLabel: 'de Longchamps',
         informationText: '● de Longchamps point',
+        ETCReference: 20,
     },
     ninePointCenter: {
         activeColor: 'lightblue',
@@ -276,6 +285,7 @@ const pointStyles = {
         displayElementId: 'ninePointCenter',
         annotationLabel: 'Nine-point',
         informationText: '● Nine-point center',
+        ETCReference: 5,
     },
     firstNapoleonPoint: {
         activeColor: 'brown',
@@ -284,6 +294,7 @@ const pointStyles = {
         displayElementId: 'firstNapoleonPoint',
         annotationLabel: '1st Napoleon',
         informationText: '● First Napoleon point',
+        ETCReference: 17,
     },
     secondNapoleonPoint: {
         activeColor: '#c5956b',
@@ -292,6 +303,7 @@ const pointStyles = {
         displayElementId: 'secondNapoleonPoint',
         annotationLabel: '2nd Napoleon',
         informationText: '● Second Napoleon point',
+        ETCReference: 18,
     },
     LemoinePoint: {
         activeColor: 'gold',
@@ -300,6 +312,7 @@ const pointStyles = {
         displayElementId: 'LemoinePoint',
         annotationLabel: 'Lemoine',
         informationText: '● Lemoine point',
+        ETCReference: 6,
     },
     CenterOfTheLesterCircle: {
         activeColor: 'gold',
@@ -308,6 +321,7 @@ const pointStyles = {
         displayElementId: 'CenterOfTheLesterCircle',
         annotationLabel: 'Center of the Lester circle',
         informationText: '● Center of the Lester circle',
+        ETCReference: 1116,
     },
     GergonnePoint: {
         activeColor: 'brown',
@@ -316,6 +330,7 @@ const pointStyles = {
         displayElementId: 'GergonnePoint',
         annotationLabel: 'Gergonne',
         informationText: '● Gergonne point',
+        ETCReference: 7,
     },
 };
 
