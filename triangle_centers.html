@@ -183,6 +183,10 @@
         <input type="checkbox" id="BevanCircle-checkbox" unchecked> 
         <span id="BevanCircle" class="circle-info"></span>
     </p>
+    <p>
+        <input type="checkbox" id="SpiekerCircle-checkbox" unchecked> 
+        <span id="SpiekerCircle" class="circle-info"></span>
+    </p>
     <p>Triangles</p>
     <p>
         <input type="checkbox" id="medialTriangle-checkbox" unchecked> 
@@ -495,6 +499,14 @@ const circleStyles = {
         displayElementId: 'BevanCircle',
         annotationLabel: 'Bevan',
         informationText: '○ Bevan circle',
+    },
+    SpiekerCircle: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'SpiekerCircle-checkbox',
+        displayElementId: 'SpiekerCircle',
+        annotationLabel: 'Spieker',
+        informationText: '○ Spieker circle',
     },
 };
 
@@ -891,6 +903,9 @@ function drawCircles() {
                     break;
                 case 'BevanCircle':
                     circle = calculateBevanCircle(points);
+                    break;
+                case 'SpiekerCircle':
+                    circle = calculateSpiekerCircle(points);
                     break;
                 default:
                     console.error(`Unknown circle key: ${key}`);
@@ -1550,6 +1565,11 @@ function calculateBevanCircle(points) {
     return calculateCircumcircle(excentralTriangle);
 }
 
+// Function to calculate the Spieker circle
+function calculateSpiekerCircle(points) {
+    const medialTriangle = calculateMedialTriangle(points);
+    return calculateIncircle(medialTriangle);
+}
 
 // Function to calculate the medial triangles
 function calculateMedialTriangle(points) {
