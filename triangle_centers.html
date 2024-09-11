@@ -125,6 +125,10 @@
         <input type="checkbox" id="NagelPoint-checkbox" unchecked> 
         <span id="NagelPoint" class="point-info"></span>
     </p>
+    <p>
+        <input type="checkbox" id="BevanPoint-checkbox" unchecked> 
+        <span id="BevanPoint" class="point-info"></span>
+    </p>
     <p>Lines</p>
     <p>
         <input type="checkbox" id="EulerLine-checkbox" unchecked> 
@@ -159,14 +163,22 @@
         <input type="checkbox" id="smallestCircle-checkbox" unchecked> 
         <span id="smallestCircle" class="circle-info"></span>
     </p>
-    <p></p>
+    <p>
         <input type="checkbox" id="LesterCircle-checkbox" unchecked> 
         <span id="LesterCircle" class="circle-info"></span>
+    </p>
+    <p>
+        <input type="checkbox" id="BevanCircle-checkbox" unchecked> 
+        <span id="BevanCircle" class="circle-info"></span>
     </p>
     <p>Triangles</p>
     <p>
         <input type="checkbox" id="medialTriangle-checkbox" unchecked> 
         <span id="medialTriangle" class="triangle-info"></span>
+    </p>
+    <p>
+        <input type="checkbox" id="excentralTriangle-checkbox" unchecked> 
+        <span id="excentralTriangle" class="triangle-info"></span>
     </p>
     <p>
         <input type="checkbox" id="outerNapoleonTriangle-checkbox" unchecked> 
@@ -349,6 +361,15 @@ const pointStyles = {
         informationText: '● Nagel point',
         ETCReference: 8,
     },
+    BevanPoint: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'BevanPoint-checkbox',
+        displayElementId: 'BevanPoint',
+        annotationLabel: 'Bevan',
+        informationText: '● Bevan point',
+        ETCReference: 40,
+    },
 };
 
 // Define styles for lines
@@ -429,6 +450,14 @@ const circleStyles = {
         annotationLabel: 'Lester',
         informationText: '○ Lester circle',
     },
+    BevanCircle: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'BevanCircle-checkbox',
+        displayElementId: 'BevanCircle',
+        annotationLabel: 'Bevan',
+        informationText: '○ Bevan circle',
+    },
 };
 
 // Define styles for triangles
@@ -440,6 +469,14 @@ const triangleStyles = {
         displayElementId: 'medialTriangle',
         annotationLabel: 'Medial',
         informationText: '△ Medial triangle',
+    },
+    excentralTriangle: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'excentralTriangle-checkbox',
+        displayElementId: 'excentralTriangle',
+        annotationLabel: 'Excentral',
+        informationText: '△ Excentral triangle',
     },
     outerNapoleonTriangle: {
         activeColor: 'brown',
@@ -727,6 +764,9 @@ function drawCenters() {
                 case 'NagelPoint':
                     center = calculateNagelPoint(points);
                     break;   
+                case 'BevanPoint':
+                    center = calculateBevanPoint(points);
+                    break;   
                 default:
                     console.error(`Unknown center key: ${key}`);
                     return;
@@ -802,6 +842,9 @@ function drawCircles() {
                 case 'LesterCircle':
                     circle = calculateLesterCircle(points);
                     break;
+                case 'BevanCircle':
+                    circle = calculateBevanCircle(points);
+                    break;
                 default:
                     console.error(`Unknown circle key: ${key}`);
                     return;
@@ -828,6 +871,9 @@ function drawTriangles() {
             switch (key) {
                 case 'medialTriangle':
                     triangle = calculateMedialTriangle(points);
+                    break;
+                case 'excentralTriangle':
+                    triangle = calculateExcentralTriangle(points);
                     break;
                 case 'outerNapoleonTriangle':
                     triangle = calculateNapoleonTriangle(points, outer = true);
@@ -1302,7 +1348,11 @@ function calculateGergonnePoint(points) {
 function calculateNagelPoint(points) {
     const extouchTriangle = calculateExtouchTriangle(points);
     return lineIntersection(points[0], extouchTriangle[0], points[1], extouchTriangle[1]);
+}
 
+// Function to calculate the Bevan point
+function calculateBevanPoint(points) {
+    return calculateBevanCircle(points).center;
 }
 
 
@@ -1433,6 +1483,12 @@ function calculateLesterCircle(points) {
     }
 }
 
+// Function to calculate the Bevan circle
+function calculateBevanCircle(points) {
+    const excentralTriangle = calculateExcentralTriangle(points);
+    return calculateCircumcircle(excentralTriangle);
+}
+
 
 // Function to calculate the medial triangles
 function calculateMedialTriangle(points) {
@@ -1442,6 +1498,17 @@ function calculateMedialTriangle(points) {
         midpoint(B, C),
         midpoint(C, A),
         midpoint(A, B)
+    ];
+}
+
+// Function to calculate the excentral triangles
+function calculateExcentralTriangle(points) {
+    const [A, B, C] = points;
+
+    return [
+        calculateExcenter([A, B, C]),
+        calculateExcenter([B, A, C]),
+        calculateExcenter([C, A, B])
     ];
 }
 
