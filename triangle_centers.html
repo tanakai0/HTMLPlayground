@@ -161,6 +161,10 @@
     </p>
     <p>Triangles</p>
     <p>
+        <input type="checkbox" id="medialTriangle-checkbox" unchecked> 
+        <span id="medialTriangle" class="triangle-info"></span>
+    </p>
+    <p>
         <input type="checkbox" id="outerNapoleonTriangle-checkbox" unchecked> 
         <span id="outerNapoleonTriangle" class="triangle-info"></span>
     </p>
@@ -397,6 +401,14 @@ const circleStyles = {
 
 // Define styles for triangles
 const triangleStyles = {
+    medialTriangle: {
+        activeColor: 'brown',
+        inactiveColor: 'lightgray',
+        checkboxId: 'medialTriangle-checkbox',
+        displayElementId: 'medialTriangle',
+        annotationLabel: 'Medial',
+        informationText: '△ Medial triangle',
+    },
     outerNapoleonTriangle: {
         activeColor: 'brown',
         inactiveColor: 'lightgray',
@@ -771,6 +783,9 @@ function drawTriangles() {
             
             // Switch statement to handle different triangle calculations
             switch (key) {
+                case 'medialTriangle':
+                    triangle = calculateMedialTriangle(points);
+                    break;
                 case 'outerNapoleonTriangle':
                     triangle = calculateNapoleonTriangle(points, outer = true);
                     break;
@@ -1365,6 +1380,17 @@ function calculateLesterCircle(points) {
     }
 }
 
+
+// Function to calculate the medial triangles
+function calculateMedialTriangle(points) {
+    const [A, B, C] = points;
+
+    return [
+        midpoint(B, C),
+        midpoint(C, A),
+        midpoint(A, B)
+    ];
+}
 
 // Function to calculate the outer Napoleon triangle
 function calculateNapoleonTriangle(points, outer = true) {
