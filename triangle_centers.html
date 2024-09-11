@@ -723,13 +723,13 @@ function drawCenters() {
                     center = calculateOrthocenter(points);
                     break;
                 case 'excenterA':
-                    center = calculateExcenter([points[0], points[1], points[2]]);
+                    center = calculateExcenter([points[2], points[0], points[1]]);
                     break;
                 case 'excenterB':
-                    center = calculateExcenter([points[1], points[0], points[2]]);
+                    center = calculateExcenter(points);
                     break;
                 case 'excenterC':
-                    center = calculateExcenter([points[2], points[0], points[1]]);
+                    center = calculateExcenter([points[1], points[2], points[0]]);
                     break;
                 case 'firstIsogonicCenter':
                     center = calculateIsogonicCenter(points, outer = true);
@@ -825,13 +825,13 @@ function drawCircles() {
                     circle = calculateCircumcircle(points);
                     break;
                 case 'excircleA':
-                    circle = calculateExcircle([points[0], points[1], points[2]]);
+                    circle = calculateExcircle([points[2], points[0], points[1]]);
                     break;
                 case 'excircleB':
-                    circle = calculateExcircle([points[1], points[0], points[2]]);
+                    circle = calculateExcircle(points);
                     break;
                 case 'excircleC':
-                    circle = calculateExcircle([points[2], points[0], points[1]]);
+                    circle = calculateExcircle([points[1], points[2], points[0]]);
                     break;
                 case 'ninePointCircle':
                     circle = calculateNinePointCircle(points);
@@ -1233,19 +1233,19 @@ function calculateOrthocenter(points) {
     return lineIntersectionGivenSlopesAndPoints(perpendicularSlopeAB, C, perpendicularSlopeBC, A);
 }
 
-// Function to calculate the excenter for the vertex A (intersection of the internal angle bisectors of the vertex and other external angle bisectors)
+// Function to calculate the excenter for the vertex B (intersection of the internal angle bisectors of the vertex and other external angle bisectors)
 function calculateExcenter(points) {
     const [A, B, C] = points;
     // Lengths of the triangle sides opposite to each vertex
     const a =  calculateDistance(B, C); // Length of side BC
-    const b =  calculateDistance(A, C); // Length of side CA
+    const b =  calculateDistance(C, A); // Length of side CA
     const c =  calculateDistance(A, B); // Length of side AB
 
-    // Excenter formula for vertex p (opposite to side BC)
-    const x = (-a * A.x + b * B.x + c * C.x) / (-a + b + c);
-    const y = (-a * A.y + b * B.y + c * C.y) / (-a + b + c);
-
-    return {x, y};
+    // Excenter formula for vertex B (opposite to side AC)
+    return {
+        x: (-b * B.x + c * C.x + a * A.x) / (-b + c + a),
+        y: (-b * B.y + c * C.y + a * A.y) / (-b + c + a)
+    }
 }
 
 // Function to calculate the isogonic center
@@ -1405,24 +1405,19 @@ function calculateCircumcircle(points) {
     };
 }
 
-// Function to calculate the excircle opposite to the vertex A
+// Function to calculate the excircle opposite to the vertex B
 function calculateExcircle(points) {
     const [A, B, C] = points;
-
-    // Calculate the center (already defined)
-    const center = calculateExcenter([A, B, C]);
 
     // Calculate the radius using the formula: 2 * area / (-a + b + c)
     const a = calculateDistance(B, C);
     const b = calculateDistance(C, A);
     const c = calculateDistance(A, B);
     const area = calculateArea(points);
-    const radius = 2 * area / (-a + b + c);
 
-    // Return the circle object with center and radius
     return {
-        center: center,
-        radius: radius
+        center: calculateExcenter(points),
+        radius: 2 * area / (-b + c + a)
     };
 }
 
@@ -1506,9 +1501,9 @@ function calculateExcentralTriangle(points) {
     const [A, B, C] = points;
 
     return [
+        calculateExcenter([C, A, B]),
         calculateExcenter([A, B, C]),
-        calculateExcenter([B, A, C]),
-        calculateExcenter([C, A, B])
+        calculateExcenter([B, C, A])
     ];
 }
 
@@ -1560,9 +1555,9 @@ function calculateGergonneTriangle(points) {
 // Function to calculate the extouch triangle
 function calculateExtouchTriangle(points) {
     const [A, B, C] = points;
-    const excenterA = calculateExcenter(points);
-    const excenterB = calculateExcenter([B, A, C]);
-    const excenterC = calculateExcenter([C, A, B]);
+    const excenterA = calculateExcenter([C, A, B]);
+    const excenterB = calculateExcenter([A, B, C]);
+    const excenterC = calculateExcenter([B, C, A]);
 
     // Slopes of perpendicular bisectors
     const slopeAB = calculateSlope(A, B);
