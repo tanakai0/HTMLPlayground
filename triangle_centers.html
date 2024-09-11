@@ -187,6 +187,10 @@
         <input type="checkbox" id="SpiekerCircle-checkbox" unchecked> 
         <span id="SpiekerCircle" class="circle-info"></span>
     </p>
+    <p>
+        <input type="checkbox" id="AdamsCircle-checkbox" unchecked> 
+        <span id="AdamsCircle" class="circle-info"></span>
+    </p>
     <p>Triangles</p>
     <p>
         <input type="checkbox" id="medialTriangle-checkbox" unchecked> 
@@ -507,6 +511,14 @@ const circleStyles = {
         displayElementId: 'SpiekerCircle',
         annotationLabel: 'Spieker',
         informationText: '○ Spieker circle',
+    },
+    AdamsCircle: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'AdamsCircle-checkbox',
+        displayElementId: 'AdamsCircle',
+        annotationLabel: 'Adams\'',
+        informationText: '○ Adams\' circle',
     },
 };
 
@@ -906,6 +918,9 @@ function drawCircles() {
                     break;
                 case 'SpiekerCircle':
                     circle = calculateSpiekerCircle(points);
+                    break;
+                case 'AdamsCircle':
+                    circle = calculateAdamsCircle(points);
                     break;
                 default:
                     console.error(`Unknown circle key: ${key}`);
@@ -1569,6 +1584,22 @@ function calculateBevanCircle(points) {
 function calculateSpiekerCircle(points) {
     const medialTriangle = calculateMedialTriangle(points);
     return calculateIncircle(medialTriangle);
+}
+
+// Function to calculate the Adams' circle
+function calculateAdamsCircle(points) {
+    const [A, B, C] = points;
+    const slopeAB = calculateSlope(A, B);
+    const slopeBC = calculateSlope(B, C);
+    const slopeCA = calculateSlope(C, A);
+    const GergonnePoint = calculateGergonnePoint(points);
+    const GergonneTriangle = calculateGergonneTriangle(points);
+    const slopeGTAB = calculateSlope(GergonneTriangle[0], GergonneTriangle[1]);
+    const slopeGTBC = calculateSlope(GergonneTriangle[1], GergonneTriangle[2]);
+    P1 = lineIntersectionGivenSlopesAndPoints(slopeGTAB, GergonnePoint, slopeBC, B);
+    P2 = lineIntersectionGivenSlopesAndPoints(slopeGTAB, GergonnePoint, slopeCA, C);
+    P3 = lineIntersectionGivenSlopesAndPoints(slopeGTBC, GergonnePoint, slopeAB, A);
+    return calculateCircumcircle([P1, P2, P3]);  
 }
 
 // Function to calculate the medial triangles
