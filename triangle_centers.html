@@ -11,10 +11,10 @@
         .info {
             margin-top: 10px;
         }
-        .point-info {
+        .center-info {
             color: black; /* Default color */
         }
-        .point-info.disabled {
+        .center-info.disabled {
             color: lightgray; /* Disabled state */
         }
         .line-info {
@@ -52,232 +52,20 @@
     <p>
         <button id="uncheck-all-btn">Uncheck all checkboxes</button>
     </p>
-    <p>Centers</p>
-    <p>
-        <input type="checkbox" id="centroid-checkbox" checked> 
-        <span id="centroid" class="point-info"></span>
-    </p>
-    <p>
-        <input type="checkbox" id="circumcenter-checkbox" checked> 
-        <span id="circumcenter" class="point-info"></span>
-    </p>
-    <p>
-        <input type="checkbox" id="incenter-checkbox" checked> 
-        <span id="incenter" class="point-info"></span>
-    </p>
-    <p>
-        <input type="checkbox" id="orthocenter-checkbox" checked> 
-        <span id="orthocenter" class="point-info"></span>
-    </p>
-    <p>
-        <input type="checkbox" id="excenterA-checkbox" checked> 
-        <span id="excenterA" class="point-info"></span>
-    </p>
-    <p>
-        <input type="checkbox" id="excenterB-checkbox" checked> 
-        <span id="excenterB" class="point-info"></span>
-    </p>
-    <p>
-        <input type="checkbox" id="excenterC-checkbox" checked> 
-        <span id="excenterC" class="point-info"></span>
-    </p>
-    <p>
-        <input type="checkbox" id="firstIsogonicCenter-checkbox" unchecked> 
-        <span id="firstIsogonicCenter" class="point-info"></span>
-    </p>
-    <p>
-        <input type="checkbox" id="FermatPoint-checkbox" unchecked> 
-        <span id="FermatPoint" class="point-info"></span>
-    </p>
-    <p>
-        <input type="checkbox" id="secondIsogonicCenter-checkbox" unchecked> 
-        <span id="secondIsogonicCenter" class="point-info"></span>
-    </p>
-    <p>
-        <input type="checkbox" id="deLongchampsPoint-checkbox" unchecked> 
-        <span id="deLongchampsPoint" class="point-info"></span>
-    </p>
-    <p>
-        <input type="checkbox" id="ninePointCenter-checkbox" unchecked> 
-        <span id="ninePointCenter" class="point-info"></span>
-    </p>
-    <p>
-        <input type="checkbox" id="firstNapoleonPoint-checkbox" unchecked> 
-        <span id="firstNapoleonPoint" class="point-info"></span>
-    </p>
-    <p>
-        <input type="checkbox" id="secondNapoleonPoint-checkbox" unchecked> 
-        <span id="secondNapoleonPoint" class="point-info"></span>
-    </p>
-    <p>
-        <input type="checkbox" id="symmedianPoint-checkbox" unchecked> 
-        <span id="symmedianPoint" class="point-info"></span>
-    </p>
-    <p>
-        <input type="checkbox" id="CenterOfTheLesterCircle-checkbox" unchecked> 
-        <span id="CenterOfTheLesterCircle" class="point-info"></span>
-    </p>
-    <p>
-        <input type="checkbox" id="GergonnePoint-checkbox" unchecked> 
-        <span id="GergonnePoint" class="point-info"></span>
-    </p>
-    <p>
-        <input type="checkbox" id="NagelPoint-checkbox" unchecked> 
-        <span id="NagelPoint" class="point-info"></span>
-    </p>
-    <p>
-        <input type="checkbox" id="BevanPoint-checkbox" unchecked> 
-        <span id="BevanPoint" class="point-info"></span>
-    </p>
-    <p>
-        <input type="checkbox" id="Mittenpunkt-checkbox" unchecked> 
-        <span id="Mittenpunkt" class="point-info"></span>
-    </p>
-    <p>
-        <input type="checkbox" id="SpiekerCenter-checkbox" unchecked> 
-        <span id="SpiekerCenter" class="point-info"></span>
-    </p>
-    <p>
-        <input type="checkbox" id="FuhrmannCenter-checkbox" unchecked> 
-        <span id="FuhrmannCenter" class="point-info"></span>
-    </p>
+    <p>Points and centers</p>
+    <div id="centers-section"></div>
     <p>Lines</p>
-    <p>
-        <input type="checkbox" id="EulerLine-checkbox" unchecked> 
-        <span id="EulerLine" class="line-info"></span>
-    </p>
-    <p>
-        <input type="checkbox" id="NagelLine-checkbox" unchecked> 
-        <span id="NagelLine" class="line-info"></span>
-    </p>
-    <p>
-        <input type="checkbox" id="FermatAxis-checkbox" unchecked> 
-        <span id="FermatAxis" class="line-info"></span>
-    </p>
+    <div id="lines-section"></div>
     <p>Circles</p>
-    <p>
-        <input type="checkbox" id="incircle-checkbox" unchecked> 
-        <span id="incircle" class="circle-info"></span>
-    </p>
-    <p>
-        <input type="checkbox" id="circumcircle-checkbox" unchecked> 
-        <span id="circumcircle" class="circle-info"></span>
-    </p>
-    <p>
-        <input type="checkbox" id="excircleA-checkbox" unchecked> 
-        <span id="excircleA" class="circle-info"></span>
-    </p>
-    <p>
-        <input type="checkbox" id="excircleB-checkbox" unchecked> 
-        <span id="excircleB" class="circle-info"></span>
-    </p>
-    <p>
-        <input type="checkbox" id="excircleC-checkbox" unchecked> 
-        <span id="excircleC" class="circle-info"></span>
-    </p>
-    <p>
-        <input type="checkbox" id="ninePointCircle-checkbox" unchecked> 
-        <span id="ninePointCircle" class="circle-info"></span>
-    </p>
-    <p>
-        <input type="checkbox" id="smallestCircle-checkbox" unchecked> 
-        <span id="smallestCircle" class="circle-info"></span>
-    </p>
-    <p>
-        <input type="checkbox" id="LesterCircle-checkbox" unchecked> 
-        <span id="LesterCircle" class="circle-info"></span>
-    </p>
-    <p>
-        <input type="checkbox" id="BevanCircle-checkbox" unchecked> 
-        <span id="BevanCircle" class="circle-info"></span>
-    </p>
-    <p>
-        <input type="checkbox" id="SpiekerCircle-checkbox" unchecked> 
-        <span id="SpiekerCircle" class="circle-info"></span>
-    </p>
-    <p>
-        <input type="checkbox" id="AdamsCircle-checkbox" unchecked> 
-        <span id="AdamsCircle" class="circle-info"></span>
-    </p>
-    <p>
-        <input type="checkbox" id="FuhrmannCircle-checkbox" unchecked> 
-        <span id="FuhrmannCircle" class="circle-info"></span>
-    </p>
+    <div id="circles-section"></div>
     <p>Triangles</p>
-    <p>
-        <input type="checkbox" id="medialTriangle-checkbox" unchecked> 
-        <span id="medialTriangle" class="triangle-info"></span>
-    </p>
-    <p>
-        <input type="checkbox" id="excentralTriangle-checkbox" unchecked> 
-        <span id="excentralTriangle" class="triangle-info"></span>
-    </p>
-    <p>
-        <input type="checkbox" id="orthicTriangle-checkbox" unchecked> 
-        <span id="orthicTriangle" class="triangle-info"></span>
-    </p>
-    <p>
-        <input type="checkbox" id="outerNapoleonTriangle-checkbox" unchecked> 
-        <span id="outerNapoleonTriangle" class="triangle-info"></span>
-    </p>
-    <p>
-        <input type="checkbox" id="innerNapoleonTriangle-checkbox" unchecked> 
-        <span id="innerNapoleonTriangle" class="triangle-info"></span>
-    </p>
-    <p>
-        <input type="checkbox" id="GergonneTriangle-checkbox" unchecked> 
-        <span id="GergonneTriangle" class="triangle-info"></span>
-    </p>
-    <p>
-        <input type="checkbox" id="extouchTriangle-checkbox" unchecked> 
-        <span id="extouchTriangle" class="triangle-info"></span>
-    </p> 
-    <p>
-        <input type="checkbox" id="FuhrmannTriangle-checkbox" unchecked> 
-        <span id="FuhrmannTriangle" class="triangle-info"></span>
-    </p>
+    <div id="triangles-section"></div>
 </div>
 
 <script>
 // Define styles for centers
 // ETCReference is the reference number of the encyclopedia of triangle centers (ETC)
-const pointStyles = {
-    centroid: {
-        activeColor: 'blue',
-        inactiveColor: 'lightgray', 
-        checkboxId: 'centroid-checkbox',
-        displayElementId: 'centroid',
-        annotationLabel: 'Centroid',
-        informationText: '● Centroid',
-        ETCReference: 2,
-    },
-    circumcenter: {
-        activeColor: 'red',
-        inactiveColor: 'lightgray', 
-        checkboxId: 'circumcenter-checkbox',
-        displayElementId: 'circumcenter',
-        annotationLabel: 'Circumcenter',
-        informationText: '● Circumcenter',
-        ETCReference: 3,
-    },
-    incenter: {
-        activeColor: 'green',
-        inactiveColor: 'lightgray', 
-        checkboxId: 'incenter-checkbox',
-        displayElementId: 'incenter',
-        annotationLabel: 'Incenter',
-        informationText: '● Incenter',
-        ETCReference: 1,
-    },
-    orthocenter: {
-        activeColor: 'purple',
-        inactiveColor: 'lightgray', 
-        checkboxId: 'orthocenter-checkbox',
-        displayElementId: 'orthocenter',
-        annotationLabel: 'Orthocenter',
-        informationText: '● Orthocenter',
-        ETCReference: 4,
-    },
+const centerStyles = {
     excenterA: {
         activeColor: 'orange',
         inactiveColor: 'lightgray', 
@@ -301,6 +89,96 @@ const pointStyles = {
         displayElementId: 'excenterC',
         annotationLabel: 'Excenter (C)',
         informationText: '● Excenter opposite to vertex C',
+    },
+    incenter: {
+        activeColor: 'green',
+        inactiveColor: 'lightgray', 
+        checkboxId: 'incenter-checkbox',
+        displayElementId: 'incenter',
+        annotationLabel: 'Incenter',
+        informationText: '● Incenter',
+        ETCReference: 1,
+    },
+    centroid: {
+        activeColor: 'blue',
+        inactiveColor: 'lightgray', 
+        checkboxId: 'centroid-checkbox',
+        displayElementId: 'centroid',
+        annotationLabel: 'Centroid',
+        informationText: '● Centroid',
+        ETCReference: 2,
+    },
+    circumcenter: {
+        activeColor: 'red',
+        inactiveColor: 'lightgray', 
+        checkboxId: 'circumcenter-checkbox',
+        displayElementId: 'circumcenter',
+        annotationLabel: 'Circumcenter',
+        informationText: '● Circumcenter',
+        ETCReference: 3,
+    },
+    orthocenter: {
+        activeColor: 'purple',
+        inactiveColor: 'lightgray', 
+        checkboxId: 'orthocenter-checkbox',
+        displayElementId: 'orthocenter',
+        annotationLabel: 'Orthocenter',
+        informationText: '● Orthocenter',
+        ETCReference: 4,
+    },
+    ninePointCenter: {
+        activeColor: 'lightblue',
+        inactiveColor: 'lightgray', 
+        checkboxId: 'ninePointCenter-checkbox',
+        displayElementId: 'ninePointCenter',
+        annotationLabel: 'Nine-point',
+        informationText: '● Nine-point center',
+        ETCReference: 5,
+    },
+    symmedianPoint: {
+        activeColor: 'gold',
+        inactiveColor: 'lightgray', 
+        checkboxId: 'symmedianPoint-checkbox',
+        displayElementId: 'symmedianPoint',
+        annotationLabel: 'Symmedian',
+        informationText: '● Symmedian point (Lemoine point, Grebe point)',
+        ETCReference: 6,
+    },
+    GergonnePoint: {
+        activeColor: 'brown',
+        inactiveColor: 'lightgray', 
+        checkboxId: 'GergonnePoint-checkbox',
+        displayElementId: 'GergonnePoint',
+        annotationLabel: 'Gergonne',
+        informationText: '● Gergonne point',
+        ETCReference: 7,
+    },
+    NagelPoint: {
+        activeColor: 'red',
+        inactiveColor: 'lightgray', 
+        checkboxId: 'NagelPoint-checkbox',
+        displayElementId: 'NagelPoint',
+        annotationLabel: 'Nagel',
+        informationText: '● Nagel point',
+        ETCReference: 8,
+    },
+    Mittenpunkt: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'Mittenpunkt-checkbox',
+        displayElementId: 'Mittenpunkt',
+        annotationLabel: 'Mittenpunkt',
+        informationText: '● Mittenpunkt',
+        ETCReference: 9,
+    },
+    SpiekerCenter: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'SpiekerCenter-checkbox',
+        displayElementId: 'SpiekerCenter',
+        annotationLabel: 'Spieker',
+        informationText: '● Spieker center',
+        ETCReference: 10,
     },
     firstIsogonicCenter: {
         activeColor: 'gray',
@@ -329,24 +207,6 @@ const pointStyles = {
         informationText: '● Second isogonic center',
         ETCReference: 14,
     },
-    deLongchampsPoint: {
-        activeColor: '#c54ea0',
-        inactiveColor: 'lightgray', 
-        checkboxId: 'deLongchampsPoint-checkbox',
-        displayElementId: 'deLongchampsPoint',
-        annotationLabel: 'de Longchamps',
-        informationText: '● de Longchamps point',
-        ETCReference: 20,
-    },
-    ninePointCenter: {
-        activeColor: 'lightblue',
-        inactiveColor: 'lightgray', 
-        checkboxId: 'ninePointCenter-checkbox',
-        displayElementId: 'ninePointCenter',
-        annotationLabel: 'Nine-point',
-        informationText: '● Nine-point center',
-        ETCReference: 5,
-    },
     firstNapoleonPoint: {
         activeColor: 'brown',
         inactiveColor: 'lightgray', 
@@ -365,41 +225,14 @@ const pointStyles = {
         informationText: '● Second Napoleon point',
         ETCReference: 18,
     },
-    symmedianPoint: {
-        activeColor: 'gold',
+    deLongchampsPoint: {
+        activeColor: '#c54ea0',
         inactiveColor: 'lightgray', 
-        checkboxId: 'symmedianPoint-checkbox',
-        displayElementId: 'symmedianPoint',
-        annotationLabel: 'Symmedian',
-        informationText: '● Symmedian point (Lemoine point, Grebe point)',
-        ETCReference: 6,
-    },
-    CenterOfTheLesterCircle: {
-        activeColor: 'gold',
-        inactiveColor: 'lightgray', 
-        checkboxId: 'CenterOfTheLesterCircle-checkbox',
-        displayElementId: 'CenterOfTheLesterCircle',
-        annotationLabel: 'Center of the Lester circle',
-        informationText: '● Center of the Lester circle',
-        ETCReference: 1116,
-    },
-    GergonnePoint: {
-        activeColor: 'brown',
-        inactiveColor: 'lightgray', 
-        checkboxId: 'GergonnePoint-checkbox',
-        displayElementId: 'GergonnePoint',
-        annotationLabel: 'Gergonne',
-        informationText: '● Gergonne point',
-        ETCReference: 7,
-    },
-    NagelPoint: {
-        activeColor: 'red',
-        inactiveColor: 'lightgray', 
-        checkboxId: 'NagelPoint-checkbox',
-        displayElementId: 'NagelPoint',
-        annotationLabel: 'Nagel',
-        informationText: '● Nagel point',
-        ETCReference: 8,
+        checkboxId: 'deLongchampsPoint-checkbox',
+        displayElementId: 'deLongchampsPoint',
+        annotationLabel: 'de Longchamps',
+        informationText: '● de Longchamps point',
+        ETCReference: 20,
     },
     BevanPoint: {
         activeColor: 'gray',
@@ -410,24 +243,6 @@ const pointStyles = {
         informationText: '● Bevan point',
         ETCReference: 40,
     },
-    Mittenpunkt: {
-        activeColor: 'gray',
-        inactiveColor: 'lightgray',
-        checkboxId: 'Mittenpunkt-checkbox',
-        displayElementId: 'Mittenpunkt',
-        annotationLabel: 'Mittenpunkt',
-        informationText: '● Mittenpunkt',
-        ETCReference: 9,
-    },
-    SpiekerCenter: {
-        activeColor: 'gray',
-        inactiveColor: 'lightgray',
-        checkboxId: 'SpiekerCenter-checkbox',
-        displayElementId: 'SpiekerCenter',
-        annotationLabel: 'Spieker',
-        informationText: '● Spieker center',
-        ETCReference: 10,
-    },
     FuhrmannCenter: {
         activeColor: 'gray',
         inactiveColor: 'lightgray',
@@ -436,6 +251,15 @@ const pointStyles = {
         annotationLabel: 'Fuhrmann',
         informationText: '● Fuhrmann center',
         ETCReference: 355,
+    },
+    CenterOfTheLesterCircle: {
+        activeColor: 'gold',
+        inactiveColor: 'lightgray', 
+        checkboxId: 'CenterOfTheLesterCircle-checkbox',
+        displayElementId: 'CenterOfTheLesterCircle',
+        annotationLabel: 'Center of the Lester circle',
+        informationText: '● Center of the Lester circle',
+        ETCReference: 1116,
     },
 };
 
@@ -469,22 +293,6 @@ const lineStyles = {
 
 // Define styles for circles
 const circleStyles = {
-    incircle: {
-        activeColor: 'green',
-        inactiveColor: 'lightgray',
-        checkboxId: 'incircle-checkbox',
-        displayElementId: 'incircle',
-        annotationLabel: 'Incircle',
-        informationText: '○ Incircle',
-    },
-    circumcircle: {
-        activeColor: 'red',
-        inactiveColor: 'lightgray',
-        checkboxId: 'circumcircle-checkbox',
-        displayElementId: 'circumcircle',
-        annotationLabel: 'Circumcircle',
-        informationText: '○ Circumcircle',
-    },
     excircleA: {
         activeColor: 'orange',
         inactiveColor: 'lightgray',
@@ -508,6 +316,22 @@ const circleStyles = {
         displayElementId: 'excircleC',
         annotationLabel: 'Excircle (C)',
         informationText: '○ Excircle opposite to vertex C',
+    },
+    incircle: {
+        activeColor: 'green',
+        inactiveColor: 'lightgray',
+        checkboxId: 'incircle-checkbox',
+        displayElementId: 'incircle',
+        annotationLabel: 'Incircle',
+        informationText: '○ Incircle',
+    },
+    circumcircle: {
+        activeColor: 'red',
+        inactiveColor: 'lightgray',
+        checkboxId: 'circumcircle-checkbox',
+        displayElementId: 'circumcircle',
+        annotationLabel: 'Circumcircle',
+        informationText: '○ Circumcircle',
     },
     ninePointCircle: {
         activeColor: 'lightblue',
@@ -662,13 +486,13 @@ const ctx = canvas.getContext('2d');
 
 // Combine all styles into one array of style objects
 const allStyles = [
-    ...Object.values(pointStyles),
+    ...Object.values(centerStyles),
     ...Object.values(lineStyles),
     ...Object.values(circleStyles),
     ...Object.values(triangleStyles)
 ];
 const allCheckboxIds = [
-    ...Object.values(pointStyles).map(style => style.checkboxId),
+    ...Object.values(centerStyles).map(style => style.checkboxId),
     ...Object.values(lineStyles).map(style => style.checkboxId),
     ...Object.values(circleStyles).map(style => style.checkboxId),
     ...Object.values(triangleStyles).map(style => style.checkboxId)
@@ -692,6 +516,29 @@ function initializeStyles() {
             displayElement.textContent = style.informationText;
         }
     });
+    createCheckboxes(Object.values(centerStyles), 'centers-section', 'center-info');
+    createCheckboxes(Object.values(lineStyles), 'lines-section', 'line-info');
+    createCheckboxes(Object.values(circleStyles), 'circles-section', 'circle-info');
+    createCheckboxes(Object.values(triangleStyles), 'triangles-section', 'triangle-info');
+
+    // Default the checkboxes for the five significant centers
+    const defaultTrueCheckboxes = [
+        centerStyles.excenterA.checkboxId,
+        centerStyles.excenterB.checkboxId,
+        centerStyles.excenterC.checkboxId,
+        centerStyles.incenter.checkboxId,
+        centerStyles.centroid.checkboxId,
+        centerStyles.circumcenter.checkboxId,
+        centerStyles.orthocenter.checkboxId,
+    ];
+
+    defaultTrueCheckboxes.forEach(checkboxId => {
+        const checkbox = document.getElementById(checkboxId);
+        if (checkbox) {
+            checkbox.checked = true;
+        }
+    });
+
 }
 
 // Function to redraw the canvas
@@ -738,6 +585,29 @@ function applyStyles() {
                 displayElement.classList.add('disabled');
             }
         }
+    });
+}
+
+// Function to create checkboxes and add them to the correct section
+function createCheckboxes(styleList, sectionId, className) {
+    const section = document.getElementById(sectionId);
+
+    styleList.forEach(style => {
+        const p = document.createElement('p');
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = style.checkboxId;
+        checkbox.checked = false;
+
+        const span = document.createElement('span');
+        span.id = style.displayElementId;
+        span.className = className;
+        span.textContent = style.informationText;
+
+        p.appendChild(checkbox);
+        p.appendChild(span);
+        section.appendChild(p);
     });
 }
 
@@ -832,8 +702,8 @@ function drawOriginalTriangle() {
 
 // Draw centers or points based on checkbox states
 function drawCenters() {
-    Object.keys(pointStyles).forEach(key => {
-        const style = pointStyles[key];
+    Object.keys(centerStyles).forEach(key => {
+        const style = centerStyles[key];
         const checkbox = document.getElementById(style.checkboxId);
 
         if (checkbox && checkbox.checked) {
