@@ -474,6 +474,14 @@ const triangleStyles = {
         annotationLabel: 'Fuhrmann',
         informationText: '△ Fuhrmann triangle',
     },
+    FeuerbachTriangle: {
+        activeColor: 'brown',
+        inactiveColor: 'lightgray',
+        checkboxId: 'FeuerbachTriangle-checkbox',
+        displayElementId: 'FeuerbachTriangle',
+        annotationLabel: 'Feuerbach',
+        informationText: '△ Feuerbach triangle',
+    },
 };
 
 // Triangle vertices
@@ -930,6 +938,9 @@ function drawTriangles() {
                 case 'FuhrmannTriangle':
                     triangle = calculateFuhrmannTriangle(points);
                     break;
+                case 'FeuerbachTriangle':
+                    triangle = calculateFeuerbachTriangle(points);
+                    break;
                 default:
                     console.error(`Unknown triangle key: ${key}`);
                     return;
@@ -1233,6 +1244,43 @@ function lineIntersection(P1, P2, Q1, Q2) {
     }
 }
 
+
+// Function to calculate a tangency point between two circles
+function calculateTangencyPoint(c1, c2) {
+    if (closeEnoughCircles(c1, c2)) {
+        return null;
+    }
+    slope = calculateSlope(c1.center, c2.center);
+    let P1, P2;
+    if (isFinite(slope)) {
+        const coefficient = c1.radius / Math.sqrt(slope ** 2 + 1);
+        P1 = {
+            x: c1.center.x + coefficient,
+            y: c1.center.y + slope * coefficient
+        };
+        P2 = {
+            x: c1.center.x - coefficient,
+            y: c1.center.y - slope * coefficient
+        };
+    }
+    else{
+        P1 = {
+            x: c1.center.x,
+            y: c1.center.y + c1.radius
+        };
+        P2 = {
+            x: c1.center.x,
+            y: c1.center.y - c1.radius
+        };
+    }
+    if (closeEnoughScalars((P1.x - c2.center.x)**2 + (P1.y - c2.center.y)**2, c2.radius ** 2)) {
+        return P1;
+    }
+    else {
+        return P2;
+    }
+}
+
 // Function to calculate the centroid of the triangle
 function calculateCentroid(points) {
     const [A, B, C] = points;
@@ -1422,38 +1470,7 @@ function calculateSpiekerCenter(points) {
 function calculateFeuerbachPoint(points) {
     const incircle = calculateIncircle(points);
     const ninePointCircle = calculateNinePointCircle(points);
-    if (closeEnoughCircles(incircle, ninePointCircle)) {
-        return null;
-    }
-    slope = calculateSlope(incircle.center, ninePointCircle.center);
-    let P1, P2;
-    if (isFinite(slope)) {
-        const coefficient = incircle.radius / Math.sqrt(slope ** 2 + 1);
-        P1 = {
-            x: incircle.center.x + coefficient,
-            y: incircle.center.y + slope * coefficient
-        };
-        P2 = {
-            x: incircle.center.x - coefficient,
-            y: incircle.center.y - slope * coefficient
-        };
-    }
-    else{
-        P1 = {
-            x: incircle.center.x,
-            y: incircle.center.y + incircle.radius
-        };
-        P2 = {
-            x: incircle.center.x,
-            y: incircle.center.y - incircle.radius
-        };
-    }
-    if (closeEnoughScalars((P1.x - ninePointCircle.center.x)**2 + (P1.y - ninePointCircle.center.y)**2, ninePointCircle.radius ** 2)) {
-        return P1;
-    }
-    else {
-        return P2;
-    }
+    return calculateTangencyPoint(incircle, ninePointCircle);
 }
 
 
@@ -1789,8 +1806,24 @@ function calculateFuhrmannTriangle(points) {
         },
 
     ];
-
 }
+
+
+// Function to calculate the Feuerbach triangle
+function calculateFeuerbachTriangle(points) {
+    const [A, B, C] = points;
+    const excircleA = calculateExcircle([C, A, B]);
+    const excircleB = calculateExcircle([A, B, C]);
+    const excircleC = calculateExcircle([B, C, A]);
+    const ninePointCircle = calculateNinePointCircle(points);
+
+    return [
+        calculateTangencyPoint(ninePointCircle, excircleA),
+        calculateTangencyPoint(ninePointCircle, excircleB),
+        calculateTangencyPoint(ninePointCircle, excircleC)
+    ];
+}
+
 </script>
 </body>
 </html>
