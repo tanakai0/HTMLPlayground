@@ -213,6 +213,10 @@
         <span id="excentralTriangle" class="triangle-info"></span>
     </p>
     <p>
+        <input type="checkbox" id="orthicTriangle-checkbox" unchecked> 
+        <span id="orthicTriangle" class="triangle-info"></span>
+    </p>
+    <p>
         <input type="checkbox" id="outerNapoleonTriangle-checkbox" unchecked> 
         <span id="outerNapoleonTriangle" class="triangle-info"></span>
     </p>
@@ -588,6 +592,14 @@ const triangleStyles = {
         displayElementId: 'excentralTriangle',
         annotationLabel: 'Excentral',
         informationText: '△ Excentral triangle',
+    },
+    orthicTriangle: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'orthicTriangle-checkbox',
+        displayElementId: 'orthicTriangle',
+        annotationLabel: 'Orthic',
+        informationText: '△ Orthic triangle',
     },
     outerNapoleonTriangle: {
         activeColor: 'brown',
@@ -1017,6 +1029,9 @@ function drawTriangles() {
                     break;
                 case 'excentralTriangle':
                     triangle = calculateExcentralTriangle(points);
+                    break;
+                case 'orthicTriangle':
+                    triangle = calculateOrthicTriangle(points);
                     break;
                 case 'outerNapoleonTriangle':
                     triangle = calculateNapoleonTriangle(points, outer = true);
@@ -1714,6 +1729,22 @@ function calculateExcentralTriangle(points) {
         calculateExcenter([C, A, B]),
         calculateExcenter([A, B, C]),
         calculateExcenter([B, C, A])
+    ];
+}
+
+// Function to calculate the orthic triangles
+function calculateOrthicTriangle(points) {
+    const [A, B, C] = points;
+    const slopeAB = calculateSlope(A, B);
+    const slopeBC = calculateSlope(B, C);
+    const slopeCA = calculateSlope(C, A);
+    const perpendicularSlopeAB = perpendicularSlope(slopeAB);
+    const perpendicularSlopeBC = perpendicularSlope(slopeBC);
+    const perpendicularSlopeCA = perpendicularSlope(slopeCA);
+    return [
+        lineIntersectionGivenSlopesAndPoints(slopeBC, B, perpendicularSlopeBC, A),
+        lineIntersectionGivenSlopesAndPoints(slopeCA, C, perpendicularSlopeCA, B),
+        lineIntersectionGivenSlopesAndPoints(slopeAB, A, perpendicularSlopeAB, C)
     ];
 }
 
