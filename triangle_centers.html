@@ -137,6 +137,10 @@
         <input type="checkbox" id="SpiekerCenter-checkbox" unchecked> 
         <span id="SpiekerCenter" class="point-info"></span>
     </p>
+    <p>
+        <input type="checkbox" id="FuhrmannCenter-checkbox" unchecked> 
+        <span id="FuhrmannCenter" class="point-info"></span>
+    </p>
     <p>Lines</p>
     <p>
         <input type="checkbox" id="EulerLine-checkbox" unchecked> 
@@ -190,6 +194,10 @@
     <p>
         <input type="checkbox" id="AdamsCircle-checkbox" unchecked> 
         <span id="AdamsCircle" class="circle-info"></span>
+    </p>
+    <p>
+        <input type="checkbox" id="FuhrmannCircle-checkbox" unchecked> 
+        <span id="FuhrmannCircle" class="circle-info"></span>
     </p>
     <p>Triangles</p>
     <p>
@@ -412,6 +420,15 @@ const pointStyles = {
         informationText: '● Spieker center',
         ETCReference: 10,
     },
+    FuhrmannCenter: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'FuhrmannCenter-checkbox',
+        displayElementId: 'FuhrmannCenter',
+        annotationLabel: 'Fuhrmann',
+        informationText: '● Fuhrmann center',
+        ETCReference: 355,
+    },
 };
 
 // Define styles for lines
@@ -523,6 +540,22 @@ const circleStyles = {
         displayElementId: 'AdamsCircle',
         annotationLabel: 'Adams\'',
         informationText: '○ Adams\' circle',
+    },
+    AdamsCircle: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'AdamsCircle-checkbox',
+        displayElementId: 'AdamsCircle',
+        annotationLabel: 'Adams\'',
+        informationText: '○ Adams\' circle',
+    },
+    FuhrmannCircle: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'FuhrmannCircle-checkbox',
+        displayElementId: 'FuhrmannCircle',
+        annotationLabel: 'Fuhrmann',
+        informationText: '○ Fuhrmann circle',
     },
 };
 
@@ -846,6 +879,9 @@ function drawCenters() {
                     break;
                 case 'SpiekerCenter':
                     center = calculateSpiekerCenter(points);
+                    break;
+                case 'FuhrmannCenter':
+                    center = calculateFuhrmannCenter(points);
                     break; 
                 default:
                     console.error(`Unknown center key: ${key}`);
@@ -933,6 +969,9 @@ function drawCircles() {
                     break;
                 case 'AdamsCircle':
                     circle = calculateAdamsCircle(points);
+                    break;
+                case 'FuhrmannCircle':
+                    circle = calculateFuhrmannCircle(points);
                     break;
                 default:
                     console.error(`Unknown circle key: ${key}`);
@@ -1464,6 +1503,11 @@ function calculateSpiekerCenter(points) {
     return calculateIncenter(medialTriangle);
 }
 
+// Function to calculate the Fuhrmann center
+function calculateFuhrmannCenter(points) {
+    return calculateCircumcircle(calculateFuhrmannTriangle(points)).center;
+}
+
 // Function to calculate the Euler line
 function calculateEulerLine(points) {
     const orthocenter = calculateOrthocenter(points);
@@ -1620,6 +1664,11 @@ function calculateAdamsCircle(points) {
     P2 = lineIntersectionGivenSlopesAndPoints(slopeGTAB, GergonnePoint, slopeCA, C);
     P3 = lineIntersectionGivenSlopesAndPoints(slopeGTBC, GergonnePoint, slopeAB, A);
     return calculateCircumcircle([P1, P2, P3]);  
+}
+
+// Function to calculate the Fuhrmann circle
+function calculateFuhrmannCircle(points) {
+    return calculateCircumcircle(calculateFuhrmannTriangle(points));
 }
 
 // Function to calculate the medial triangles
