@@ -215,6 +215,10 @@
     <p>
         <input type="checkbox" id="extouchTriangle-checkbox" unchecked> 
         <span id="extouchTriangle" class="triangle-info"></span>
+    </p> 
+    <p>
+        <input type="checkbox" id="FuhrmannTriangle-checkbox" unchecked> 
+        <span id="FuhrmannTriangle" class="triangle-info"></span>
     </p>    
 </div>
 
@@ -571,6 +575,14 @@ const triangleStyles = {
         displayElementId: 'extouchTriangle',
         annotationLabel: 'Extouch',
         informationText: '△ Extouch triangle',
+    },
+    FuhrmannTriangle: {
+        activeColor: 'brown',
+        inactiveColor: 'lightgray',
+        checkboxId: 'FuhrmannTriangle-checkbox',
+        displayElementId: 'FuhrmannTriangle',
+        annotationLabel: 'Fuhrmann',
+        informationText: '△ Fuhrmann triangle',
     },
 };
 
@@ -964,6 +976,9 @@ function drawTriangles() {
                 case 'extouchTriangle':
                     triangle = calculateExtouchTriangle(points);
                     break;
+                case 'FuhrmannTriangle':
+                    triangle = calculateFuhrmannTriangle(points);
+                    break;
                 default:
                     console.error(`Unknown triangle key: ${key}`);
                     return;
@@ -1147,6 +1162,11 @@ function midpoint(p1, p2){
         x: (p1.x + p2.x) / 2,
         y: (p1.y + p2.y) / 2
     }
+}
+
+// Cross product of vectors p1p2 and p1p3
+function calculateCrossProduct(p1, p2, p3) {
+    return (p2.x - p1.x) * (p3.y - p1.y) - (p2.y - p1.y) * (p3.x - p1.x);
 }
 
 function closeEnoughScalars(val1, val2) {
@@ -1336,7 +1356,7 @@ function calculateIsogonicCenter(points, outer = true) {
     }
 
     // Determine rotation direction based on the cross product of vectors AB and AC
-    const crossProduct = (B.x - A.x) * (C.y - A.y) - (B.y - A.y) * (C.x - A.x);
+    const crossProduct = calculateCrossProduct(A, B, C);
     let rotationRadian = crossProduct > 0 ? -60 : 60;
     if (!outer){
         rotationRadian = -rotationRadian;
@@ -1629,7 +1649,7 @@ function calculateNapoleonTriangle(points, outer = true) {
     const [A, B, C] = points;
 
     // Calculate the outer equilateral triangle on each side
-    const crossProductAB_AC = (B.x - A.x) * (C.y - A.y) - (B.y - A.y) * (C.x - A.x);
+    const crossProductAB_AC = calculateCrossProduct(A, B, C);
 
     // Determine rotation direction based on cross products
     let rotationRadian = crossProductAB_AC > 0 ? -60 : 60;
@@ -1691,6 +1711,58 @@ function calculateExtouchTriangle(points) {
     ];
 }
 
+// Function to calculate the Fuhrmann triangle
+function calculateFuhrmannTriangle(points) {
+    // Function to calculate point bisecting the arc AC length opposite to the points B
+    function calculatePointBisectingArc(points) {
+        const [A, B, C] = points;
+        const circumcircle = calculateCircumcircle(points);
+        const circumcenter = circumcircle.center;
+        const circumradius = circumcircle.radius;
+        const crossProductBA_BC = calculateCrossProduct(B, A, C);
+        const perpendicularSlopeCA = perpendicularSlope(calculateSlope(C, A));
+        const sqrtDenominator = Math.sqrt(perpendicularSlopeCA**2 + 1);
+        // Two candidate points to bisect the arc length P1, P2
+        const P1 = {
+            x: circumcenter.x + circumradius / sqrtDenominator,
+            y: isFinite(perpendicularSlopeCA) ? 
+            circumcenter.y + circumradius * perpendicularSlopeCA / sqrtDenominator
+            : circumcenter.y + circumradius
+        };
+        const P2 = {
+            x: circumcenter.x - circumradius / sqrtDenominator,
+            y: isFinite(perpendicularSlopeCA) ? 
+            circumcenter.y - circumradius * perpendicularSlopeCA / sqrtDenominator
+            : circumcenter.y - circumradius
+        };
+        crossProductP1A_P1C = calculateCrossProduct(P1, A, C);
+        return (crossProductBA_BC * crossProductP1A_P1C < 0) ? P1 : P2;
+    }
+
+    const [A, B, C] = points;
+    const midpointAB = midpoint(A, B);
+    const midpointBC = midpoint(B, C);
+    const midpointCA = midpoint(C, A);
+    const PA = calculatePointBisectingArc([C, A, B]);
+    const PB = calculatePointBisectingArc([A, B, C]);
+    const PC = calculatePointBisectingArc([B, C, A]);
+    return [
+        {
+            x: 2 * midpointBC.x - PA.x,
+            y: 2 * midpointBC.y - PA.y
+        },
+        {
+            x: 2 * midpointCA.x - PB.x,
+            y: 2 * midpointCA.y - PB.y
+        },
+        {
+            x: 2 * midpointAB.x - PC.x,
+            y: 2 * midpointAB.y - PC.y
+        },
+
+    ];
+
+}
 </script>
 </body>
 </html>
