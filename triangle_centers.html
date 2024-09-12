@@ -406,6 +406,14 @@ const circleStyles = {
         annotationLabel: 'Fuhrmann',
         informationText: '○ Fuhrmann circle',
     },
+    MandartCircle: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'MandartCircle-checkbox',
+        displayElementId: 'MandartCircle',
+        annotationLabel: 'Mandart',
+        informationText: '○ Mandart circle',
+    },
 };
 
 // Define styles for triangles
@@ -889,6 +897,9 @@ function drawCircles() {
                     break;
                 case 'FuhrmannCircle':
                     circle = calculateFuhrmannCircle(points);
+                    break;
+                case 'MandartCircle':
+                    circle = calculateMandartCircle(points);
                     break;
                 default:
                     console.error(`Unknown circle key: ${key}`);
@@ -1649,6 +1660,11 @@ function calculateAdamsCircle(points) {
 // Function to calculate the Fuhrmann circle
 function calculateFuhrmannCircle(points) {
     return calculateCircumcircle(calculateFuhrmannTriangle(points));
+}
+
+// Function to calculate the Mandart circle
+function calculateMandartCircle(points) {
+    return calculateCircumcircle(calculateExtouchTriangle(points));
 }
 
 // Function to calculate the medial triangles
