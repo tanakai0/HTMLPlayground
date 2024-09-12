@@ -180,6 +180,15 @@ const centerStyles = {
         informationText: '● Spieker center',
         ETCReference: 10,
     },
+    FeuerbachPoint: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'FeuerbachPoint-checkbox',
+        displayElementId: 'FeuerbachPoint',
+        annotationLabel: 'Feuerbach',
+        informationText: '● Feuerbach point',
+        ETCReference: 11,
+    },
     firstIsogonicCenter: {
         activeColor: 'gray',
         inactiveColor: 'lightgray', 
@@ -774,6 +783,9 @@ function drawCenters() {
                 case 'SpiekerCenter':
                     center = calculateSpiekerCenter(points);
                     break;
+                case 'FeuerbachPoint':
+                    center = calculateFeuerbachPoint(points);
+                    break;
                 case 'FuhrmannCenter':
                     center = calculateFuhrmannCenter(points);
                     break; 
@@ -977,7 +989,6 @@ function drawLine(line, label = '', color = 'black') {
 
     // When the line is vertical
     if (!isFinite(slope)) {
-        // 垂直線の場合は x は固定
         if (0 <= point1.x && point1.x <= CANVAS_WIDTH) {
             points.push({ x: point1.x, y: 0 });
             points.push({ x: point1.x, y: CANVAS_HEIGHT });
@@ -1114,6 +1125,10 @@ function closeEnoughScalars(val1, val2) {
 
 function closeEnoughPoints(p1, p2) {
     return calculateDistance(p1, p2) < epsilon;
+}
+
+function closeEnoughCircles(c1, c2) {
+    return closeEnoughPoints(c1.center, c2.center) && closeEnoughScalars(c1.radius, c2.radius);
 }
 
 // Check if a triangle is equilateral
@@ -1402,6 +1417,45 @@ function calculateSpiekerCenter(points) {
     const medialTriangle = calculateMedialTriangle(points);
     return calculateIncenter(medialTriangle);
 }
+
+// Function to calculate the Feuerbach point
+function calculateFeuerbachPoint(points) {
+    const incircle = calculateIncircle(points);
+    const ninePointCircle = calculateNinePointCircle(points);
+    if (closeEnoughCircles(incircle, ninePointCircle)) {
+        return null;
+    }
+    slope = calculateSlope(incircle.center, ninePointCircle.center);
+    let P1, P2;
+    if (isFinite(slope)) {
+        const coefficient = incircle.radius / Math.sqrt(slope ** 2 + 1);
+        P1 = {
+            x: incircle.center.x + coefficient,
+            y: incircle.center.y + slope * coefficient
+        };
+        P2 = {
+            x: incircle.center.x - coefficient,
+            y: incircle.center.y - slope * coefficient
+        };
+    }
+    else{
+        P1 = {
+            x: incircle.center.x,
+            y: incircle.center.y + incircle.radius
+        };
+        P2 = {
+            x: incircle.center.x,
+            y: incircle.center.y - incircle.radius
+        };
+    }
+    if (closeEnoughScalars((P1.x - ninePointCircle.center.x)**2 + (P1.y - ninePointCircle.center.y)**2, ninePointCircle.radius ** 2)) {
+        return P1;
+    }
+    else {
+        return P2;
+    }
+}
+
 
 // Function to calculate the Fuhrmann center
 function calculateFuhrmannCenter(points) {
