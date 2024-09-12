@@ -858,61 +858,70 @@ function drawCircles() {
         const checkbox = document.getElementById(style.checkboxId);
 
         if (checkbox && checkbox.checked) {
-            let circle;
+            let circles = []; // Multiple circles can be stored here
 
             // Switch statement to handle different circle calculations
             switch (key) {
                 case 'incircle':
-                    circle = calculateIncircle(points);
+                    circles.push(calculateIncircle(points)); // Add a single circle to the list
                     break;
                 case 'circumcircle':
-                    circle = calculateCircumcircle(points);
+                    circles.push(calculateCircumcircle(points));
                     break;
                 case 'excircleA':
-                    circle = calculateExcircle([points[2], points[0], points[1]]);
+                    circles.push(calculateExcircle([points[2], points[0], points[1]]));
                     break;
                 case 'excircleB':
-                    circle = calculateExcircle(points);
+                    circles.push(calculateExcircle(points));
                     break;
                 case 'excircleC':
-                    circle = calculateExcircle([points[1], points[2], points[0]]);
+                    circles.push(calculateExcircle([points[1], points[2], points[0]]));
                     break;
                 case 'ninePointCircle':
-                    circle = calculateNinePointCircle(points);
+                    circles.push(calculateNinePointCircle(points));
                     break;
                 case 'smallestCircle':
-                    circle = calculateSmallestCircle(points);
+                    circles.push(calculateSmallestCircle(points));
                     break;
                 case 'LesterCircle':
-                    circle = calculateLesterCircle(points);
+                    circles.push(calculateLesterCircle(points));
                     break;
                 case 'BevanCircle':
-                    circle = calculateBevanCircle(points);
+                    circles.push(calculateBevanCircle(points));
                     break;
                 case 'SpiekerCircle':
-                    circle = calculateSpiekerCircle(points);
+                    circles.push(calculateSpiekerCircle(points));
                     break;
                 case 'AdamsCircle':
-                    circle = calculateAdamsCircle(points);
+                    circles.push(calculateAdamsCircle(points));
                     break;
                 case 'FuhrmannCircle':
-                    circle = calculateFuhrmannCircle(points);
+                    circles.push(calculateFuhrmannCircle(points));
                     break;
                 case 'MandartCircle':
-                    circle = calculateMandartCircle(points);
+                    circles.push(calculateMandartCircle(points));
+                    break;
+                case 'multipleCircleExample': // Example for multiple circles
+                    // Add multiple circles with different parameters or calculations
+                    circles.push(calculateCircleVariant1(points));
+                    circles.push(calculateCircleVariant2(points));
+                    circles.push(calculateCircleVariant3(points));
                     break;
                 default:
                     console.error(`Unknown circle key: ${key}`);
                     return;
             }
 
-            // Draw the circle if it was calculated
-            if (circle) {
-                drawCircle(circle, style.annotationLabel, style.activeColor);
-            }
+            // Draw each circle in the list
+            circles.forEach(circle => {
+                if (circle) {
+                    drawCircle(circle, style.annotationLabel, style.activeColor);
+                }
+            });
         }
     });
 }
+
 
 // Draw triangles based on checkbox states
 function drawTriangles() {
