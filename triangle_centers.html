@@ -110,8 +110,8 @@
         <span id="secondNapoleonPoint" class="point-info"></span>
     </p>
     <p>
-        <input type="checkbox" id="LemoinePoint-checkbox" unchecked> 
-        <span id="LemoinePoint" class="point-info"></span>
+        <input type="checkbox" id="symmedianPoint-checkbox" unchecked> 
+        <span id="symmedianPoint" class="point-info"></span>
     </p>
     <p>
         <input type="checkbox" id="CenterOfTheLesterCircle-checkbox" unchecked> 
@@ -121,10 +121,38 @@
         <input type="checkbox" id="GergonnePoint-checkbox" unchecked> 
         <span id="GergonnePoint" class="point-info"></span>
     </p>
+    <p>
+        <input type="checkbox" id="NagelPoint-checkbox" unchecked> 
+        <span id="NagelPoint" class="point-info"></span>
+    </p>
+    <p>
+        <input type="checkbox" id="BevanPoint-checkbox" unchecked> 
+        <span id="BevanPoint" class="point-info"></span>
+    </p>
+    <p>
+        <input type="checkbox" id="Mittenpunkt-checkbox" unchecked> 
+        <span id="Mittenpunkt" class="point-info"></span>
+    </p>
+    <p>
+        <input type="checkbox" id="SpiekerCenter-checkbox" unchecked> 
+        <span id="SpiekerCenter" class="point-info"></span>
+    </p>
+    <p>
+        <input type="checkbox" id="FuhrmannCenter-checkbox" unchecked> 
+        <span id="FuhrmannCenter" class="point-info"></span>
+    </p>
     <p>Lines</p>
     <p>
         <input type="checkbox" id="EulerLine-checkbox" unchecked> 
         <span id="EulerLine" class="line-info"></span>
+    </p>
+    <p>
+        <input type="checkbox" id="NagelLine-checkbox" unchecked> 
+        <span id="NagelLine" class="line-info"></span>
+    </p>
+    <p>
+        <input type="checkbox" id="FermatAxis-checkbox" unchecked> 
+        <span id="FermatAxis" class="line-info"></span>
     </p>
     <p>Circles</p>
     <p>
@@ -155,11 +183,35 @@
         <input type="checkbox" id="smallestCircle-checkbox" unchecked> 
         <span id="smallestCircle" class="circle-info"></span>
     </p>
-    <p></p>
+    <p>
         <input type="checkbox" id="LesterCircle-checkbox" unchecked> 
         <span id="LesterCircle" class="circle-info"></span>
     </p>
+    <p>
+        <input type="checkbox" id="BevanCircle-checkbox" unchecked> 
+        <span id="BevanCircle" class="circle-info"></span>
+    </p>
+    <p>
+        <input type="checkbox" id="SpiekerCircle-checkbox" unchecked> 
+        <span id="SpiekerCircle" class="circle-info"></span>
+    </p>
+    <p>
+        <input type="checkbox" id="AdamsCircle-checkbox" unchecked> 
+        <span id="AdamsCircle" class="circle-info"></span>
+    </p>
+    <p>
+        <input type="checkbox" id="FuhrmannCircle-checkbox" unchecked> 
+        <span id="FuhrmannCircle" class="circle-info"></span>
+    </p>
     <p>Triangles</p>
+    <p>
+        <input type="checkbox" id="medialTriangle-checkbox" unchecked> 
+        <span id="medialTriangle" class="triangle-info"></span>
+    </p>
+    <p>
+        <input type="checkbox" id="excentralTriangle-checkbox" unchecked> 
+        <span id="excentralTriangle" class="triangle-info"></span>
+    </p>
     <p>
         <input type="checkbox" id="outerNapoleonTriangle-checkbox" unchecked> 
         <span id="outerNapoleonTriangle" class="triangle-info"></span>
@@ -171,11 +223,20 @@
     <p>
         <input type="checkbox" id="GergonneTriangle-checkbox" unchecked> 
         <span id="GergonneTriangle" class="triangle-info"></span>
-    </p>    
+    </p>
+    <p>
+        <input type="checkbox" id="extouchTriangle-checkbox" unchecked> 
+        <span id="extouchTriangle" class="triangle-info"></span>
+    </p> 
+    <p>
+        <input type="checkbox" id="FuhrmannTriangle-checkbox" unchecked> 
+        <span id="FuhrmannTriangle" class="triangle-info"></span>
+    </p>
 </div>
 
 <script>
 // Define styles for centers
+// ETCReference is the reference number of the encyclopedia of triangle centers (ETC)
 const pointStyles = {
     centroid: {
         activeColor: 'blue',
@@ -183,7 +244,8 @@ const pointStyles = {
         checkboxId: 'centroid-checkbox',
         displayElementId: 'centroid',
         annotationLabel: 'Centroid',
-        informationText: '● Centroid'
+        informationText: '● Centroid',
+        ETCReference: 2,
     },
     circumcenter: {
         activeColor: 'red',
@@ -191,7 +253,8 @@ const pointStyles = {
         checkboxId: 'circumcenter-checkbox',
         displayElementId: 'circumcenter',
         annotationLabel: 'Circumcenter',
-        informationText: '● Circumcenter'
+        informationText: '● Circumcenter',
+        ETCReference: 3,
     },
     incenter: {
         activeColor: 'green',
@@ -200,6 +263,7 @@ const pointStyles = {
         displayElementId: 'incenter',
         annotationLabel: 'Incenter',
         informationText: '● Incenter',
+        ETCReference: 1,
     },
     orthocenter: {
         activeColor: 'purple',
@@ -208,6 +272,7 @@ const pointStyles = {
         displayElementId: 'orthocenter',
         annotationLabel: 'Orthocenter',
         informationText: '● Orthocenter',
+        ETCReference: 4,
     },
     excenterA: {
         activeColor: 'orange',
@@ -240,6 +305,7 @@ const pointStyles = {
         displayElementId: 'firstIsogonicCenter',
         annotationLabel: '1st isogonic',
         informationText: '● First isogonic center',
+        ETCReference: 13,
     },
     FermatPoint: {
         activeColor: 'gray',
@@ -248,6 +314,7 @@ const pointStyles = {
         displayElementId: 'FermatPoint',
         annotationLabel: 'Fermat',
         informationText: '● Fermat point',
+        ETCReference: 13,
     },
     secondIsogonicCenter: {
         activeColor: 'gray',
@@ -256,6 +323,7 @@ const pointStyles = {
         displayElementId: 'secondIsogonicCenter',
         annotationLabel: '2nd isogonic',
         informationText: '● Second isogonic center',
+        ETCReference: 14,
     },
     deLongchampsPoint: {
         activeColor: '#c54ea0',
@@ -264,6 +332,7 @@ const pointStyles = {
         displayElementId: 'deLongchampsPoint',
         annotationLabel: 'de Longchamps',
         informationText: '● de Longchamps point',
+        ETCReference: 20,
     },
     ninePointCenter: {
         activeColor: 'lightblue',
@@ -272,6 +341,7 @@ const pointStyles = {
         displayElementId: 'ninePointCenter',
         annotationLabel: 'Nine-point',
         informationText: '● Nine-point center',
+        ETCReference: 5,
     },
     firstNapoleonPoint: {
         activeColor: 'brown',
@@ -280,6 +350,7 @@ const pointStyles = {
         displayElementId: 'firstNapoleonPoint',
         annotationLabel: '1st Napoleon',
         informationText: '● First Napoleon point',
+        ETCReference: 17,
     },
     secondNapoleonPoint: {
         activeColor: '#c5956b',
@@ -288,14 +359,16 @@ const pointStyles = {
         displayElementId: 'secondNapoleonPoint',
         annotationLabel: '2nd Napoleon',
         informationText: '● Second Napoleon point',
+        ETCReference: 18,
     },
-    LemoinePoint: {
+    symmedianPoint: {
         activeColor: 'gold',
         inactiveColor: 'lightgray', 
-        checkboxId: 'LemoinePoint-checkbox',
-        displayElementId: 'LemoinePoint',
-        annotationLabel: 'Lemoine',
-        informationText: '● Lemoine point',
+        checkboxId: 'symmedianPoint-checkbox',
+        displayElementId: 'symmedianPoint',
+        annotationLabel: 'Symmedian',
+        informationText: '● Symmedian point (Lemoine point, Grebe point)',
+        ETCReference: 6,
     },
     CenterOfTheLesterCircle: {
         activeColor: 'gold',
@@ -304,6 +377,7 @@ const pointStyles = {
         displayElementId: 'CenterOfTheLesterCircle',
         annotationLabel: 'Center of the Lester circle',
         informationText: '● Center of the Lester circle',
+        ETCReference: 1116,
     },
     GergonnePoint: {
         activeColor: 'brown',
@@ -312,6 +386,52 @@ const pointStyles = {
         displayElementId: 'GergonnePoint',
         annotationLabel: 'Gergonne',
         informationText: '● Gergonne point',
+        ETCReference: 7,
+    },
+    NagelPoint: {
+        activeColor: 'red',
+        inactiveColor: 'lightgray', 
+        checkboxId: 'NagelPoint-checkbox',
+        displayElementId: 'NagelPoint',
+        annotationLabel: 'Nagel',
+        informationText: '● Nagel point',
+        ETCReference: 8,
+    },
+    BevanPoint: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'BevanPoint-checkbox',
+        displayElementId: 'BevanPoint',
+        annotationLabel: 'Bevan',
+        informationText: '● Bevan point',
+        ETCReference: 40,
+    },
+    Mittenpunkt: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'Mittenpunkt-checkbox',
+        displayElementId: 'Mittenpunkt',
+        annotationLabel: 'Mittenpunkt',
+        informationText: '● Mittenpunkt',
+        ETCReference: 9,
+    },
+    SpiekerCenter: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'SpiekerCenter-checkbox',
+        displayElementId: 'SpiekerCenter',
+        annotationLabel: 'Spieker',
+        informationText: '● Spieker center',
+        ETCReference: 10,
+    },
+    FuhrmannCenter: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'FuhrmannCenter-checkbox',
+        displayElementId: 'FuhrmannCenter',
+        annotationLabel: 'Fuhrmann',
+        informationText: '● Fuhrmann center',
+        ETCReference: 355,
     },
 };
 
@@ -324,6 +444,22 @@ const lineStyles = {
         displayElementId: 'EulerLine',
         annotationLabel: 'Euler',
         informationText: '- Euler line',
+    },
+    NagelLine: {
+        activeColor: 'red',
+        inactiveColor: 'lightgray',
+        checkboxId: 'NagelLine-checkbox',
+        displayElementId: 'NagelLine',
+        annotationLabel: 'Nagel',
+        informationText: '- Nagel line',
+    },
+    FermatAxis: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'FermatAxis-checkbox',
+        displayElementId: 'FermatAxis',
+        annotationLabel: 'Fermat axis',
+        informationText: '- Fermat axis',
     },
 };
 
@@ -393,10 +529,66 @@ const circleStyles = {
         annotationLabel: 'Lester',
         informationText: '○ Lester circle',
     },
+    BevanCircle: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'BevanCircle-checkbox',
+        displayElementId: 'BevanCircle',
+        annotationLabel: 'Bevan',
+        informationText: '○ Bevan circle',
+    },
+    SpiekerCircle: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'SpiekerCircle-checkbox',
+        displayElementId: 'SpiekerCircle',
+        annotationLabel: 'Spieker',
+        informationText: '○ Spieker circle',
+    },
+    AdamsCircle: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'AdamsCircle-checkbox',
+        displayElementId: 'AdamsCircle',
+        annotationLabel: 'Adams\'',
+        informationText: '○ Adams\' circle',
+    },
+    AdamsCircle: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'AdamsCircle-checkbox',
+        displayElementId: 'AdamsCircle',
+        annotationLabel: 'Adams\'',
+        informationText: '○ Adams\' circle',
+    },
+    FuhrmannCircle: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'FuhrmannCircle-checkbox',
+        displayElementId: 'FuhrmannCircle',
+        annotationLabel: 'Fuhrmann',
+        informationText: '○ Fuhrmann circle',
+    },
 };
 
 // Define styles for triangles
 const triangleStyles = {
+    medialTriangle: {
+        activeColor: 'brown',
+        inactiveColor: 'lightgray',
+        checkboxId: 'medialTriangle-checkbox',
+        displayElementId: 'medialTriangle',
+        annotationLabel: 'Medial',
+        informationText: '△ Medial triangle',
+    },
+    excentralTriangle: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'excentralTriangle-checkbox',
+        displayElementId: 'excentralTriangle',
+        annotationLabel: 'Excentral',
+        informationText: '△ Excentral triangle',
+    },
     outerNapoleonTriangle: {
         activeColor: 'brown',
         inactiveColor: 'lightgray',
@@ -420,6 +612,22 @@ const triangleStyles = {
         displayElementId: 'GergonneTriangle',
         annotationLabel: 'Gergonne',
         informationText: '△ Gergonne triangle',
+    },
+    extouchTriangle: {
+        activeColor: 'brown',
+        inactiveColor: 'lightgray',
+        checkboxId: 'extouchTriangle-checkbox',
+        displayElementId: 'extouchTriangle',
+        annotationLabel: 'Extouch',
+        informationText: '△ Extouch triangle',
+    },
+    FuhrmannTriangle: {
+        activeColor: 'brown',
+        inactiveColor: 'lightgray',
+        checkboxId: 'FuhrmannTriangle-checkbox',
+        displayElementId: 'FuhrmannTriangle',
+        annotationLabel: 'Fuhrmann',
+        informationText: '△ Fuhrmann triangle',
     },
 };
 
@@ -634,13 +842,13 @@ function drawCenters() {
                     center = calculateOrthocenter(points);
                     break;
                 case 'excenterA':
-                    center = calculateExcenter([points[0], points[1], points[2]]);
+                    center = calculateExcenter([points[2], points[0], points[1]]);
                     break;
                 case 'excenterB':
-                    center = calculateExcenter([points[1], points[0], points[2]]);
+                    center = calculateExcenter(points);
                     break;
                 case 'excenterC':
-                    center = calculateExcenter([points[2], points[0], points[1]]);
+                    center = calculateExcenter([points[1], points[2], points[0]]);
                     break;
                 case 'firstIsogonicCenter':
                     center = calculateIsogonicCenter(points, outer = true);
@@ -663,15 +871,30 @@ function drawCenters() {
                 case 'secondNapoleonPoint':
                     center = calculateNapoleonPoint(points, outer = false);
                     break;
-                case 'LemoinePoint':
-                    center = calculateLemoinePoint(points);
+                case 'symmedianPoint':
+                    center = calculateSymmedianPoint(points);
                     break;
                 case 'CenterOfTheLesterCircle':
                     center = calculateLesterCircle(points).center;
                     break;
                 case 'GergonnePoint':
                     center = calculateGergonnePoint(points);
-                    break;     
+                    break;
+                case 'NagelPoint':
+                    center = calculateNagelPoint(points);
+                    break;   
+                case 'BevanPoint':
+                    center = calculateBevanPoint(points);
+                    break;
+                case 'Mittenpunkt':
+                    center = calculateMittenpunkt(points);
+                    break;
+                case 'SpiekerCenter':
+                    center = calculateSpiekerCenter(points);
+                    break;
+                case 'FuhrmannCenter':
+                    center = calculateFuhrmannCenter(points);
+                    break; 
                 default:
                     console.error(`Unknown center key: ${key}`);
                     return;
@@ -698,6 +921,12 @@ function drawLines() {
             switch (key) {
                 case 'EulerLine':
                     line = calculateEulerLine(points);
+                    break;
+                case 'NagelLine':
+                    line = calculateNagelLine(points);
+                    break;
+                case 'FermatAxis':
+                    line = calculateFermatAxis(points);
                     break;
                 default:
                     console.error(`Unknown line key: ${key}`);
@@ -730,13 +959,13 @@ function drawCircles() {
                     circle = calculateCircumcircle(points);
                     break;
                 case 'excircleA':
-                    circle = calculateExcircle([points[0], points[1], points[2]]);
+                    circle = calculateExcircle([points[2], points[0], points[1]]);
                     break;
                 case 'excircleB':
-                    circle = calculateExcircle([points[1], points[0], points[2]]);
+                    circle = calculateExcircle(points);
                     break;
                 case 'excircleC':
-                    circle = calculateExcircle([points[2], points[0], points[1]]);
+                    circle = calculateExcircle([points[1], points[2], points[0]]);
                     break;
                 case 'ninePointCircle':
                     circle = calculateNinePointCircle(points);
@@ -746,6 +975,18 @@ function drawCircles() {
                     break;
                 case 'LesterCircle':
                     circle = calculateLesterCircle(points);
+                    break;
+                case 'BevanCircle':
+                    circle = calculateBevanCircle(points);
+                    break;
+                case 'SpiekerCircle':
+                    circle = calculateSpiekerCircle(points);
+                    break;
+                case 'AdamsCircle':
+                    circle = calculateAdamsCircle(points);
+                    break;
+                case 'FuhrmannCircle':
+                    circle = calculateFuhrmannCircle(points);
                     break;
                 default:
                     console.error(`Unknown circle key: ${key}`);
@@ -771,6 +1012,12 @@ function drawTriangles() {
             
             // Switch statement to handle different triangle calculations
             switch (key) {
+                case 'medialTriangle':
+                    triangle = calculateMedialTriangle(points);
+                    break;
+                case 'excentralTriangle':
+                    triangle = calculateExcentralTriangle(points);
+                    break;
                 case 'outerNapoleonTriangle':
                     triangle = calculateNapoleonTriangle(points, outer = true);
                     break;
@@ -779,6 +1026,12 @@ function drawTriangles() {
                     break;
                 case 'GergonneTriangle':
                     triangle = calculateGergonneTriangle(points);
+                    break;
+                case 'extouchTriangle':
+                    triangle = calculateExtouchTriangle(points);
+                    break;
+                case 'FuhrmannTriangle':
+                    triangle = calculateFuhrmannTriangle(points);
                     break;
                 default:
                     console.error(`Unknown triangle key: ${key}`);
@@ -965,6 +1218,11 @@ function midpoint(p1, p2){
     }
 }
 
+// Cross product of vectors p1p2 and p1p3
+function calculateCrossProduct(p1, p2, p3) {
+    return (p2.x - p1.x) * (p3.y - p1.y) - (p2.y - p1.y) * (p3.x - p1.x);
+}
+
 function closeEnoughScalars(val1, val2) {
     return Math.abs(val1 - val2) < epsilon;
 }
@@ -1126,19 +1384,19 @@ function calculateOrthocenter(points) {
     return lineIntersectionGivenSlopesAndPoints(perpendicularSlopeAB, C, perpendicularSlopeBC, A);
 }
 
-// Function to calculate the excenter for the vertex A (intersection of the internal angle bisectors of the vertex and other external angle bisectors)
+// Function to calculate the excenter for the vertex B (intersection of the internal angle bisectors of the vertex and other external angle bisectors)
 function calculateExcenter(points) {
     const [A, B, C] = points;
     // Lengths of the triangle sides opposite to each vertex
     const a =  calculateDistance(B, C); // Length of side BC
-    const b =  calculateDistance(A, C); // Length of side CA
+    const b =  calculateDistance(C, A); // Length of side CA
     const c =  calculateDistance(A, B); // Length of side AB
 
-    // Excenter formula for vertex p (opposite to side BC)
-    const x = (-a * A.x + b * B.x + c * C.x) / (-a + b + c);
-    const y = (-a * A.y + b * B.y + c * C.y) / (-a + b + c);
-
-    return {x, y};
+    // Excenter formula for vertex B (opposite to side AC)
+    return {
+        x: (-b * B.x + c * C.x + a * A.x) / (-b + c + a),
+        y: (-b * B.y + c * C.y + a * A.y) / (-b + c + a)
+    }
 }
 
 // Function to calculate the isogonic center
@@ -1152,7 +1410,7 @@ function calculateIsogonicCenter(points, outer = true) {
     }
 
     // Determine rotation direction based on the cross product of vectors AB and AC
-    const crossProduct = (B.x - A.x) * (C.y - A.y) - (B.y - A.y) * (C.x - A.x);
+    const crossProduct = calculateCrossProduct(A, B, C);
     let rotationRadian = crossProduct > 0 ? -60 : 60;
     if (!outer){
         rotationRadian = -rotationRadian;
@@ -1216,8 +1474,8 @@ function calculateNapoleonPoint(points, outer = true) {
     return lineIntersection(A, D, B, E);
 }
 
-// Function to calculate the Lemoine point
-function calculateLemoinePoint(points) {
+// Function to calculate the symmedian point
+function calculateSymmedianPoint(points) {
     const [A, B, C] = points;
     // The circumcircle of triangle ABC and the tangents at each vertex.
     const circumcenter = calculateCircumcenter(points);
@@ -1237,11 +1495,55 @@ function calculateGergonnePoint(points) {
     return lineIntersection(points[0], GergonneTriangle[0], points[1], GergonneTriangle[1]);
 }
 
+// Function to calculate the Nagel point
+function calculateNagelPoint(points) {
+    const extouchTriangle = calculateExtouchTriangle(points);
+    return lineIntersection(points[0], extouchTriangle[0], points[1], extouchTriangle[1]);
+}
 
+// Function to calculate the Bevan point
+function calculateBevanPoint(points) {
+    return calculateBevanCircle(points).center;
+}
+
+// Function to calculate the Mittenpunkt
+function calculateMittenpunkt(points) {
+    const excentralTriangle = calculateExcentralTriangle(points);
+    return calculateSymmedianPoint(excentralTriangle);
+}
+
+// Function to calculate the Spieker center
+function calculateSpiekerCenter(points) {
+    const medialTriangle = calculateMedialTriangle(points);
+    return calculateIncenter(medialTriangle);
+}
+
+// Function to calculate the Fuhrmann center
+function calculateFuhrmannCenter(points) {
+    return calculateCircumcircle(calculateFuhrmannTriangle(points)).center;
+}
+
+// Function to calculate the Euler line
 function calculateEulerLine(points) {
     const orthocenter = calculateOrthocenter(points);
     const circumcenter = calculateCircumcenter(points);
     return [orthocenter, circumcenter];
+}
+
+// Function to calculate the Nagel line
+function calculateNagelLine(points) {
+    return [
+        calculateIncenter(points),
+        calculateNagelPoint(points)
+    ];
+}
+
+// Function to calculate the Fermat axis
+function calculateFermatAxis(points) {
+    return[
+        calculateIsogonicCenter(points, outer = true),
+        calculateIsogonicCenter(points, outer = false)
+    ];
 }
 
 // Function to calculate the incircle
@@ -1287,24 +1589,19 @@ function calculateCircumcircle(points) {
     };
 }
 
-// Function to calculate the excircle opposite to the vertex A
+// Function to calculate the excircle opposite to the vertex B
 function calculateExcircle(points) {
     const [A, B, C] = points;
-
-    // Calculate the center (already defined)
-    const center = calculateExcenter([A, B, C]);
 
     // Calculate the radius using the formula: 2 * area / (-a + b + c)
     const a = calculateDistance(B, C);
     const b = calculateDistance(C, A);
     const c = calculateDistance(A, B);
     const area = calculateArea(points);
-    const radius = 2 * area / (-a + b + c);
 
-    // Return the circle object with center and radius
     return {
-        center: center,
-        radius: radius
+        center: calculateExcenter(points),
+        radius: 2 * area / (-b + c + a)
     };
 }
 
@@ -1365,13 +1662,67 @@ function calculateLesterCircle(points) {
     }
 }
 
+// Function to calculate the Bevan circle
+function calculateBevanCircle(points) {
+    const excentralTriangle = calculateExcentralTriangle(points);
+    return calculateCircumcircle(excentralTriangle);
+}
+
+// Function to calculate the Spieker circle
+function calculateSpiekerCircle(points) {
+    const medialTriangle = calculateMedialTriangle(points);
+    return calculateIncircle(medialTriangle);
+}
+
+// Function to calculate the Adams' circle
+function calculateAdamsCircle(points) {
+    const [A, B, C] = points;
+    const slopeAB = calculateSlope(A, B);
+    const slopeBC = calculateSlope(B, C);
+    const slopeCA = calculateSlope(C, A);
+    const GergonnePoint = calculateGergonnePoint(points);
+    const GergonneTriangle = calculateGergonneTriangle(points);
+    const slopeGTAB = calculateSlope(GergonneTriangle[0], GergonneTriangle[1]);
+    const slopeGTBC = calculateSlope(GergonneTriangle[1], GergonneTriangle[2]);
+    P1 = lineIntersectionGivenSlopesAndPoints(slopeGTAB, GergonnePoint, slopeBC, B);
+    P2 = lineIntersectionGivenSlopesAndPoints(slopeGTAB, GergonnePoint, slopeCA, C);
+    P3 = lineIntersectionGivenSlopesAndPoints(slopeGTBC, GergonnePoint, slopeAB, A);
+    return calculateCircumcircle([P1, P2, P3]);  
+}
+
+// Function to calculate the Fuhrmann circle
+function calculateFuhrmannCircle(points) {
+    return calculateCircumcircle(calculateFuhrmannTriangle(points));
+}
+
+// Function to calculate the medial triangles
+function calculateMedialTriangle(points) {
+    const [A, B, C] = points;
+
+    return [
+        midpoint(B, C),
+        midpoint(C, A),
+        midpoint(A, B)
+    ];
+}
+
+// Function to calculate the excentral triangles
+function calculateExcentralTriangle(points) {
+    const [A, B, C] = points;
+
+    return [
+        calculateExcenter([C, A, B]),
+        calculateExcenter([A, B, C]),
+        calculateExcenter([B, C, A])
+    ];
+}
 
 // Function to calculate the outer Napoleon triangle
 function calculateNapoleonTriangle(points, outer = true) {
     const [A, B, C] = points;
 
     // Calculate the outer equilateral triangle on each side
-    const crossProductAB_AC = (B.x - A.x) * (C.y - A.y) - (B.y - A.y) * (C.x - A.x);
+    const crossProductAB_AC = calculateCrossProduct(A, B, C);
 
     // Determine rotation direction based on cross products
     let rotationRadian = crossProductAB_AC > 0 ? -60 : 60;
@@ -1411,6 +1762,80 @@ function calculateGergonneTriangle(points) {
     ];
 }
 
+// Function to calculate the extouch triangle
+function calculateExtouchTriangle(points) {
+    const [A, B, C] = points;
+    const excenterA = calculateExcenter([C, A, B]);
+    const excenterB = calculateExcenter([A, B, C]);
+    const excenterC = calculateExcenter([B, C, A]);
+
+    // Slopes of perpendicular bisectors
+    const slopeAB = calculateSlope(A, B);
+    const slopeBC = calculateSlope(B, C);
+    const slopeCA = calculateSlope(C, A);
+    const perpendicularSlopeAB = perpendicularSlope(slopeAB);
+    const perpendicularSlopeBC = perpendicularSlope(slopeBC);
+    const perpendicularSlopeCA = perpendicularSlope(slopeCA);
+
+    return [
+        lineIntersectionGivenSlopesAndPoints(slopeBC, B, perpendicularSlopeBC, excenterA),
+        lineIntersectionGivenSlopesAndPoints(slopeCA, C, perpendicularSlopeCA, excenterB),
+        lineIntersectionGivenSlopesAndPoints(slopeAB, A, perpendicularSlopeAB, excenterC)
+    ];
+}
+
+// Function to calculate the Fuhrmann triangle
+function calculateFuhrmannTriangle(points) {
+    // Function to calculate point bisecting the arc AC length opposite to the points B
+    function calculatePointBisectingArc(points) {
+        const [A, B, C] = points;
+        const circumcircle = calculateCircumcircle(points);
+        const circumcenter = circumcircle.center;
+        const circumradius = circumcircle.radius;
+        const crossProductBA_BC = calculateCrossProduct(B, A, C);
+        const perpendicularSlopeCA = perpendicularSlope(calculateSlope(C, A));
+        const sqrtDenominator = Math.sqrt(perpendicularSlopeCA**2 + 1);
+        // Two candidate points to bisect the arc length P1, P2
+        const P1 = {
+            x: circumcenter.x + circumradius / sqrtDenominator,
+            y: isFinite(perpendicularSlopeCA) ? 
+            circumcenter.y + circumradius * perpendicularSlopeCA / sqrtDenominator
+            : circumcenter.y + circumradius
+        };
+        const P2 = {
+            x: circumcenter.x - circumradius / sqrtDenominator,
+            y: isFinite(perpendicularSlopeCA) ? 
+            circumcenter.y - circumradius * perpendicularSlopeCA / sqrtDenominator
+            : circumcenter.y - circumradius
+        };
+        crossProductP1A_P1C = calculateCrossProduct(P1, A, C);
+        return (crossProductBA_BC * crossProductP1A_P1C < 0) ? P1 : P2;
+    }
+
+    const [A, B, C] = points;
+    const midpointAB = midpoint(A, B);
+    const midpointBC = midpoint(B, C);
+    const midpointCA = midpoint(C, A);
+    const PA = calculatePointBisectingArc([C, A, B]);
+    const PB = calculatePointBisectingArc([A, B, C]);
+    const PC = calculatePointBisectingArc([B, C, A]);
+    return [
+        {
+            x: 2 * midpointBC.x - PA.x,
+            y: 2 * midpointBC.y - PA.y
+        },
+        {
+            x: 2 * midpointCA.x - PB.x,
+            y: 2 * midpointCA.y - PB.y
+        },
+        {
+            x: 2 * midpointAB.x - PC.x,
+            y: 2 * midpointAB.y - PC.y
+        },
+
+    ];
+
+}
 </script>
 </body>
 </html>
