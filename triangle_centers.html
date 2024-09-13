@@ -47,7 +47,7 @@
 <!-- Information display -->
 <div class="info">
     <p>Side lengths: AB = <span id="ab-length"></span>, BC = <span id="bc-length"></span>, CA = <span id="ca-length"></span></p>
-    <p>Acute angles: ∠A = <span id="a-angle"></span>, ∠B = <span id="b-angle"></span>, ∠C = <span id="c-angle"></span></p>
+    <p>Angles: ∠A = <span id="a-angle"></span>, ∠B = <span id="b-angle"></span>, ∠C = <span id="c-angle"></span></p>
     <p>Area: <span id="area"></span></p>
     <p>
         <button id="uncheck-all-btn">Uncheck all checkboxes</button>
@@ -594,7 +594,7 @@ function updateInfo() {
     document.getElementById('bc-length').textContent = (calculateDistance(B, C) * scaleFactor).toFixed(2);
     document.getElementById('ca-length').textContent = (calculateDistance(C, A) * scaleFactor).toFixed(2);
 
-    // Acute angles
+    // Angles
     document.getElementById('a-angle').textContent = calculateAngleInDegrees(B, A, C).toFixed(2);
     document.getElementById('b-angle').textContent = calculateAngleInDegrees(A, B, C).toFixed(2);
     document.getElementById('c-angle').textContent = calculateAngleInDegrees(A, C, B).toFixed(2);
