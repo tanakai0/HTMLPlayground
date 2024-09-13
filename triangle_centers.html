@@ -414,6 +414,14 @@ const circleStyles = {
         annotationLabel: 'Mandart',
         informationText: '○ Mandart circle',
     },
+    MalfattiCircles: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'MalfattiCircles-checkbox',
+        displayElementId: 'MalfattiCircles',
+        annotationLabel: 'Malfatti',
+        informationText: '○ Malfatti circles',
+    },
 };
 
 // Define styles for triangles
@@ -587,9 +595,9 @@ function updateInfo() {
     document.getElementById('ca-length').textContent = (calculateDistance(C, A) * scaleFactor).toFixed(2);
 
     // Acute angles
-    document.getElementById('a-angle').textContent = calculateAngle(B, A, C).toFixed(2);
-    document.getElementById('b-angle').textContent = calculateAngle(A, B, C).toFixed(2);
-    document.getElementById('c-angle').textContent = calculateAngle(A, C, B).toFixed(2);
+    document.getElementById('a-angle').textContent = calculateAngleInDegrees(B, A, C).toFixed(2);
+    document.getElementById('b-angle').textContent = calculateAngleInDegrees(A, B, C).toFixed(2);
+    document.getElementById('c-angle').textContent = calculateAngleInDegrees(A, C, B).toFixed(2);
 
     // Area
     document.getElementById('area').textContent = (calculateArea(points) * scaleFactor**2).toFixed(2);
@@ -901,11 +909,8 @@ function drawCircles() {
                 case 'MandartCircle':
                     circles.push(calculateMandartCircle(points));
                     break;
-                case 'multipleCircleExample': // Example for multiple circles
-                    // Add multiple circles with different parameters or calculations
-                    circles.push(calculateCircleVariant1(points));
-                    circles.push(calculateCircleVariant2(points));
-                    circles.push(calculateCircleVariant3(points));
+                case 'MalfattiCircles':
+                    circles.push(...calculateMalfattiCircles(points));
                     break;
                 default:
                     console.error(`Unknown circle key: ${key}`);
@@ -1107,12 +1112,17 @@ function calculateDistance(p1, p2) {
     return Math.sqrt((p2.x - p1.x) ** 2 + (p2.y - p1.y) ** 2);
 }
 
-// Function to calculate the acute angle at the middle point (B) given three points A, B, and C.
-function calculateAngle(p1, p2, p3) {
+// Function to calculate the angle (radian) at the middle point (B) given three points A, B, and C.
+function calculateAngleInRadians(p1, p2, p3) {
     const v21 = vectorSubtract(p1, p2);
     const v23 = vectorSubtract(p3, p2);
     const cosTheta = dotProduct(v21, v23) / (magnitude(v21) * (magnitude(v23)));
-    const thetaRad = Math.acos(cosTheta);
+    return Math.acos(cosTheta);
+}
+
+// Function to calculate the angle (degree) at the middle point (B) given three points A, B, and C.
+function calculateAngleInDegrees(p1, p2, p3) {
+    const thetaRad = calculateAngleInRadians(p1, p2, p3);
     return thetaRad * (180 / Math.PI);
 }
 
@@ -1397,11 +1407,11 @@ function calculateFermatPoint(points) {
     const [A, B, C] = points;
     
     // Check for angles >= 120 degrees
-    if (calculateAngle(B, A, C) >= 120) {
+    if (calculateAngleInDegrees(B, A, C) >= 120) {
         return A;
-    } else if (calculateAngle(A, B, C) >= 120) {
+    } else if (calculateAngleInDegrees(A, B, C) >= 120) {
         return B;
-    } else if (calculateAngle(A, C, B) >= 120) {
+    } else if (calculateAngleInDegrees(A, C, B) >= 120) {
         return C;
     }
     else{
@@ -1674,6 +1684,57 @@ function calculateFuhrmannCircle(points) {
 // Function to calculate the Mandart circle
 function calculateMandartCircle(points) {
     return calculateCircumcircle(calculateExtouchTriangle(points));
+}
+
+// Function to calculate the Malfatti circles
+function calculateMalfattiCircles(points) {
+    // Function to calculate the center of Malfatti circles near the vertex A
+    function calculateCenters(points, P, r) {
+        const [A, B, C] = points;
+        const perpendicularSlopeAB = perpendicularSlope(calculateSlope(A, B));
+        const sqrtDenominator = Math.sqrt(perpendicularSlopeAB**2 + 1);
+        // Two candidates of centers
+        const P1 = {
+            x: P.x + r / sqrtDenominator,
+            y: isFinite(perpendicularSlopeAB) ? 
+            P.y + r * perpendicularSlopeAB / sqrtDenominator
+            : P.y + r
+        };
+        const P2 = {
+            x: P.x - r / sqrtDenominator,
+            y: isFinite(perpendicularSlopeAB) ? 
+            P.y - r * perpendicularSlopeAB / sqrtDenominator
+            : P.y - r
+        };
+        return (calculateCrossProduct(A, B, C) * calculateCrossProduct(A, B, P1) >= 0) ? P1 : P2;
+    }
+    const [A, B, C] = points;
+    const a = calculateDistance(B, C);
+    const b = calculateDistance(C, A);
+    const c = calculateDistance(A, B);
+    const incircle = calculateIncircle(points);
+    const inradius = incircle.radius;
+    const incenter = incircle.center;
+    const IA = calculateDistance(incenter, A);
+    const IB = calculateDistance(incenter, B);
+    const IC = calculateDistance(incenter, C);
+    const semiperimeter = (a + b + c) / 2;
+    const rA = inradius * (semiperimeter - inradius + IA - IB - IC) / 2 / (semiperimeter-a);
+    const rB = inradius * (semiperimeter - inradius - IA + IB - IC) / 2 / (semiperimeter-b);
+    const rC = inradius * (semiperimeter - inradius - IA - IB + IC) / 2 / (semiperimeter-c);
+    const radianA = calculateAngleInRadians(C, A, B);
+    const radianB = calculateAngleInRadians(A, B, C);
+    const radianC = calculateAngleInRadians(B, C, A);
+    const dA = rA / Math.tan(radianA / 2);
+    const dB = rB / Math.tan(radianB / 2);
+    const dC = rC / Math.tan(radianC / 2);
+    const PA = {x: ((c-dA)*A.x+dA*B.x)/c, y: ((c-dA)*A.y+dA*B.y)/c};
+    const PB = {x: ((a-dB)*B.x+dB*C.x)/a, y: ((a-dB)*B.y+dB*C.y)/a};
+    const PC = {x: ((b-dC)*C.x+dC*A.x)/b, y: ((b-dC)*C.y+dC*A.y)/b};
+    const circleA = {center: calculateCenters([A, B, C], PA, rA), radius: rA};
+    const circleB = {center: calculateCenters([B, C, A], PB, rB), radius: rB};
+    const circleC = {center: calculateCenters([C, A, B], PC, rC), radius: rC};
+    return [circleA, circleB, circleC];
 }
 
 // Function to calculate the medial triangles
