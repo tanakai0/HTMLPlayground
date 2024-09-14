@@ -496,6 +496,22 @@ const circleStyles = {
         annotationLabel: 'Malfatti',
         informationText: '○ Malfatti circles',
     },
+    ParryCircle: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'ParryCircle-checkbox',
+        displayElementId: 'ParryCircle',
+        annotationLabel: 'Parry',
+        informationText: '○ Parry circle',
+    },
+    BrocardCircle: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'BrocardCircle-checkbox',
+        displayElementId: 'BrocardCircle',
+        annotationLabel: 'Brocard',
+        informationText: '○ Brocard circle',
+    },
 };
 
 // Define styles for triangles
@@ -1014,6 +1030,12 @@ function drawCircles() {
                     break;
                 case 'MalfattiCircles':
                     circles.push(...calculateMalfattiCircles(points));
+                    break;
+                case 'ParryCircle':
+                    circles.push(calculateParryCircle(points));
+                    break;
+                case 'BrocardCircle':
+                    circles.push(calculateBrocardCircle(points));
                     break;
                 default:
                     console.error(`Unknown circle key: ${key}`);
@@ -1982,6 +2004,24 @@ function calculateMalfattiCircles(points) {
     const circleB = {center: calculateCenters([B, C, A], PB, rB), radius: rB};
     const circleC = {center: calculateCenters([C, A, B], PC, rC), radius: rC};
     return [circleA, circleB, circleC];
+}
+
+// Function to calculate the Parry circle
+function calculateParryCircle(points) {
+    const centroid = calculateCentroid(points);
+    const firstIsodynamicPoint = calculateIsodynamicPoint(points, outer = false);
+    const secondIsodynamicPoint = calculateIsodynamicPoint(points, outer = true);
+    return calculateCircumcircle([centroid, firstIsodynamicPoint, secondIsodynamicPoint]);
+}
+
+// Function to calculate the Brocard circle
+function calculateBrocardCircle(points) {
+    const circumcenter = calculateCircumcenter(points);
+    const symmedianPoint = calculateSymmedianPoint(points);
+    return {
+        center: midpoint(circumcenter, symmedianPoint),
+        radius: calculateDistance(circumcenter, symmedianPoint) / 2
+    };
 }
 
 // Function to calculate the medial triangles
