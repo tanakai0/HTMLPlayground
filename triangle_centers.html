@@ -274,6 +274,62 @@ const centerStyles = {
 
 // Define styles for lines
 const lineStyles = {
+    medians: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'medians-checkbox',
+        displayElementId: 'medians',
+        annotationLabel: 'Median',
+        informationText: '- Medians',
+    },
+    perpendicularBisectors: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'perpendicularBisectors-checkbox',
+        displayElementId: 'perpendicularBisectors',
+        annotationLabel: 'perpendicular bisector',
+        informationText: '- Perpendicular bisectors',
+    },
+    internalAngleBisectors: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'internalAngleBisectors-checkbox',
+        displayElementId: 'internalAngleBisectors',
+        annotationLabel: 'angle bisector',
+        informationText: '- Internal angle bisectors',
+    },
+    altitudes: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: ' altitudes-checkbox',
+        displayElementId: ' altitudes',
+        annotationLabel: 'Altitude',
+        informationText: '- Altitudes',
+    },
+    symmedians: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'symmedians-checkbox',
+        displayElementId: 'symmedians',
+        annotationLabel: 'Symmedian',
+        informationText: '- Symmedians',
+    },
+    splitters: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'splitters-checkbox',
+        displayElementId: 'splitters',
+        annotationLabel: 'Splitter',
+        informationText: '- Splitters',
+    },
+    cleavers: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'cleavers-checkbox',
+        displayElementId: 'cleavers',
+        annotationLabel: 'Cleaver',
+        informationText: '- Cleavers',
+    },
     EulerLine: {
         activeColor: 'blue',
         inactiveColor: 'lightgray',
@@ -837,6 +893,27 @@ function drawLines() {
 
             // Switch statement to handle different line calculations
             switch (key) {
+                case 'medians':
+                    lines.push(...calculateMedians(points));
+                    break;  
+                case 'perpendicularBisectors':
+                    lines.push(...calculatePerpendicularBisectors(points));
+                    break;                
+                case 'internalAngleBisectors':
+                    lines.push(...calculateInternalAngleBisectors(points));
+                    break;
+                case 'altitudes':
+                    lines.push(...calculateAltitudes(points));
+                    break;  
+                case 'symmedians':
+                    lines.push(...calculateSymmedians(points));
+                    break;      
+                case 'splitters':
+                    lines.push(...calculateSplitters(points));
+                    break;
+                case 'cleavers':
+                    lines.push(...calculateCleavers(points));
+                    break;           
                 case 'EulerLine':
                     lines.push(calculateEulerLine(points));
                     break;
@@ -1510,6 +1587,85 @@ function calculateFeuerbachPoint(points) {
 function calculateFuhrmannCenter(points) {
     return calculateCircumcircle(calculateFuhrmannTriangle(points)).center;
 }
+
+// Function to calculate the medians
+function calculateMedians(points) {
+    const [A, B, C] = points;
+    const centroid = calculateCentroid(points);
+    return [
+        [A, centroid],
+        [B, centroid],
+        [C, centroid]
+    ];
+}
+
+// Function to calculate the perpendicular bisectors
+function calculatePerpendicularBisectors(points) {
+    const [A, B, C] = points;
+    const circumcenter = calculateCircumcenter(points);
+    return [
+        [midpoint(B, C), circumcenter],
+        [midpoint(C, A), circumcenter],
+        [midpoint(A, B), circumcenter]
+    ];
+}
+
+
+// Function to calculate the internal angle bisectors
+function calculateInternalAngleBisectors(points) {
+    const [A, B, C] = points;
+    const incenter = calculateIncenter(points);
+    return [
+        [A, incenter],
+        [B, incenter],
+        [C, incenter]
+    ];
+}
+
+// Function to calculate the altitudes
+function calculateAltitudes(points) {
+    const [A, B, C] = points;
+    const orthocenter = calculateOrthocenter(points);
+    return [
+        [A, orthocenter],
+        [B, orthocenter],
+        [C, orthocenter]
+    ];
+}
+
+// Function to calculate the symmedians
+function calculateSymmedians(points) {
+    const [A, B, C] = points;
+    const symmedianPoint = calculateSymmedianPoint(points);
+    return [
+        [A, symmedianPoint],
+        [B, symmedianPoint],
+        [C, symmedianPoint]
+    ];
+}
+
+// Function to calculate the splitters
+function calculateSplitters(points) {
+    const [A, B, C] = points;
+    const NagelPoint = calculateNagelPoint(points);
+    return [
+        [A, NagelPoint],
+        [B, NagelPoint],
+        [C, NagelPoint]
+    ];
+}
+
+// Function to calculate the cleavers
+function calculateCleavers(points) {
+    const [A, B, C] = points;
+    const SpiekerCenter = calculateSpiekerCenter(points);
+    return [
+        [midpoint(B, C), SpiekerCenter],
+        [midpoint(C, A), SpiekerCenter],
+        [midpoint(A, B), SpiekerCenter]
+    ];
+}
+
 
 // Function to calculate the Euler line
 function calculateEulerLine(points) {
