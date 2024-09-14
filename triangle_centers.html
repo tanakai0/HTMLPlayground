@@ -833,28 +833,30 @@ function drawLines() {
         const checkbox = document.getElementById(style.checkboxId);
 
         if (checkbox && checkbox.checked) {
-            let line;
+            let lines = [];
 
             // Switch statement to handle different line calculations
             switch (key) {
                 case 'EulerLine':
-                    line = calculateEulerLine(points);
+                    lines.push(calculateEulerLine(points));
                     break;
                 case 'NagelLine':
-                    line = calculateNagelLine(points);
+                    lines.push(calculateNagelLine(points));
                     break;
                 case 'FermatAxis':
-                    line = calculateFermatAxis(points);
+                    lines.push(calculateFermatAxis(points));
                     break;
                 default:
                     console.error(`Unknown line key: ${key}`);
                     return;
             }
+            // Draw
+            lines.forEach(line => {
+                if (line) {
+                    drawLine(line, style.annotationLabel, style.activeColor);
+                }
+            });
 
-            // Draw the line if it was calculated
-            if (line) {
-                drawLine(line, style.annotationLabel, style.activeColor);
-            }
         }
     });
 }
@@ -917,7 +919,7 @@ function drawCircles() {
                     return;
             }
 
-            // Draw each circle in the list
+            // Draw
             circles.forEach(circle => {
                 if (circle) {
                     drawCircle(circle, style.annotationLabel, style.activeColor);
@@ -971,7 +973,7 @@ function drawTriangles() {
                     return;
             }
 
-            // Draw the triangle if it was calculated
+            // Draw
             if (triangle) {
                 drawTriangle(triangle, style.annotationLabel, style.activeColor);
             }
