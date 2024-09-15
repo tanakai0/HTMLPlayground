@@ -530,6 +530,14 @@ const circleStyles = {
         annotationLabel: 'Brocard',
         informationText: '○ Brocard circle',
     },
+    TaylorCircle: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'TaylorCircle-checkbox',
+        displayElementId: 'TaylorCircle',
+        annotationLabel: 'Taylor',
+        informationText: '○ Taylor circle',
+    },
 };
 
 // Define styles for triangles
@@ -1060,6 +1068,9 @@ function drawCircles() {
                     break;
                 case 'BrocardCircle':
                     circles.push(calculateBrocardCircle(points));
+                    break;
+                case 'TaylorCircle':
+                    circles.push(calculateTaylorCircle(points));
                     break;
                 default:
                     console.error(`Unknown circle key: ${key}`);
@@ -2082,6 +2093,23 @@ function calculateBrocardCircle(points) {
         center: midpoint(circumcenter, symmedianPoint),
         radius: calculateDistance(circumcenter, symmedianPoint) / 2
     };
+}
+
+// Function to calculate the Taylor circle
+function calculateTaylorCircle(points) {
+    const [A, B, C] = points;
+    const slopeAB = calculateSlope(A, B);
+    const slopeBC = calculateSlope(B, C);
+    const slopeCA = calculateSlope(C, A);
+    const perpendicularSlopeAB = perpendicularSlope(slopeAB);
+    const perpendicularSlopeBC = perpendicularSlope(slopeBC);
+    const perpendicularSlopeCA = perpendicularSlope(slopeCA);
+    const PA = lineIntersectionGivenSlopesAndPoints(perpendicularSlopeBC, A, slopeBC, B);
+    const PB = lineIntersectionGivenSlopesAndPoints(perpendicularSlopeCA, B, slopeCA, C);
+    const PAB = lineIntersectionGivenSlopesAndPoints(perpendicularSlopeCA, PA, slopeCA, C);
+    const PAC = lineIntersectionGivenSlopesAndPoints(perpendicularSlopeAB, PA, slopeAB, A);
+    const PBC = lineIntersectionGivenSlopesAndPoints(perpendicularSlopeAB, PB, slopeAB, A);
+    return calculateCircumcircle([PAB, PAC, PBC]);
 }
 
 // Function to calculate the medial triangles
