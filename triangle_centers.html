@@ -270,6 +270,24 @@ const centerStyles = {
         informationText: '● Bevan point',
         ETCReference: 40,
     },
+    firstAjimaMalfattiPoint: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'firstAjimaMalfattiPoint-checkbox',
+        displayElementId: 'firstAjimaMalfattiPoint',
+        annotationLabel: '1st Ajima-Malfatti',
+        informationText: '● First Ajima-Malfatti point',
+        ETCReference: 179,
+    },
+    secondAjimaMalfattiPoint: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'secondAjimaMalfattiPoint-checkbox',
+        displayElementId: 'secondAjimaMalfattiPoint',
+        annotationLabel: '2nd Ajima-Malfatti',
+        informationText: '● Second Ajima-Malfatti point',
+        ETCReference: 180,
+    },
     FuhrmannCenter: {
         activeColor: 'gray',
         inactiveColor: 'lightgray',
@@ -896,6 +914,12 @@ function drawCenters() {
                     break;   
                 case 'BevanPoint':
                     center = calculateBevanPoint(points);
+                    break;
+                case 'firstAjimaMalfattiPoint':
+                    center = calculateFirstAjimaMalfattiPoint(points);
+                    break;
+                case 'secondAjimaMalfattiPoint':
+                    center = calculateSecondAjimaMalfattiPoint(points);
                     break;
                 case 'Mittenpunkt':
                     center = calculateMittenpunkt(points);
@@ -1672,6 +1696,42 @@ function calculateNagelPoint(points) {
 // Function to calculate the Bevan point
 function calculateBevanPoint(points) {
     return calculateBevanCircle(points).center;
+}
+
+// Function to calculate the first Ajima-Malfatti point
+function calculateFirstAjimaMalfattiPoint(points) {
+    const [A, B, C] = points;
+    const MalfattiCircles = calculateMalfattiCircles(points);
+    const [cA, cB, cC] = MalfattiCircles;
+    // calculate the tangency points of two Malfatti circles
+    const PA = {
+        x: (cC.radius * cB.center.x + cB.radius * cC.center.x) / (cB.radius + cC.radius),
+        y: (cC.radius * cB.center.y + cB.radius * cC.center.y) / (cB.radius + cC.radius)
+    };
+    const PB = {
+        x: (cA.radius * cC.center.x + cC.radius * cA.center.x) / (cC.radius + cA.radius),
+        y: (cA.radius * cC.center.y + cC.radius * cA.center.y) / (cC.radius + cA.radius)
+    };
+    return lineIntersection(A, PA, B, PB);
+}
+
+// Function to calculate the second Ajima-Malfatti point
+function calculateSecondAjimaMalfattiPoint(points) {
+    const [A, B, C] = points;
+    const MalfattiCircles = calculateMalfattiCircles(points);
+    const [cA, cB, cC] = MalfattiCircles;
+    const excenterA = calculateExcenter([C, A, B]);
+    const excenterB = calculateExcenter([A, B, C]);
+    // calculate the tangency points of two Malfatti circles
+    const PA = {
+        x: (cC.radius * cB.center.x + cB.radius * cC.center.x) / (cB.radius + cC.radius),
+        y: (cC.radius * cB.center.y + cB.radius * cC.center.y) / (cB.radius + cC.radius)
+    };
+    const PB = {
+        x: (cA.radius * cC.center.x + cC.radius * cA.center.x) / (cC.radius + cA.radius),
+        y: (cA.radius * cC.center.y + cC.radius * cA.center.y) / (cC.radius + cA.radius)
+    };
+    return lineIntersection(excenterA, PA, excenterB, PB);
 }
 
 // Function to calculate the Mittenpunkt
