@@ -1532,6 +1532,33 @@ function calculateTangencyPoint(c1, c2) {
     }
 }
 
+// Function to convert barycentric coordinates to Cartesian coordinates
+function barycentricToCartesian(points, bary) {
+    const [A, B, C] = points;
+    const [u, v, w] = bary;
+    const x = (u * A.x + v * B.x + w * C.x) / (u + v + w);
+    const y = (u * A.y + v * B.y + w * C.y) / (u + v + w);
+    return { x, y };
+}
+
+// Function to convert trilinear coordinates to Cartesian coordinates
+function trilinearToCartesian(points, trilinear) {
+    const [A, B, C] = points;
+    const [alpha, beta, gamma] = trilinear;
+    // Calculate the side lengths of the triangle
+    const a = calculateDistance(B, C);
+    const b = calculateDistance(C, A);
+    const c = calculateDistance(A, B);
+
+    // Convert trilinear coordinates to barycentric coordinates
+    const u = alpha * a;
+    const v = beta * b;
+    const w = gamma * c;
+
+    // Use the barycentricToCartesian function to get Cartesian coordinates
+    return barycentricToCartesian(points, [u, v, w]);
+}
+
 // Function to calculate the centroid of the triangle
 function calculateCentroid(points) {
     const [A, B, C] = points;
@@ -1558,11 +1585,13 @@ function calculateCircumcenter(points) {
 
 // Function to calculate the incenter (intersection of angle bisectors)
 function calculateIncenter(points) {
+    // return trilinearToCartesian(points, [1, 1, 1]);
+    
     const [A, B, C] = points;
 
     // Lengths of the sides
     const a = calculateDistance(B, C);
-    const b = calculateDistance(A, C);
+    const b = calculateDistance(C, A);
     const c = calculateDistance(A, B);
 
     // Incenter coordinates
