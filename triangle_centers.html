@@ -261,6 +261,15 @@ const centerStyles = {
         informationText: '● de Longchamps point',
         ETCReference: 20,
     },
+    SchifflerPoint: {
+        activeColor: '#c54ea0',
+        inactiveColor: 'lightgray', 
+        checkboxId: 'SchifflerPoint-checkbox',
+        displayElementId: 'SchifflerPoint',
+        annotationLabel: 'Schiffler',
+        informationText: '● Schiffler point',
+        ETCReference: 21,
+    },
     BevanPoint: {
         activeColor: 'gray',
         inactiveColor: 'lightgray',
@@ -898,6 +907,9 @@ function drawCenters() {
                     break;
                 case 'deLongchampsPoint':
                     center = calculateDeLongchampsPoint(points);
+                    break;
+                case 'SchifflerPoint':
+                    center = calculateSchifflerPoint(points);
                     break;
                 case 'ninePointCenter':
                     center = calculateNinePointCenter(points);
@@ -1664,6 +1676,15 @@ function calculateDeLongchampsPoint(points) {
         x: 2 * circumcenter.x - orthocenter.x,
         y: 2 * circumcenter.y - orthocenter.y,
     }
+}
+
+// Function to calculate the Schiffler point
+function calculateSchifflerPoint(points) {
+    const [A, B, C] = points;
+    const incenter = calculateIncenter(points);
+    const EulerLineA = calculateEulerLine([B, C, incenter]);
+    const EulerLineB = calculateEulerLine([C, A, incenter]);
+    return lineIntersection(EulerLineA[0], EulerLineA[1], EulerLineB[0], EulerLineB[1]);
 }
 
 // Function to calculate the nine point center
