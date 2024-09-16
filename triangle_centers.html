@@ -1133,7 +1133,7 @@ function drawTriangles() {
 
             // Draw
             if (triangle) {
-                drawTriangle(triangle, style.annotationLabel, style.activeColor);
+                drawPolygon(triangle, style.annotationLabel, style.activeColor);
             }
         }
     });
@@ -1244,28 +1244,38 @@ function drawCircle(circle, label = '', color = 'black') {
     }
 }
 
-// Function to draw a triangle
-function drawTriangle(triangle, label = '', color = 'black') {
-    const [A, B, C] = triangle;
+// Function to draw a polygon
+function drawPolygon(polygon, label = '', color = 'black') {
+    if (polygon.length < 3) {
+        console.error("A polygon must have at least 3 vertices.");
+        return;
+    }
 
-    // Draw the triangle
+    // Draw the polygon
     ctx.beginPath();
-    ctx.moveTo(A.x, A.y);
-    ctx.lineTo(B.x, B.y);
-    ctx.lineTo(C.x, C.y);
+    ctx.moveTo(polygon[0].x, polygon[0].y);
+    for (let i = 1; i < polygon.length; i++) {
+        ctx.lineTo(polygon[i].x, polygon[i].y);
+    }
     ctx.closePath();
     ctx.strokeStyle = color;
     ctx.stroke();
 
-    // Draw the label at the centroid of the triangle (or near one vertex)
+    // Draw the label at the centroid of the polygon
     if (label) {
-        const centroidX = (A.x + B.x + C.x) / 3;
-        const centroidY = (A.y + B.y + C.y) / 3;
+        // Calculate the centroid of the polygon
+        let centroidX = 0, centroidY = 0;
+        polygon.forEach(point => {
+            centroidX += point.x;
+            centroidY += point.y;
+        });
+        centroidX /= polygon.length;
+        centroidY /= polygon.length;
+
         ctx.fillStyle = color;
         ctx.fillText(label, centroidX, centroidY);
     }
 }
-
 
 // Function to calculate the distance between two points
 function calculateDistance(p1, p2) {
