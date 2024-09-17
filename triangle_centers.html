@@ -399,6 +399,14 @@ const lineStyles = {
         annotationLabel: 'Fermat axis',
         informationText: '- Fermat axis',
     },
+    OrthogonalRegressionLine: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'OrthogonalRegressionLine-checkbox',
+        displayElementId: 'OrthogonalRegressionLine',
+        annotationLabel: 'Orthogonal regression',
+        informationText: '- Orthogonal regression line for the three vertices',
+    },
 };
 
 // Define styles for circles
@@ -1006,6 +1014,9 @@ function drawLines() {
                     break;
                 case 'FermatAxis':
                     lines.push(calculateFermatAxis(points));
+                    break;
+                case 'OrthogonalRegressionLine':
+                    lines.push(calculateOrthogonalRegressionLine(points));
                     break;
                 default:
                     console.error(`Unknown line key: ${key}`);
@@ -1930,6 +1941,36 @@ function calculateFermatAxis(points) {
         calculateIsogonicCenter(points, outer = true),
         calculateIsogonicCenter(points, outer = false)
     ];
+}
+
+// Function to calculate the orthogonal regression line for three vertices
+function calculateOrthogonalRegressionLine(points) {
+    // Step 1: Calculate the sample means
+    const n = points.length;
+    const meanX = points.reduce((sum, p) => sum + p.x, 0) / n;
+    const meanY = points.reduce((sum, p) => sum + p.y, 0) / n;
+
+    // Step 2: Calculate second-degree sample moments
+    let s_xx = 0, s_yy = 0, s_xy = 0;
+    points.forEach(p => {
+        s_xx += (p.x - meanX) * (p.x - meanX);
+        s_yy += (p.y - meanY) * (p.y - meanY);
+        s_xy += (p.x - meanX) * (p.y - meanY);
+    });
+
+    s_xx /= n;
+    s_yy /= n;
+    s_xy /= n;
+
+    // Step 3: Calculate the slope (beta_1) and intercept (beta_0)
+    // For delta = 1, the orthogonal regression slope is calculated using:
+    const delta = 1;
+    const numerator = s_yy - delta * s_xx + Math.sqrt((s_yy - delta * s_xx) ** 2 + 4 * delta * s_xy ** 2);
+    const beta_1 = numerator / (2 * s_xy);
+    const beta_0 = meanY - beta_1 * meanX;
+
+    // Step 4: Return the orthogonal regression line
+    return [{x: meanX, y: meanY}, {x: meanX + 1, y: meanY + beta_1}];
 }
 
 // Function to calculate the incircle
