@@ -27,16 +27,17 @@
 </head>
 <body>
     <h1>Interactive Color Picker</h1>
-    <input type="color" id="colorPicker" value="#ffffff">
-    
+
     <div class="color-values">
         <p>RGB: <span id="rgbValue"></span></p>
         <p>HSL: <span id="hslValue"></span></p>
         <p>HEX: <span id="hexValue"></span></p>
     </div>
+    
+    <input type="color" id="colorPicker" value="#ffffff">
 
     <script>
-        // HEXからRGBに変換する関数
+        // Function to convert HEX to RGB
         function hexToRgb(hex) {
             const r = parseInt(hex.slice(1, 3), 16);
             const g = parseInt(hex.slice(3, 5), 16);
@@ -44,7 +45,7 @@
             return { r, g, b };
         }
 
-        // RGBからHSLに変換する関数
+        // Function to convert RGB to HSL
         function rgbToHsl(r, g, b) {
             r /= 255;
             g /= 255;
@@ -54,7 +55,7 @@
             let h, s, l = (max + min) / 2;
 
             if (max === min) {
-                h = s = 0; // グレースケール
+                h = s = 0; // grayscale
             } else {
                 const d = max - min;
                 s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
@@ -73,22 +74,50 @@
             return { h, s, l };
         }
 
-        // 色が選択されたときに色を変換し、値を表示する
+        // Function to calculate color distance using Euclidean distance in RGB space
+        function colorDistance(rgb1, rgb2) {
+            return Math.sqrt(
+                Math.pow(rgb1.r - rgb2.r, 2) +
+                Math.pow(rgb1.g - rgb2.g, 2) +
+                Math.pow(rgb1.b - rgb2.b, 2)
+            );
+        }
+
+        // Set text color based on the selected background color
+        function updateTextColor(rgbValue) {
+            const black = { r: 0, g: 0, b: 0 };
+            const white = { r: 255, g: 255, b: 255 };
+
+            const distanceToBlack = colorDistance(rgbValue, black);
+            const distanceToWhite = colorDistance(rgbValue, white);
+
+            // Choose text color (black or white) based on which has a greater distance
+            if (distanceToWhite > distanceToBlack) {
+                document.body.style.color = "white";
+            } else {
+                document.body.style.color = "black";
+            }
+        }
+
+        // When the color is picked, convert it and update the displayed values
         document.getElementById('colorPicker').addEventListener('input', function() {
             const hexValue = this.value;
             const rgbValue = hexToRgb(hexValue);
             const hslValue = rgbToHsl(rgbValue.r, rgbValue.g, rgbValue.b);
 
-            // 背景色を変更
+            // Change the background color
             document.body.style.backgroundColor = hexValue;
 
-            // 各値を表示
+            // Update text color
+            updateTextColor(rgbValue);
+
+            // Display the RGB, HSL, and HEX values
             document.getElementById('hexValue').textContent = hexValue.toUpperCase();
             document.getElementById('rgbValue').textContent = `rgb(${rgbValue.r}, ${rgbValue.g}, ${rgbValue.b})`;
             document.getElementById('hslValue').textContent = `hsl(${hslValue.h}, ${hslValue.s}%, ${hslValue.l}%)`;
         });
 
-        // 初期値の色を設定
+        // Initialize with default color
         document.getElementById('colorPicker').dispatchEvent(new Event('input'));
     </script>
 </body>
