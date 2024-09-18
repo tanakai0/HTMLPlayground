@@ -26,119 +26,235 @@
     </style>
 </head>
 <body>
-    <div class="grid", id="grid"></div>
+<div class="grid", id="grid"></div>
+<script>
+    const GRID_INTERVAL = 20;
+    const GRID_DIMENSION = 112;
+    document.documentElement.style.setProperty('--grid-interval', `${GRID_INTERVAL}px`);
+    document.documentElement.style.setProperty('--grid-interval-1', `${GRID_INTERVAL - 1}px`);
+    document.documentElement.style.setProperty('--grid-dimension', `${GRID_DIMENSION}`);
 
-    <script>
-        const GRID_INTERVAL = 20;
-        const GRID_DIMENSION = 112;
-        document.documentElement.style.setProperty('--grid-interval', `${GRID_INTERVAL}px`);
-        document.documentElement.style.setProperty('--grid-interval-1', `${GRID_INTERVAL - 1}px`);
-        document.documentElement.style.setProperty('--grid-dimension', `${GRID_DIMENSION}`);
+    function generatePieceClass(n, color) {
+        // Create style class
+        const style = document.createElement('style');
+        style.type = 'text/css';
+        const size = GRID_INTERVAL * n;
+        const className = `.piece${n} {
+            width: ${size}px;
+            height: ${size}px;
+            background-color: ${color};
+            position: absolute;
+            cursor: grab;
+            z-index: ${10000-n};
+        }`;
+        style.innerHTML = className;
+        document.getElementsByTagName('head')[0].appendChild(style);
 
-        function generatePieceClass(n, color) {
-            // Create style class
-            const style = document.createElement('style');
-            style.type = 'text/css';
-            const size = GRID_INTERVAL * n;
-            const className = `.piece${n} {
-                width: ${size}px;
-                height: ${size}px;
-                background-color: ${color};
-                position: absolute;
-                cursor: grab;
-                z-index: ${10000-n};
-            }`;
-            style.innerHTML = className;
-            document.getElementsByTagName('head')[0].appendChild(style);
+        // Create element
+        const piece = document.createElement('div');
+        piece.className = `piece${n}`;
+        piece.id = `piece${n}`;
+        document.body.appendChild(piece);
+    }
 
-            // Create element
-            const piece = document.createElement('div');
-            piece.className = `piece${n}`;
-            piece.id = `piece${n}`;
-            document.body.appendChild(piece);
+    const dimensions = [
+        2, 4, 6, 7, 8, 9, 11, 15, 16, 17, 18, 19, 24, 25, 27, 29, 33, 35 ,37, 42, 50
+    ];
+
+    const colors = [
+        'Red', 'Green', 'Blue', 'Yellow', 'Orange', 'Purple', 'Pink', 'Cyan', 'Magenta', 'Lime',
+        'Teal', 'Violet', 'Indigo', 'Coral', 'Turquoise', 'Chocolate', 'Olive', 'Maroon', 'Navy', 'Salmon', 'Gold'
+    ];
+
+    // Correct position of pieces
+    const correctPositions = [
+        {n: 50, x:  0, y:  0},
+        {n: 35, x: 50, y:  0},
+        {n: 27, x: 85, y:  0},
+        {n:  8, x: 85, y: 27},
+        {n: 19, x: 93, y: 27},
+        {n: 15, x: 50, y: 35},
+        {n: 17, x: 65, y: 35},
+        {n: 11, x: 82, y: 35},
+        {n:  6, x: 82, y: 46},
+        {n:  2, x: 63, y: 50},
+        {n: 29, x:  0, y: 50},
+        {n: 25, x: 29, y: 50},
+        {n:  9, x: 54, y: 50},
+        {n:  7, x: 63, y: 52},
+        {n: 18, x: 70, y: 52},
+        {n: 24, x: 88, y: 46},
+        {n: 16, x: 54, y: 59},
+        {n:  4, x: 29, y: 75},
+        {n: 33, x:  0, y: 79},
+        {n: 37, x: 33, y: 75},
+        {n: 42, x: 70, y: 70}
+    ];
+
+    function rotateLeft(positions) {
+        return positions.map(pos => ({
+            n: pos.n,
+            x: pos.y,
+            y: 112 - pos.x - pos.n
+        }));
+    }
+
+    function reflect(positions) {
+        return positions.map(pos => ({
+            n: pos.n,
+            x: pos.y,
+            y: pos.x
+        }));
+    }
+
+    // All patterns including rotate and flip
+    function generateAllPositionPatterns(positions) {
+        const patterns = [];
+        let currentPositions = positions;
+
+        for (let i = 0; i < 4; i++) {
+            patterns.push(currentPositions);
+            patterns.push(reflect(currentPositions));
+            currentPositions = rotateLeft(currentPositions);
         }
 
-        const dimensions = [
-            2, 4, 6, 7, 8, 9, 11, 15, 16, 17, 18, 19, 24, 25, 27, 29, 33, 35 ,37, 42, 50
-        ];
+        return patterns;
+    }
 
-        const colors = [
-            'Red', 'Green', 'Blue', 'Yellow', 'Orange', 'Purple', 'Pink', 'Cyan', 'Magenta', 'Lime',
-            'Teal', 'Violet', 'Indigo', 'Coral', 'Turquoise', 'Chocolate', 'Olive', 'Maroon', 'Navy', 'Salmon', 'Gold'
-        ];
+    const correctPositionsList = generateAllPositionPatterns(correctPositions);
 
-        for (let i=0; i < dimensions.length; i++) {
-            generatePieceClass(dimensions[i], colors[i]);
-        }
+    for (let i=0; i < dimensions.length; i++) {
+        generatePieceClass(dimensions[i], colors[i]);
+    }
 
-        const gridElement = document.getElementById('grid');
-        for (let i = 0; i < GRID_DIMENSION*GRID_DIMENSION; i++) {
-            cell = document.createElement('div');
-            gridElement.appendChild(cell);
-        }
+    const gridElement = document.getElementById('grid');
+    for (let i = 0; i < GRID_DIMENSION*GRID_DIMENSION; i++) {
+        cell = document.createElement('div');
+        gridElement.appendChild(cell);
+    }
 
-        let pieces = [];
-        for (let i=0; i < dimensions.length; i++) {
-            pieces.push(document.getElementById(`piece${dimensions[i]}`));
-        }
-        
-        let selectedPiece = null;
-        let offsetX, offsetY;
+    let pieces = [];
+    for (let i=0; i < dimensions.length; i++) {
+        pieces.push(document.getElementById(`piece${dimensions[i]}`));
+    }
+    
+    let selectedPiece = null;
+    let offsetX, offsetY;
 
-        pieces.forEach(piece => {
-            piece.addEventListener('mousedown', (e) => {
-                if (selectedPiece && selectedPiece !== piece) {
-                    const selectedRect = selectedPiece.getBoundingClientRect();
-                    const pieceRect = piece.getBoundingClientRect();
-                    if (
-                        pieceRect.left <= e.clientX &&
-                        e.clientX <= pieceRect.right &&
-                        pieceRect.top <= e.clientY &&
-                        e.clientY <= pieceRect.bottom
-                    ) {
-                        selectedPiece = piece;
-                    }
-                } else {
+    pieces.forEach(piece => {
+        piece.addEventListener('mousedown', (e) => {
+            if (selectedPiece && selectedPiece !== piece) {
+                const selectedRect = selectedPiece.getBoundingClientRect();
+                const pieceRect = piece.getBoundingClientRect();
+                if (
+                    pieceRect.left <= e.clientX &&
+                    e.clientX <= pieceRect.right &&
+                    pieceRect.top <= e.clientY &&
+                    e.clientY <= pieceRect.bottom
+                ) {
                     selectedPiece = piece;
                 }
-
-                offsetX = e.pageX - selectedPiece.getBoundingClientRect().left - window.scrollX;
-                offsetY = e.pageY - selectedPiece.getBoundingClientRect().top - window.scrollY;
-                selectedPiece.style.cursor = 'grabbing';
-                document.addEventListener('mousemove', onMouseMove);
-            });
-        });
-
-        document.addEventListener('mouseup', () => {
-            if (selectedPiece) {
-                selectedPiece.style.cursor = 'grab';
-                document.removeEventListener('mousemove', onMouseMove);
-
-                // Snap piece to grid if within bounds
-                const gridRect = document.querySelector('.grid').getBoundingClientRect();
-                const pieceRect = selectedPiece.getBoundingClientRect();
-                
-                if (
-                    pieceRect.left >= gridRect.left &&
-                    pieceRect.top >= gridRect.top &&
-                    pieceRect.right <= gridRect.right &&
-                    pieceRect.bottom <= gridRect.bottom
-                ) {
-                    const gridX = Math.round((pieceRect.left - gridRect.left) / GRID_INTERVAL) * GRID_INTERVAL;
-                    const gridY = Math.round((pieceRect.top - gridRect.top) / GRID_INTERVAL) * GRID_INTERVAL;
-                    selectedPiece.style.left = `${gridX + gridRect.left + window.scrollX}px`;
-                    selectedPiece.style.top = `${gridY + gridRect.top + window.scrollY}px`;
-                }
-                selectedPiece = null;
+            } else {
+                selectedPiece = piece;
             }
-        });
 
-        function onMouseMove(e) {
-            if (selectedPiece) {
-                selectedPiece.style.left = `${e.pageX - offsetX}px`;
-                selectedPiece.style.top = `${e.pageY - offsetY}px`;
+            offsetX = e.pageX - selectedPiece.getBoundingClientRect().left - window.scrollX;
+            offsetY = e.pageY - selectedPiece.getBoundingClientRect().top - window.scrollY;
+            selectedPiece.style.cursor = 'grabbing';
+            document.addEventListener('mousemove', onMouseMove);
+        });
+    });
+
+    document.addEventListener('mouseup', () => {
+        if (selectedPiece) {
+            selectedPiece.style.cursor = 'grab';
+            document.removeEventListener('mousemove', onMouseMove);
+
+            // Snap piece to grid if within bounds
+            const gridRect = document.querySelector('.grid').getBoundingClientRect();
+            const pieceRect = selectedPiece.getBoundingClientRect();
+            
+            if (
+                pieceRect.left >= gridRect.left &&
+                pieceRect.top >= gridRect.top &&
+                pieceRect.right <= gridRect.right &&
+                pieceRect.bottom <= gridRect.bottom
+            ) {
+                const gridX = Math.round((pieceRect.left - gridRect.left) / GRID_INTERVAL) * GRID_INTERVAL;
+                const gridY = Math.round((pieceRect.top - gridRect.top) / GRID_INTERVAL) * GRID_INTERVAL;
+                selectedPiece.style.left = `${gridX + gridRect.left + window.scrollX}px`;
+                selectedPiece.style.top = `${gridY + gridRect.top + window.scrollY}px`;
+            
+                checkPosition(selectedPiece, gridX, gridY);
+            }
+            selectedPiece = null;
+        }
+    });
+
+    function onMouseMove(e) {
+        if (selectedPiece) {
+            selectedPiece.style.left = `${e.pageX - offsetX}px`;
+            selectedPiece.style.top = `${e.pageY - offsetY}px`;
+        }
+    }
+
+    function checkPosition(piece, x, y) {
+        const gridX = Math.round(x / GRID_INTERVAL);
+        const gridY = Math.round(y / GRID_INTERVAL);
+        const pieceNumber = parseInt(piece.id.replace('piece', ''));
+
+        let isPossiblyCorrect = false;
+
+        for (let pattern of correctPositionsList) {
+            const correctPosition = pattern.find(pos => pos.n === pieceNumber);
+            if (correctPosition && gridX === correctPosition.x && gridY === correctPosition.y) {
+                isPossiblyCorrect = true;
+                break;
             }
         }
-    </script>
+
+        if (isPossiblyCorrect) {
+            console.log(`Piece ${pieceNumber} may be in the correct position!`);
+        } else {
+            console.log(`Piece ${pieceNumber} may not be in the correct position.`);
+        }
+
+        if (areAllPiecesInPlace()) {
+            alert("Congratulations! All pieces are in the correct place.");
+        }
+    }
+
+    function areAllPiecesInPlace() {
+    for (let pattern of correctPositionsList) {
+        let isPatternCorrect = true;
+
+        for (let piece of pieces) {
+            const pieceRect = piece.getBoundingClientRect();
+            const gridX = Math.round((pieceRect.left - gridElement.getBoundingClientRect().left) / GRID_INTERVAL);
+            const gridY = Math.round((pieceRect.top - gridElement.getBoundingClientRect().top) / GRID_INTERVAL);
+            const pieceNumber = parseInt(piece.id.replace('piece', ''));
+
+            const correctPosition = pattern.find(pos => pos.n === pieceNumber);
+
+            if (!correctPosition || gridX !== correctPosition.x || gridY !== correctPosition.y) {
+                isPatternCorrect = false;
+                break; // when the pieces cannot match this pattern
+            }
+        }
+
+        if (isPatternCorrect) {
+            return true; // When the pieces match this pattern
+        }
+    }
+
+    return false; // When the pieces does not match all patterns 
+}
+
+
+    //　Initial message
+    window.onload = function() {
+        alert("A simple squared-square pattern was discovered by A. Duijvestijn in 1978. It tiles a squared square with a side length of 112 using 21 other integral squares of different sizes. Let's find it.");
+    }
+</script>
 </body>
 </html>
