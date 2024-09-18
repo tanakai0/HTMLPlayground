@@ -35,6 +35,12 @@
         .triangle-info.disabled {
             color: lightgray; /* Disabled state */
         }
+        .ellipse-info {
+            color: black; /* Default color */
+        }
+        .ellipse-info.disabled {
+            color: lightgray; /* Disabled state */
+        }
     </style>
 </head>
 <body>
@@ -47,7 +53,7 @@
 <!-- Information display -->
 <div class="info">
     <p>Side lengths: AB = <span id="ab-length"></span>, BC = <span id="bc-length"></span>, CA = <span id="ca-length"></span></p>
-    <p>Acute angles: ∠A = <span id="a-angle"></span>, ∠B = <span id="b-angle"></span>, ∠C = <span id="c-angle"></span></p>
+    <p>Angles: ∠A = <span id="a-angle"></span>, ∠B = <span id="b-angle"></span>, ∠C = <span id="c-angle"></span></p>
     <p>Area: <span id="area"></span></p>
     <p>
         <button id="uncheck-all-btn">Uncheck all checkboxes</button>
@@ -60,6 +66,8 @@
     <div id="circles-section"></div>
     <p>Triangles</p>
     <div id="triangles-section"></div>
+    <p>Ellipses</p>
+    <div id="ellipses-section"></div>
 </div>
 
 <script>
@@ -216,6 +224,24 @@ const centerStyles = {
         informationText: '● Second isogonic center',
         ETCReference: 14,
     },
+    firstIsodynamicPoint: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray', 
+        checkboxId: 'firstIsodynamicPoint-checkbox',
+        displayElementId: 'firstIsodynamicPoint',
+        annotationLabel: '1st isodynamic',
+        informationText: '● First isodynamic point',
+        ETCReference: 15,
+    },
+    secondIsodynamicPoint: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray', 
+        checkboxId: 'secondIsodynamicPoint-checkbox',
+        displayElementId: 'secondIsodynamicPoint',
+        annotationLabel: '2nd isodynamic',
+        informationText: '● Second isodynamic point',
+        ETCReference: 16,
+    },
     firstNapoleonPoint: {
         activeColor: 'brown',
         inactiveColor: 'lightgray', 
@@ -243,6 +269,15 @@ const centerStyles = {
         informationText: '● de Longchamps point',
         ETCReference: 20,
     },
+    SchifflerPoint: {
+        activeColor: '#c54ea0',
+        inactiveColor: 'lightgray', 
+        checkboxId: 'SchifflerPoint-checkbox',
+        displayElementId: 'SchifflerPoint',
+        annotationLabel: 'Schiffler',
+        informationText: '● Schiffler point',
+        ETCReference: 21,
+    },
     BevanPoint: {
         activeColor: 'gray',
         inactiveColor: 'lightgray',
@@ -251,6 +286,24 @@ const centerStyles = {
         annotationLabel: 'Bevan',
         informationText: '● Bevan point',
         ETCReference: 40,
+    },
+    firstAjimaMalfattiPoint: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'firstAjimaMalfattiPoint-checkbox',
+        displayElementId: 'firstAjimaMalfattiPoint',
+        annotationLabel: '1st Ajima-Malfatti',
+        informationText: '● First Ajima-Malfatti point',
+        ETCReference: 179,
+    },
+    secondAjimaMalfattiPoint: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'secondAjimaMalfattiPoint-checkbox',
+        displayElementId: 'secondAjimaMalfattiPoint',
+        annotationLabel: '2nd Ajima-Malfatti',
+        informationText: '● Second Ajima-Malfatti point',
+        ETCReference: 180,
     },
     FuhrmannCenter: {
         activeColor: 'gray',
@@ -274,6 +327,62 @@ const centerStyles = {
 
 // Define styles for lines
 const lineStyles = {
+    medians: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'medians-checkbox',
+        displayElementId: 'medians',
+        annotationLabel: 'Median',
+        informationText: '- Medians',
+    },
+    perpendicularBisectors: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'perpendicularBisectors-checkbox',
+        displayElementId: 'perpendicularBisectors',
+        annotationLabel: 'perpendicular bisector',
+        informationText: '- Perpendicular bisectors',
+    },
+    internalAngleBisectors: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'internalAngleBisectors-checkbox',
+        displayElementId: 'internalAngleBisectors',
+        annotationLabel: 'angle bisector',
+        informationText: '- Internal angle bisectors',
+    },
+    altitudes: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: ' altitudes-checkbox',
+        displayElementId: ' altitudes',
+        annotationLabel: 'Altitude',
+        informationText: '- Altitudes',
+    },
+    symmedians: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'symmedians-checkbox',
+        displayElementId: 'symmedians',
+        annotationLabel: 'Symmedian',
+        informationText: '- Symmedians',
+    },
+    splitters: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'splitters-checkbox',
+        displayElementId: 'splitters',
+        annotationLabel: 'Splitter',
+        informationText: '- Splitters',
+    },
+    cleavers: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'cleavers-checkbox',
+        displayElementId: 'cleavers',
+        annotationLabel: 'Cleaver',
+        informationText: '- Cleavers',
+    },
     EulerLine: {
         activeColor: 'blue',
         inactiveColor: 'lightgray',
@@ -297,6 +406,14 @@ const lineStyles = {
         displayElementId: 'FermatAxis',
         annotationLabel: 'Fermat axis',
         informationText: '- Fermat axis',
+    },
+    OrthogonalRegressionLine: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'OrthogonalRegressionLine-checkbox',
+        displayElementId: 'OrthogonalRegressionLine',
+        annotationLabel: 'Orthogonal regression',
+        informationText: '- Orthogonal regression line for the three vertices',
     },
 };
 
@@ -422,6 +539,30 @@ const circleStyles = {
         annotationLabel: 'Malfatti',
         informationText: '○ Malfatti circles',
     },
+    ParryCircle: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'ParryCircle-checkbox',
+        displayElementId: 'ParryCircle',
+        annotationLabel: 'Parry',
+        informationText: '○ Parry circle',
+    },
+    BrocardCircle: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'BrocardCircle-checkbox',
+        displayElementId: 'BrocardCircle',
+        annotationLabel: 'Brocard',
+        informationText: '○ Brocard circle',
+    },
+    TaylorCircle: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'TaylorCircle-checkbox',
+        displayElementId: 'TaylorCircle',
+        annotationLabel: 'Taylor',
+        informationText: '○ Taylor circle',
+    },
 };
 
 // Define styles for triangles
@@ -500,6 +641,26 @@ const triangleStyles = {
     },
 };
 
+// Define styles for ellipse
+const ellipseStyles = {
+    SteinerInellipse: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'SteinerInellipse-checkbox',
+        displayElementId: 'SteinerInellipse',
+        annotationLabel: 'Steiner inellipse',
+        informationText: '⬭ Steiner inellipse ',
+    },
+    SteinerCircumellipse: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'SteinerCircumellipse-checkbox',
+        displayElementId: 'SteinerCircumellipse',
+        annotationLabel: 'Steiner circumellipse',
+        informationText: '⬭ Steiner circumellipse ',
+    },
+}
+
 // Triangle vertices
 let points = [
     { x: 300, y: 100 }, // A
@@ -522,13 +683,15 @@ const allStyles = [
     ...Object.values(centerStyles),
     ...Object.values(lineStyles),
     ...Object.values(circleStyles),
-    ...Object.values(triangleStyles)
+    ...Object.values(triangleStyles),
+    ...Object.values(ellipseStyles)
 ];
 const allCheckboxIds = [
     ...Object.values(centerStyles).map(style => style.checkboxId),
     ...Object.values(lineStyles).map(style => style.checkboxId),
     ...Object.values(circleStyles).map(style => style.checkboxId),
-    ...Object.values(triangleStyles).map(style => style.checkboxId)
+    ...Object.values(triangleStyles).map(style => style.checkboxId),
+    ...Object.values(ellipseStyles).map(style => style.checkboxId),
 ];
 
 // Initial drawing
@@ -553,6 +716,7 @@ function initializeStyles() {
     createCheckboxes(Object.values(lineStyles), 'lines-section', 'line-info');
     createCheckboxes(Object.values(circleStyles), 'circles-section', 'circle-info');
     createCheckboxes(Object.values(triangleStyles), 'triangles-section', 'triangle-info');
+    createCheckboxes(Object.values(ellipseStyles), 'ellipses-section', 'ellipse-info');
 
     // Default the checkboxes for the five significant centers
     const defaultTrueCheckboxes = [
@@ -581,6 +745,7 @@ function reDraw(){
     drawLines();
     drawCircles();
     drawTriangles();
+    drawEllipses();
     updateInfo();
     applyStyles();
 }
@@ -594,7 +759,7 @@ function updateInfo() {
     document.getElementById('bc-length').textContent = (calculateDistance(B, C) * scaleFactor).toFixed(2);
     document.getElementById('ca-length').textContent = (calculateDistance(C, A) * scaleFactor).toFixed(2);
 
-    // Acute angles
+    // Angles
     document.getElementById('a-angle').textContent = calculateAngleInDegrees(B, A, C).toFixed(2);
     document.getElementById('b-angle').textContent = calculateAngleInDegrees(A, B, C).toFixed(2);
     document.getElementById('c-angle').textContent = calculateAngleInDegrees(A, C, B).toFixed(2);
@@ -774,8 +939,17 @@ function drawCenters() {
                 case 'secondIsogonicCenter':
                     center = calculateIsogonicCenter(points, outer = false);
                     break;
+                case 'firstIsodynamicPoint':
+                    center = calculateIsodynamicPoint(points, outer = false);
+                    break;
+                case 'secondIsodynamicPoint':
+                    center = calculateIsodynamicPoint(points, outer = true);
+                    break;
                 case 'deLongchampsPoint':
                     center = calculateDeLongchampsPoint(points);
+                    break;
+                case 'SchifflerPoint':
+                    center = calculateSchifflerPoint(points);
                     break;
                 case 'ninePointCenter':
                     center = calculateNinePointCenter(points);
@@ -800,6 +974,12 @@ function drawCenters() {
                     break;   
                 case 'BevanPoint':
                     center = calculateBevanPoint(points);
+                    break;
+                case 'firstAjimaMalfattiPoint':
+                    center = calculateFirstAjimaMalfattiPoint(points);
+                    break;
+                case 'secondAjimaMalfattiPoint':
+                    center = calculateSecondAjimaMalfattiPoint(points);
                     break;
                 case 'Mittenpunkt':
                     center = calculateMittenpunkt(points);
@@ -833,28 +1013,54 @@ function drawLines() {
         const checkbox = document.getElementById(style.checkboxId);
 
         if (checkbox && checkbox.checked) {
-            let line;
+            let lines = [];
 
             // Switch statement to handle different line calculations
             switch (key) {
+                case 'medians':
+                    lines.push(...calculateMedians(points));
+                    break;  
+                case 'perpendicularBisectors':
+                    lines.push(...calculatePerpendicularBisectors(points));
+                    break;                
+                case 'internalAngleBisectors':
+                    lines.push(...calculateInternalAngleBisectors(points));
+                    break;
+                case 'altitudes':
+                    lines.push(...calculateAltitudes(points));
+                    break;  
+                case 'symmedians':
+                    lines.push(...calculateSymmedians(points));
+                    break;      
+                case 'splitters':
+                    lines.push(...calculateSplitters(points));
+                    break;
+                case 'cleavers':
+                    lines.push(...calculateCleavers(points));
+                    break;           
                 case 'EulerLine':
-                    line = calculateEulerLine(points);
+                    lines.push(calculateEulerLine(points));
                     break;
                 case 'NagelLine':
-                    line = calculateNagelLine(points);
+                    lines.push(calculateNagelLine(points));
                     break;
                 case 'FermatAxis':
-                    line = calculateFermatAxis(points);
+                    lines.push(calculateFermatAxis(points));
+                    break;
+                case 'OrthogonalRegressionLine':
+                    lines.push(calculateOrthogonalRegressionLine(points));
                     break;
                 default:
                     console.error(`Unknown line key: ${key}`);
                     return;
             }
+            // Draw
+            lines.forEach(line => {
+                if (line) {
+                    drawLine(line, style.annotationLabel, style.activeColor);
+                }
+            });
 
-            // Draw the line if it was calculated
-            if (line) {
-                drawLine(line, style.annotationLabel, style.activeColor);
-            }
         }
     });
 }
@@ -912,12 +1118,21 @@ function drawCircles() {
                 case 'MalfattiCircles':
                     circles.push(...calculateMalfattiCircles(points));
                     break;
+                case 'ParryCircle':
+                    circles.push(calculateParryCircle(points));
+                    break;
+                case 'BrocardCircle':
+                    circles.push(calculateBrocardCircle(points));
+                    break;
+                case 'TaylorCircle':
+                    circles.push(calculateTaylorCircle(points));
+                    break;
                 default:
                     console.error(`Unknown circle key: ${key}`);
                     return;
             }
 
-            // Draw each circle in the list
+            // Draw
             circles.forEach(circle => {
                 if (circle) {
                     drawCircle(circle, style.annotationLabel, style.activeColor);
@@ -971,9 +1186,38 @@ function drawTriangles() {
                     return;
             }
 
-            // Draw the triangle if it was calculated
+            // Draw
             if (triangle) {
-                drawTriangle(triangle, style.annotationLabel, style.activeColor);
+                drawPolygon(triangle, style.annotationLabel, style.activeColor);
+            }
+        }
+    });
+}
+
+// Draw ellipses based on checkbox states
+function drawEllipses() {
+    Object.keys(ellipseStyles).forEach(key => {
+        const style = ellipseStyles[key];
+        const checkbox = document.getElementById(style.checkboxId);
+        
+        if (checkbox && checkbox.checked) {
+            let ellipse;
+            
+            switch (key) {
+                case 'SteinerInellipse':
+                    ellipse = calculateSteinerInellipse(points);
+                    break;
+                case 'SteinerCircumellipse':
+                    ellipse = calculateSteinerCircumellipse(points);
+                    break;
+                default:
+                    console.error(`Unknown ellipse key: ${key}`);
+                    return;
+            }
+
+            // Draw
+            if (ellipse) {
+                drawEllipse(ellipse, style.annotationLabel, style.activeColor);
             }
         }
     });
@@ -1084,25 +1328,68 @@ function drawCircle(circle, label = '', color = 'black') {
     }
 }
 
-// Function to draw a triangle
-function drawTriangle(triangle, label = '', color = 'black') {
-    const [A, B, C] = triangle;
+// Function to draw a polygon
+function drawPolygon(polygon, label = '', color = 'black') {
+    if (polygon.length < 3) {
+        console.error("A polygon must have at least 3 vertices.");
+        return;
+    }
 
-    // Draw the triangle
+    // Draw the polygon
     ctx.beginPath();
-    ctx.moveTo(A.x, A.y);
-    ctx.lineTo(B.x, B.y);
-    ctx.lineTo(C.x, C.y);
+    ctx.moveTo(polygon[0].x, polygon[0].y);
+    for (let i = 1; i < polygon.length; i++) {
+        ctx.lineTo(polygon[i].x, polygon[i].y);
+    }
     ctx.closePath();
     ctx.strokeStyle = color;
     ctx.stroke();
 
-    // Draw the label at the centroid of the triangle (or near one vertex)
+    // Draw the label at the centroid of the polygon
     if (label) {
-        const centroidX = (A.x + B.x + C.x) / 3;
-        const centroidY = (A.y + B.y + C.y) / 3;
+        // Calculate the centroid of the polygon
+        let centroidX = 0, centroidY = 0;
+        polygon.forEach(point => {
+            centroidX += point.x;
+            centroidY += point.y;
+        });
+        centroidX /= polygon.length;
+        centroidY /= polygon.length;
+
         ctx.fillStyle = color;
         ctx.fillText(label, centroidX, centroidY);
+    }
+}
+
+/*
+Function to draw an ellipse
+Ellipse data structure
+const ellipse = {
+    center: { x: ???, y: ??? },  // Center of the ellipse
+    radiusX: ???,                // Length of semi-major axis (half of the major axis)
+    radiusY: ???,                // Length of semi-minor axis (half of the minor axis)
+    rotationRadian: ???                // Rotation angle in radians
+};
+*/
+// Function to draw an ellipse
+function drawEllipse(ellipse, label = '', color = 'black') {
+    const { center, radiusX, radiusY, rotationRadian } = ellipse;
+
+    // Begin drawing the ellipse
+    ctx.beginPath();
+    
+    // Use CanvasRenderingContext2D's `ellipse` method to draw the ellipse
+    // ctx.ellipse(x, y, radiusX, radiusY, rotation, startAngle, endAngle)
+    ctx.ellipse(center.x, center.y, radiusX, radiusY, rotationRadian, 0, 2 * Math.PI);
+
+    // Set the stroke style and draw the outline of the ellipse
+    ctx.strokeStyle = color;
+    ctx.stroke();
+
+    // Draw the label at the center of the ellipse
+    if (label) {
+        ctx.fillStyle = color;
+        ctx.fillText(label, center.x, center.y);
     }
 }
 
@@ -1216,6 +1503,45 @@ function rotate(P, O, d) {
     };
 }
 
+/**
+ * Function to reflect a point across a line segment.
+ * Parameters;
+ * point - The point to reflect, with properties x and y.
+ * linePoints - An array of two points, each with properties x and y, representing the line segment.
+ * Returns;
+ * The reflected point with properties x and y.
+ */
+ function reflectPointAcrossLine(point, line) {
+    const [p1, p2] = line;
+    const slope = calculateSlope(p1, p2);
+
+    // If the line is vertical
+    if (!isFinite(slope)) {
+        return {
+            x: 2 * p1.x - point.x,
+            y: point.y
+        };
+    }
+
+    // If the line is horizontal
+    if (slope === 0) {
+        return {
+            x: point.x,
+            y: 2 * p1.y - point.y
+        };
+    }
+
+    const intercept = p1.y - slope * p1.x;
+    const perSlope = perpendicularSlope(slope);
+    
+    // Calculate the intersection of the line through the point and perpendicular to the given line
+    const intersection = lineIntersectionGivenSlopesAndPoints(slope, p1, perSlope, point);
+    return {
+        x: 2 * intersection.x - point.x,
+        y: 2 * intersection.y - point.y
+    };
+}
+
 // Function to find the intersection of two lines (P1, P2) and (Q1, Q2)
 function lineIntersection(P1, P2, Q1, Q2) {
     const a1 = P2.y - P1.y;
@@ -1311,6 +1637,53 @@ function calculateTangencyPoint(c1, c2) {
     }
 }
 
+// Function to calculate the angle between a line and the x-axis
+function calculateAngleInRadianWithXAxis(points) {
+    const [p1, p2] = points;
+    
+    // Ensure the points are different
+    if (closeEnoughPoints(p1, p2)) {
+        throw new Error("The two points must be distinct.");
+    }
+    // the line is vertical
+    else if (closeEnoughScalars(p1. x, p2.x)) {
+        console.log('asfsd')
+        return Math.PI / 2;
+    }
+    else{
+        const deltaX = p2.x - p1.x;
+        const deltaY = p2.y - p1.y;
+        return angleInRadians = Math.atan2(deltaY, deltaX);
+    }
+}
+
+// Function to convert barycentric coordinates to Cartesian coordinates
+function barycentricToCartesian(points, bary) {
+    const [A, B, C] = points;
+    const [u, v, w] = bary;
+    const x = (u * A.x + v * B.x + w * C.x) / (u + v + w);
+    const y = (u * A.y + v * B.y + w * C.y) / (u + v + w);
+    return { x, y };
+}
+
+// Function to convert trilinear coordinates to Cartesian coordinates
+function trilinearToCartesian(points, trilinear) {
+    const [A, B, C] = points;
+    const [alpha, beta, gamma] = trilinear;
+    // Calculate the side lengths of the triangle
+    const a = calculateDistance(B, C);
+    const b = calculateDistance(C, A);
+    const c = calculateDistance(A, B);
+
+    // Convert trilinear coordinates to barycentric coordinates
+    const u = alpha * a;
+    const v = beta * b;
+    const w = gamma * c;
+
+    // Use the barycentricToCartesian function to get Cartesian coordinates
+    return barycentricToCartesian(points, [u, v, w]);
+}
+
 // Function to calculate the centroid of the triangle
 function calculateCentroid(points) {
     const [A, B, C] = points;
@@ -1337,11 +1710,13 @@ function calculateCircumcenter(points) {
 
 // Function to calculate the incenter (intersection of angle bisectors)
 function calculateIncenter(points) {
+    // return trilinearToCartesian(points, [1, 1, 1]);
+    
     const [A, B, C] = points;
 
     // Lengths of the sides
     const a = calculateDistance(B, C);
-    const b = calculateDistance(A, C);
+    const b = calculateDistance(C, A);
     const c = calculateDistance(A, B);
 
     // Incenter coordinates
@@ -1402,6 +1777,32 @@ function calculateIsogonicCenter(points, outer = true) {
     return lineIntersection(B, R2, C, R1);
 }
 
+// Function to calculate the isodynamic point
+function calculateIsodynamicPoint(points, outer = false) {
+    if (outer) {
+        if (isEquilateralTriangle(points)){
+            return null;
+        }    
+    }
+    const [A, B, C] = points;
+
+    // Determine rotation direction based on the cross product of vectors AB and AC
+    const crossProduct = calculateCrossProduct(A, B, C);
+    let rotationRadian = crossProduct > 0 ? -60 : 60;
+    if (!outer){
+        rotationRadian = -rotationRadian;
+    }
+
+    // Calculate rotation points for Fermat point
+    const P1 = rotate(C, B, rotationRadian);
+    const P2 = rotate(A, C, rotationRadian);
+    const Q1 = reflectPointAcrossLine(A, [B, C]);
+    const Q2 = reflectPointAcrossLine(B, [C, A]);
+
+    // Intersection of lines BR2 and CR1 gives the Fermat point
+    return lineIntersection(P1, Q1, P2, Q2);
+}
+
 // Function to calculate the isogonic center
 function calculateFermatPoint(points) {
     const [A, B, C] = points;
@@ -1429,6 +1830,15 @@ function calculateDeLongchampsPoint(points) {
         x: 2 * circumcenter.x - orthocenter.x,
         y: 2 * circumcenter.y - orthocenter.y,
     }
+}
+
+// Function to calculate the Schiffler point
+function calculateSchifflerPoint(points) {
+    const [A, B, C] = points;
+    const incenter = calculateIncenter(points);
+    const EulerLineA = calculateEulerLine([B, C, incenter]);
+    const EulerLineB = calculateEulerLine([C, A, incenter]);
+    return lineIntersection(EulerLineA[0], EulerLineA[1], EulerLineB[0], EulerLineB[1]);
 }
 
 // Function to calculate the nine point center
@@ -1484,6 +1894,42 @@ function calculateBevanPoint(points) {
     return calculateBevanCircle(points).center;
 }
 
+// Function to calculate the first Ajima-Malfatti point
+function calculateFirstAjimaMalfattiPoint(points) {
+    const [A, B, C] = points;
+    const MalfattiCircles = calculateMalfattiCircles(points);
+    const [cA, cB, cC] = MalfattiCircles;
+    // calculate the tangency points of two Malfatti circles
+    const PA = {
+        x: (cC.radius * cB.center.x + cB.radius * cC.center.x) / (cB.radius + cC.radius),
+        y: (cC.radius * cB.center.y + cB.radius * cC.center.y) / (cB.radius + cC.radius)
+    };
+    const PB = {
+        x: (cA.radius * cC.center.x + cC.radius * cA.center.x) / (cC.radius + cA.radius),
+        y: (cA.radius * cC.center.y + cC.radius * cA.center.y) / (cC.radius + cA.radius)
+    };
+    return lineIntersection(A, PA, B, PB);
+}
+
+// Function to calculate the second Ajima-Malfatti point
+function calculateSecondAjimaMalfattiPoint(points) {
+    const [A, B, C] = points;
+    const MalfattiCircles = calculateMalfattiCircles(points);
+    const [cA, cB, cC] = MalfattiCircles;
+    const excenterA = calculateExcenter([C, A, B]);
+    const excenterB = calculateExcenter([A, B, C]);
+    // calculate the tangency points of two Malfatti circles
+    const PA = {
+        x: (cC.radius * cB.center.x + cB.radius * cC.center.x) / (cB.radius + cC.radius),
+        y: (cC.radius * cB.center.y + cB.radius * cC.center.y) / (cB.radius + cC.radius)
+    };
+    const PB = {
+        x: (cA.radius * cC.center.x + cC.radius * cA.center.x) / (cC.radius + cA.radius),
+        y: (cA.radius * cC.center.y + cC.radius * cA.center.y) / (cC.radius + cA.radius)
+    };
+    return lineIntersection(excenterA, PA, excenterB, PB);
+}
+
 // Function to calculate the Mittenpunkt
 function calculateMittenpunkt(points) {
     const excentralTriangle = calculateExcentralTriangle(points);
@@ -1509,6 +1955,85 @@ function calculateFuhrmannCenter(points) {
     return calculateCircumcircle(calculateFuhrmannTriangle(points)).center;
 }
 
+// Function to calculate the medians
+function calculateMedians(points) {
+    const [A, B, C] = points;
+    const centroid = calculateCentroid(points);
+    return [
+        [A, centroid],
+        [B, centroid],
+        [C, centroid]
+    ];
+}
+
+// Function to calculate the perpendicular bisectors
+function calculatePerpendicularBisectors(points) {
+    const [A, B, C] = points;
+    const circumcenter = calculateCircumcenter(points);
+    return [
+        [midpoint(B, C), circumcenter],
+        [midpoint(C, A), circumcenter],
+        [midpoint(A, B), circumcenter]
+    ];
+}
+
+
+// Function to calculate the internal angle bisectors
+function calculateInternalAngleBisectors(points) {
+    const [A, B, C] = points;
+    const incenter = calculateIncenter(points);
+    return [
+        [A, incenter],
+        [B, incenter],
+        [C, incenter]
+    ];
+}
+
+// Function to calculate the altitudes
+function calculateAltitudes(points) {
+    const [A, B, C] = points;
+    const orthocenter = calculateOrthocenter(points);
+    return [
+        [A, orthocenter],
+        [B, orthocenter],
+        [C, orthocenter]
+    ];
+}
+
+// Function to calculate the symmedians
+function calculateSymmedians(points) {
+    const [A, B, C] = points;
+    const symmedianPoint = calculateSymmedianPoint(points);
+    return [
+        [A, symmedianPoint],
+        [B, symmedianPoint],
+        [C, symmedianPoint]
+    ];
+}
+
+// Function to calculate the splitters
+function calculateSplitters(points) {
+    const [A, B, C] = points;
+    const NagelPoint = calculateNagelPoint(points);
+    return [
+        [A, NagelPoint],
+        [B, NagelPoint],
+        [C, NagelPoint]
+    ];
+}
+
+// Function to calculate the cleavers
+function calculateCleavers(points) {
+    const [A, B, C] = points;
+    const SpiekerCenter = calculateSpiekerCenter(points);
+    return [
+        [midpoint(B, C), SpiekerCenter],
+        [midpoint(C, A), SpiekerCenter],
+        [midpoint(A, B), SpiekerCenter]
+    ];
+}
+
+
 // Function to calculate the Euler line
 function calculateEulerLine(points) {
     const orthocenter = calculateOrthocenter(points);
@@ -1531,6 +2056,41 @@ function calculateFermatAxis(points) {
         calculateIsogonicCenter(points, outer = false)
     ];
 }
+
+// Function to calculate the orthogonal regression line for three vertices
+function calculateOrthogonalRegressionLine(points) {
+    // Step 1: Calculate the sample means
+    const n = points.length;
+    const meanX = points.reduce((sum, p) => sum + p.x, 0) / n;
+    const meanY = points.reduce((sum, p) => sum + p.y, 0) / n;
+
+    // Step 2: Calculate second-degree sample moments
+    let s_xx = 0, s_yy = 0, s_xy = 0;
+    points.forEach(p => {
+        s_xx += (p.x - meanX) * (p.x - meanX);
+        s_yy += (p.y - meanY) * (p.y - meanY);
+        s_xy += (p.x - meanX) * (p.y - meanY);
+    });
+
+    s_xx /= n;
+    s_yy /= n;
+    s_xy /= n;
+
+    // Step 3: Calculate the slope (beta_1)
+    // For delta = 1, the orthogonal regression slope is calculated using:
+    const delta = 1;
+    const numerator = s_yy - delta * s_xx + Math.sqrt((s_yy - delta * s_xx) ** 2 + 4 * delta * s_xy ** 2);
+    const beta_1 = numerator / (2 * s_xy);
+
+    // Step 4: Return the orthogonal regression line
+    if (isFinite(beta_1)) {
+        return [{x: meanX, y: meanY}, {x: meanX + 1, y: meanY + beta_1}];
+    }
+    else {
+        return [{x: meanX, y: meanY}, {x: meanX, y: meanY + 1}];
+    }
+}
+    
 
 // Function to calculate the incircle
 function calculateIncircle(points) {
@@ -1737,6 +2297,41 @@ function calculateMalfattiCircles(points) {
     return [circleA, circleB, circleC];
 }
 
+// Function to calculate the Parry circle
+function calculateParryCircle(points) {
+    const centroid = calculateCentroid(points);
+    const firstIsodynamicPoint = calculateIsodynamicPoint(points, outer = false);
+    const secondIsodynamicPoint = calculateIsodynamicPoint(points, outer = true);
+    return calculateCircumcircle([centroid, firstIsodynamicPoint, secondIsodynamicPoint]);
+}
+
+// Function to calculate the Brocard circle
+function calculateBrocardCircle(points) {
+    const circumcenter = calculateCircumcenter(points);
+    const symmedianPoint = calculateSymmedianPoint(points);
+    return {
+        center: midpoint(circumcenter, symmedianPoint),
+        radius: calculateDistance(circumcenter, symmedianPoint) / 2
+    };
+}
+
+// Function to calculate the Taylor circle
+function calculateTaylorCircle(points) {
+    const [A, B, C] = points;
+    const slopeAB = calculateSlope(A, B);
+    const slopeBC = calculateSlope(B, C);
+    const slopeCA = calculateSlope(C, A);
+    const perpendicularSlopeAB = perpendicularSlope(slopeAB);
+    const perpendicularSlopeBC = perpendicularSlope(slopeBC);
+    const perpendicularSlopeCA = perpendicularSlope(slopeCA);
+    const PA = lineIntersectionGivenSlopesAndPoints(perpendicularSlopeBC, A, slopeBC, B);
+    const PB = lineIntersectionGivenSlopesAndPoints(perpendicularSlopeCA, B, slopeCA, C);
+    const PAB = lineIntersectionGivenSlopesAndPoints(perpendicularSlopeCA, PA, slopeCA, C);
+    const PAC = lineIntersectionGivenSlopesAndPoints(perpendicularSlopeAB, PA, slopeAB, A);
+    const PBC = lineIntersectionGivenSlopesAndPoints(perpendicularSlopeAB, PB, slopeAB, A);
+    return calculateCircumcircle([PAB, PAC, PBC]);
+}
+
 // Function to calculate the medial triangles
 function calculateMedialTriangle(points) {
     const [A, B, C] = points;
@@ -1909,6 +2504,57 @@ function calculateFeuerbachTriangle(points) {
         calculateTangencyPoint(ninePointCircle, excircleC)
     ];
 }
+
+// Function to calculate the Steiner inellipse
+function calculateSteinerInellipse(points) {
+    const [A, B, C] = points;
+    const a = calculateDistance(B, C);
+    const b = calculateDistance(C, A);
+    const c = calculateDistance(A, B);
+    const centroid = calculateCentroid(points);
+    const Z = Math.sqrt(
+        Math.pow(a, 4) + Math.pow(b, 4) + Math.pow(c, 4) - 
+        (Math.pow(a, 2) * Math.pow(b, 2)) - 
+        (Math.pow(b, 2) * Math.pow(c, 2)) - 
+        (Math.pow(c, 2) * Math.pow(a, 2))
+    );
+    // Calculate the semi-major axis (largest axis) and semi-minor axis (smallest axis)
+    const semiMajorAxisLength = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2) + Math.pow(c, 2) + 2 * Z) / 6;
+    const semiMinorAxisLength = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2) + Math.pow(c, 2) - 2 * Z) / 6;
+    const rotationRadian = calculateAngleInRadianWithXAxis(calculateOrthogonalRegressionLine(points));
+    return {
+        center: centroid,
+        radiusX: semiMajorAxisLength,
+        radiusY: semiMinorAxisLength,
+        rotationRadian: rotationRadian
+    };
+}
+
+// Function to calculate the Steiner circumellipse
+function calculateSteinerCircumellipse(points) {
+    const [A, B, C] = points;
+    const a = calculateDistance(B, C);
+    const b = calculateDistance(C, A);
+    const c = calculateDistance(A, B);
+    const centroid = calculateCentroid(points);
+    const Z = Math.sqrt(
+        Math.pow(a, 4) + Math.pow(b, 4) + Math.pow(c, 4) - 
+        (Math.pow(a, 2) * Math.pow(b, 2)) - 
+        (Math.pow(b, 2) * Math.pow(c, 2)) - 
+        (Math.pow(c, 2) * Math.pow(a, 2))
+    );
+    // Calculate the semi-major axis (largest axis) and semi-minor axis (smallest axis)
+    const semiMajorAxisLength = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2) + Math.pow(c, 2) + 2 * Z) / 3;
+    const semiMinorAxisLength = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2) + Math.pow(c, 2) - 2 * Z) / 3;
+    const rotationRadian = calculateAngleInRadianWithXAxis(calculateOrthogonalRegressionLine(points));
+    return {
+        center: centroid,
+        radiusX: semiMajorAxisLength,
+        radiusY: semiMinorAxisLength,
+        rotationRadian: rotationRadian
+    };
+}
+
 
 </script>
 </body>
