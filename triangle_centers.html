@@ -693,7 +693,12 @@ const CANVAS_WIDTH = 1000;
 const CANVAS_HEIGHT = 500;
 const canvas = document.getElementById('triangleCanvas');
 const ctx = canvas.getContext('2d');
-const useHomogeneousCoordinates = true;  // use trilinear coordinates and barycentric coodinates
+
+/*
+Whether to use trilinear coordinates and barycentric coodinates.
+Using homogeneous coordinates reduces the computational cost, as it simplifies the process of calculating points
+compared to more complex calculations like finding intersections between circles and lines. */
+const useHomogeneousCoordinates = true;
 
 // Combine all styles into one array of style objects
 const allStyles = [
