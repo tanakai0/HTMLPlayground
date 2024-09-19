@@ -35,6 +35,12 @@
         .triangle-info.disabled {
             color: lightgray; /* Disabled state */
         }
+        .hexagon-info {
+            color: black; /* Default color */
+        }
+        .hexagon-info.disabled {
+            color: lightgray; /* Disabled state */
+        }
         .ellipse-info {
             color: black; /* Default color */
         }
@@ -66,6 +72,8 @@
     <div id="circles-section"></div>
     <p>Triangles</p>
     <div id="triangles-section"></div>
+    <p>Hexagons</p>
+    <div id="hexagons-section"></div>
     <p>Ellipses</p>
     <div id="ellipses-section"></div>
 </div>
@@ -243,7 +251,7 @@ const centerStyles = {
         ETCReference: 16,
     },
     firstNapoleonPoint: {
-        activeColor: '#A52A2A',
+        activeColor: '#008000',
         inactiveColor: 'lightgray', 
         checkboxId: 'firstNapoleonPoint-checkbox',
         displayElementId: 'firstNapoleonPoint',
@@ -252,7 +260,7 @@ const centerStyles = {
         ETCReference: 17,
     },
     secondNapoleonPoint: {
-        activeColor: '#c5956b',
+        activeColor: '#0000FF',
         inactiveColor: 'lightgray', 
         checkboxId: 'secondNapoleonPoint-checkbox',
         displayElementId: 'secondNapoleonPoint',
@@ -616,7 +624,7 @@ const triangleStyles = {
         informationText: '△ Orthic triangle',
     },
     outerNapoleonTriangle: {
-        activeColor: '#A52A2A',
+        activeColor: '#008000',
         inactiveColor: 'lightgray',
         checkboxId: 'outerNapoleonTriangle-checkbox',
         displayElementId: 'outerNapoleonTriangle',
@@ -624,7 +632,7 @@ const triangleStyles = {
         informationText: '△ Outer Napoleon triangle',
     },
     innerNapoleonTriangle: {
-        activeColor: '#c5956b',
+        activeColor: '#0000FF',
         inactiveColor: 'lightgray',
         checkboxId: 'innerNapoleonTriangle-checkbox',
         displayElementId: 'innerNapoleonTriangle',
@@ -657,6 +665,26 @@ const triangleStyles = {
     },
 };
 
+// Define styles for hexagon
+const hexagonStyles = {
+    firstLemoineHexagon: {
+        activeColor: '#008000',
+        inactiveColor: 'lightgray',
+        checkboxId: 'firstLemoineHexagon-checkbox',
+        displayElementId: 'firstLemoineHexagon',
+        annotationLabel: '1st Lemoine',
+        informationText: '⬡ First Lemoine hexagon',
+    },
+    secondLemoineHexagon: {
+        activeColor: '#0000FF',
+        inactiveColor: 'lightgray',
+        checkboxId: 'secondLemoineHexagon-checkbox',
+        displayElementId: 'secondLemoineHexagon',
+        annotationLabel: '2nd Lemoine',
+        informationText: '⬡ Second Lemoine hexagon',
+    },
+}
+
 // Define styles for ellipse
 const ellipseStyles = {
     SteinerInellipse: {
@@ -665,7 +693,7 @@ const ellipseStyles = {
         checkboxId: 'SteinerInellipse-checkbox',
         displayElementId: 'SteinerInellipse',
         annotationLabel: 'Steiner inellipse',
-        informationText: '⬭ Steiner inellipse ',
+        informationText: '⬭ Steiner inellipse',
     },
     SteinerCircumellipse: {
         activeColor: '#808080',
@@ -673,7 +701,7 @@ const ellipseStyles = {
         checkboxId: 'SteinerCircumellipse-checkbox',
         displayElementId: 'SteinerCircumellipse',
         annotationLabel: 'Steiner circumellipse',
-        informationText: '⬭ Steiner circumellipse ',
+        informationText: '⬭ Steiner circumellipse',
     },
 }
 
@@ -706,6 +734,7 @@ const allStyles = [
     ...Object.values(lineStyles),
     ...Object.values(circleStyles),
     ...Object.values(triangleStyles),
+    ...Object.values(hexagonStyles),
     ...Object.values(ellipseStyles)
 ];
 const allCheckboxIds = [
@@ -713,6 +742,7 @@ const allCheckboxIds = [
     ...Object.values(lineStyles).map(style => style.checkboxId),
     ...Object.values(circleStyles).map(style => style.checkboxId),
     ...Object.values(triangleStyles).map(style => style.checkboxId),
+    ...Object.values(hexagonStyles).map(style => style.checkboxId),
     ...Object.values(ellipseStyles).map(style => style.checkboxId),
 ];
 
@@ -738,6 +768,7 @@ function initializeStyles() {
     createCheckboxes(Object.values(lineStyles), 'lines-section', 'line-info');
     createCheckboxes(Object.values(circleStyles), 'circles-section', 'circle-info');
     createCheckboxes(Object.values(triangleStyles), 'triangles-section', 'triangle-info');
+    createCheckboxes(Object.values(hexagonStyles), 'hexagons-section', 'hexagon-info');
     createCheckboxes(Object.values(ellipseStyles), 'ellipses-section', 'ellipse-info');
 
     // Default the checkboxes for the five significant centers
@@ -767,6 +798,7 @@ function reDraw(){
     drawLines();
     drawCircles();
     drawTriangles();
+    drawHexagons();
     drawEllipses();
     updateInfo();
     applyStyles();
@@ -1230,6 +1262,35 @@ function drawTriangles() {
             // Draw
             if (triangle) {
                 drawPolygon(triangle, style.annotationLabel, style.activeColor);
+            }
+        }
+    });
+}
+
+// Draw hexagons based on checkbox states
+function drawHexagons() {
+    Object.keys(hexagonStyles).forEach(key => {
+        const style = hexagonStyles[key];
+        const checkbox = document.getElementById(style.checkboxId);
+        
+        if (checkbox && checkbox.checked) {
+            let hexagon;
+            
+            switch (key) {
+                case 'firstLemoineHexagon':
+                    hexagon = calculateLemoineHexagon(points, selfIntersecting = true);
+                    break;
+                case 'secondLemoineHexagon':
+                    hexagon = calculateLemoineHexagon(points, selfIntersecting = false);
+                    break;
+                default:
+                    console.error(`Unknown hexagon key: ${key}`);
+                    return;
+            }
+
+            // Draw
+            if (hexagon) {
+                drawPolygon(hexagon, style.annotationLabel, style.activeColor);
             }
         }
     });
@@ -2617,6 +2678,27 @@ function calculateFeuerbachTriangle(points) {
         calculateTangencyPoint(ninePointCircle, excircleB),
         calculateTangencyPoint(ninePointCircle, excircleC)
     ];
+}
+
+// Function to calculate the Lemoine hexagon
+function calculateLemoineHexagon(points, selfIntersecting = false) {
+    const [A, B, C] = points;
+    const symmedianPoint = calculateSymmedianPoint(points);
+    const slopeAB = calculateSlope(A, B);
+    const slopeBC = calculateSlope(B, C);
+    const slopeCA = calculateSlope(C, A);
+    const PAB = lineIntersectionGivenSlopesAndPoints(slopeAB, A, slopeBC, symmedianPoint);
+    const PAC = lineIntersectionGivenSlopesAndPoints(slopeCA, C, slopeBC, symmedianPoint);
+    const PBA = lineIntersectionGivenSlopesAndPoints(slopeAB, A, slopeCA, symmedianPoint);
+    const PBC = lineIntersectionGivenSlopesAndPoints(slopeBC, B, slopeCA, symmedianPoint);
+    const PCA = lineIntersectionGivenSlopesAndPoints(slopeCA, C, slopeAB, symmedianPoint);
+    const PCB = lineIntersectionGivenSlopesAndPoints(slopeBC, B, slopeAB, symmedianPoint);
+    if (selfIntersecting) {
+        return [PAB, PCB, PCA, PBA, PBC, PAC];
+    }
+    else {
+        return [PAB, PBA, PCA, PAC, PBC, PCB];
+    }
 }
 
 // Function to calculate the Steiner inellipse
