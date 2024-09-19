@@ -327,6 +327,14 @@ const centerStyles = {
 
 // Define styles for lines
 const lineStyles = {
+    sidelines: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'sidelines-checkbox',
+        displayElementId: 'sidelines',
+        annotationLabel: 'Sideline',
+        informationText: '- Sidelines',
+    },
     medians: {
         activeColor: 'gray',
         inactiveColor: 'lightgray',
@@ -1026,9 +1034,12 @@ function drawLines() {
 
             // Switch statement to handle different line calculations
             switch (key) {
+                case 'sidelines':
+                    lines.push(...calculateSidelines(points));
+                    break;  
                 case 'medians':
                     lines.push(...calculateMedians(points));
-                    break;  
+                    break;
                 case 'perpendicularBisectors':
                     lines.push(...calculatePerpendicularBisectors(points));
                     break;                
@@ -2016,6 +2027,17 @@ function calculateFeuerbachPoint(points) {
 function calculateFuhrmannCenter(points) {
     return calculateCircumcircle(calculateFuhrmannTriangle(points)).center;
 }
+
+// Function to calculate the sidelines (extended side)
+function calculateSidelines(points) {
+    const [A, B, C] = points;
+    return [
+        [B, C],
+        [C, A],
+        [A, B]
+    ];
+}
+
 
 // Function to calculate the medians
 function calculateMedians(points) {
