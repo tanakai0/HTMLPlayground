@@ -563,6 +563,14 @@ const circleStyles = {
         annotationLabel: 'Taylor',
         informationText: '○ Taylor circle',
     },
+    VanLamoenCircle: {
+        activeColor: 'gray',
+        inactiveColor: 'lightgray',
+        checkboxId: 'VanLamoenCircle-checkbox',
+        displayElementId: 'VanLamoenCircle',
+        annotationLabel: 'Van Lamoen',
+        informationText: '○ Van Lamoen circle',
+    },
 };
 
 // Define styles for triangles
@@ -1126,6 +1134,9 @@ function drawCircles() {
                     break;
                 case 'TaylorCircle':
                     circles.push(calculateTaylorCircle(points));
+                    break;
+                case 'VanLamoenCircle':
+                    circles.push(calculateVanLamoenCircle(points));
                     break;
                 default:
                     console.error(`Unknown circle key: ${key}`);
@@ -2330,6 +2341,18 @@ function calculateTaylorCircle(points) {
     const PAC = lineIntersectionGivenSlopesAndPoints(perpendicularSlopeAB, PA, slopeAB, A);
     const PBC = lineIntersectionGivenSlopesAndPoints(perpendicularSlopeAB, PB, slopeAB, A);
     return calculateCircumcircle([PAB, PAC, PBC]);
+}
+
+// Function to calculate the Van Lamoen circle
+function calculateVanLamoenCircle(points) {
+    const [A, B, C] = points;
+    const centroid = calculateCentroid(points);
+    const midpointBC = midpoint(B, C);
+    const midpointCA = midpoint(C, A);
+    const circumcenter1 = calculateCircumcenter([B, centroid, midpointBC]);
+    const circumcenter2 = calculateCircumcenter([C, centroid, midpointBC]);
+    const circumcenter3 = calculateCircumcenter([A, centroid, midpointCA]);
+    return calculateCircumcircle([circumcenter1, circumcenter2, circumcenter3]);
 }
 
 // Function to calculate the medial triangles
