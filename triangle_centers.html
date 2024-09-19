@@ -685,6 +685,7 @@ const CANVAS_WIDTH = 1000;
 const CANVAS_HEIGHT = 500;
 const canvas = document.getElementById('triangleCanvas');
 const ctx = canvas.getContext('2d');
+const useHomogeneousCoordinates = true;  // use trilinear coordinates and barycentric coodinates
 
 // Combine all styles into one array of style objects
 const allStyles = [
@@ -1697,6 +1698,9 @@ function trilinearToCartesian(points, trilinear) {
 
 // Function to calculate the centroid of the triangle
 function calculateCentroid(points) {
+    if (useHomogeneousCoordinates) {
+        return barycentricToCartesian(points, [1, 1, 1]);
+    }
     const [A, B, C] = points;
     const x = ((A.x + B.x + C.x) / 3);
     const y = ((A.y + B.y + C.y) / 3);
@@ -1706,6 +1710,18 @@ function calculateCentroid(points) {
 // Function to calculate the circumcenter (intersection of perpendicular bisectors)
 function calculateCircumcenter(points) {
     const [A, B, C] = points;
+
+    if (useHomogeneousCoordinates) {
+        const a = calculateDistance(B, C);
+        const b = calculateDistance(C, A);
+        const c = calculateDistance(A, B);
+        const barycentric = [
+            a**2 * (b**2 + c**2 - a**2),
+            b**2 * (c**2 + a**2 - b**2),
+            c**2 * (a**2 + b**2 - c**2),
+        ]
+        return barycentricToCartesian(points, barycentric);
+    }
 
     // Midpoints of sides
     const D = { x: (A.x + B.x) / 2, y: (A.y + B.y) / 2 };
@@ -1721,8 +1737,9 @@ function calculateCircumcenter(points) {
 
 // Function to calculate the incenter (intersection of angle bisectors)
 function calculateIncenter(points) {
-    // return trilinearToCartesian(points, [1, 1, 1]);
-    
+    if (useHomogeneousCoordinates) {
+        return trilinearToCartesian(points, [1, 1, 1]);
+    }
     const [A, B, C] = points;
 
     // Lengths of the sides
@@ -1740,6 +1757,19 @@ function calculateIncenter(points) {
 // Function to calculate the orthocenter (intersection of perpendiculars)
 function calculateOrthocenter(points) {
     const [A, B, C] = points;
+
+    if (useHomogeneousCoordinates) {
+        const a = calculateDistance(B, C);
+        const b = calculateDistance(C, A);
+        const c = calculateDistance(A, B);
+        const barycentric = [
+            1 / (b**2 + c**2 - a**2),
+            1 / (c**2 + a**2 - b**2),
+            1 / (a**2 + b**2 - c**2),
+        ]
+        return barycentricToCartesian(points, barycentric);
+    }
+
     // Calculate perpendiculars
     const perpendicularSlopeAB = perpendicularSlope(calculateSlope(A, B));
     const perpendicularSlopeBC = perpendicularSlope(calculateSlope(B, C));
@@ -1750,6 +1780,9 @@ function calculateOrthocenter(points) {
 
 // Function to calculate the excenter for the vertex B (intersection of the internal angle bisectors of the vertex and other external angle bisectors)
 function calculateExcenter(points) {
+    if (useHomogeneousCoordinates) {
+        return trilinearToCartesian(points, [1, -1, 1]);
+    }
     const [A, B, C] = points;
     // Lengths of the triangle sides opposite to each vertex
     const a =  calculateDistance(B, C); // Length of side BC
@@ -1854,6 +1887,18 @@ function calculateSchifflerPoint(points) {
 
 // Function to calculate the nine point center
 function calculateNinePointCenter(points) {
+    if (useHomogeneousCoordinates) {
+        const [A, B, C] = points;
+        const a = calculateDistance(B, C);
+        const b = calculateDistance(C, A);
+        const c = calculateDistance(A, B);
+        const barycentric = [
+            a**2 * (b**2 + c**2) - (b**2 - c**2)**2,
+            b**2 * (c**2 + a**2) - (c**2 - a**2)**2,
+            c**2 * (a**2 + b**2) - (a**2 - b**2)**2,
+        ]
+        return barycentricToCartesian(points, barycentric);
+    }
     // Calculate the center and radius
     // The center is the midpoint between the orthocenter and circumcenter.
     // The radius is half of the circumradius.
@@ -1876,6 +1921,12 @@ function calculateNapoleonPoint(points, outer = true) {
 // Function to calculate the symmedian point
 function calculateSymmedianPoint(points) {
     const [A, B, C] = points;
+    if (useHomogeneousCoordinates) {
+        const a = calculateDistance(B, C);
+        const b = calculateDistance(C, A);
+        const c = calculateDistance(A, B);
+        return barycentricToCartesian(points, [a**2, b**2, c**2]);
+    }
     // The circumcircle of triangle ABC and the tangents at each vertex.
     const circumcenter = calculateCircumcenter(points);
     const tangentSlopeA = perpendicularSlope(calculateSlope(circumcenter, A));
