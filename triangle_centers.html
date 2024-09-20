@@ -719,6 +719,14 @@ const ellipseStyles = {
         annotationLabel: 'Steiner circumellipse',
         informationText: '⬭ Steiner circumellipse',
     },
+    LemoineInellipse: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'LemoineInellipse-checkbox',
+        displayElementId: 'LemoineInellipse',
+        annotationLabel: 'Lemoine',
+        informationText: '⬭ Lemoine inellipse',
+    },
 }
 
 // Triangle vertices
@@ -1333,6 +1341,9 @@ function drawEllipses() {
                     break;
                 case 'SteinerCircumellipse':
                     ellipse = calculateSteinerCircumellipse(points);
+                    break;
+                case 'LemoineInellipse':
+                    ellipse = calculateLemoineInellipse(points);
                     break;
                 default:
                     console.error(`Unknown ellipse key: ${key}`);
@@ -2790,6 +2801,37 @@ function calculateSteinerCircumellipse(points) {
         radiusY: semiMinorAxisLength,
         rotationRadian: rotationRadian
     };
+}
+
+// Function to calculate the Lemoine inellipse
+function calculateLemoineInellipse(points) {
+    const [A, B, C] = points;
+    const centroid = calculateCentroid(points);
+    const symmedianPoint = calculateSymmedianPoint(points);
+    const a = calculateDistance(B, C);
+    const b = calculateDistance(C, A);
+    const c = calculateDistance(A, B);
+    const semiMajorAxisLength = Math.sqrt((-(a**2)+2*b**2+2*c**2)*(2*a**2+2*b**2-c**2)*(2*a**2-b**2+2*c**2))/6/(a**2+b**2+c**2);
+    const semiMinorAxisLength = 2 * calculateArea(points) / Math.sqrt(3*(a**2+b**2+c**2));
+
+    if (closeEnoughPoints(centroid, symmedianPoint)) {
+        // When the triangle is equilateral triangle 
+        return {
+            center: centroid,
+            radiusX: semiMajorAxisLength,
+            radiusY: semiMinorAxisLength,
+            rotationRadian: 0,
+        }
+    }
+    else{
+        const rotationRadian = calculateAngleInRadianWithXAxis([centroid, symmedianPoint]);
+        return {
+            center: midpoint(centroid, symmedianPoint),
+            radiusX: semiMajorAxisLength,
+            radiusY: semiMinorAxisLength,
+            rotationRadian: rotationRadian
+        };
+    }
 }
 
 
