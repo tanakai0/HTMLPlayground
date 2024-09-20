@@ -587,6 +587,22 @@ const circleStyles = {
         annotationLabel: 'Van Lamoen',
         informationText: '○ Van Lamoen circle',
     },
+    firstLemoineCircle: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'firstLemoineCircle-checkbox',
+        displayElementId: 'firstLemoineCircle',
+        annotationLabel: '1st Lemoine',
+        informationText: '○ First Lemoine circle',
+    },
+    cosineCircle: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'cosineCircle-checkbox',
+        displayElementId: 'cosineCircle',
+        annotationLabel: 'Cosine',
+        informationText: '○ Cosine circle (Second Lemoine circle)',
+    },
 };
 
 // Define styles for triangles
@@ -1199,6 +1215,12 @@ function drawCircles() {
                     break;
                 case 'VanLamoenCircle':
                     circles.push(calculateVanLamoenCircle(points));
+                    break;
+                case 'firstLemoineCircle':
+                    circles.push(calculateFirstLemoineCircle(points));
+                    break;
+                case 'cosineCircle':
+                    circles.push(calculateCosineCircle(points));
                     break;
                 default:
                     console.error(`Unknown circle key: ${key}`);
@@ -2506,6 +2528,25 @@ function calculateVanLamoenCircle(points) {
     const circumcenter3 = calculateCircumcenter([A, centroid, midpointCA]);
     return calculateCircumcircle([circumcenter1, circumcenter2, circumcenter3]);
 }
+
+// Function to calculate the first Lemoine circle
+function calculateFirstLemoineCircle(points) {
+    const LemoineHexagon = calculateLemoineHexagon(points);
+    return calculateCircumcircle(LemoineHexagon.slice(0, 3));
+}
+
+// Function to calculate the cosine circle
+function calculateCosineCircle(points) {
+    const [A, B, C] = points;
+    const a = calculateDistance(B, C);
+    const b = calculateDistance(C, A);
+    const c = calculateDistance(A, B);
+    return {
+        center: calculateSymmedianPoint(points),
+        radius: a*b*c / (a**2 + b**2 + c**2)
+    };
+}
+
 
 // Function to calculate the medial triangles
 function calculateMedialTriangle(points) {
