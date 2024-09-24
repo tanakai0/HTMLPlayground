@@ -106,6 +106,22 @@ const centerStyles = {
         annotationLabel: 'Excenter (C)',
         informationText: '● Excenter opposite to vertex C',
     },
+    firstBrocardPoint: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray', 
+        checkboxId: 'firstBrocardPoint-checkbox',
+        displayElementId: 'firstBrocardPoint',
+        annotationLabel: '1st Brocard',
+        informationText: '● First Brocard point',
+    },
+    secondBrocardPoint: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray', 
+        checkboxId: 'secondBrocardPoint-checkbox',
+        displayElementId: 'secondBrocardPoint',
+        annotationLabel: '2nd Brocard',
+        informationText: '● Second Brocard point',
+    },
     incenter: {
         activeColor: '#008000',
         inactiveColor: 'lightgray', 
@@ -1000,6 +1016,21 @@ function drawCenters() {
 
             // Switch statement to handle different center calculations
             switch (key) {
+                case 'excenterA':
+                    center = calculateExcenter([points[2], points[0], points[1]]);
+                    break;
+                case 'excenterB':
+                    center = calculateExcenter(points);
+                    break;
+                case 'excenterC':
+                    center = calculateExcenter([points[1], points[2], points[0]]);
+                    break;
+                case 'firstBrocardPoint':
+                    center = calculateBrocardPoint(points, number = 1);
+                    break;
+                case 'secondBrocardPoint':
+                    center = calculateBrocardPoint(points, number = 2);
+                    break;
                 case 'centroid':
                     center = calculateCentroid(points);
                     break;
@@ -1011,15 +1042,6 @@ function drawCenters() {
                     break;
                 case 'orthocenter':
                     center = calculateOrthocenter(points);
-                    break;
-                case 'excenterA':
-                    center = calculateExcenter([points[2], points[0], points[1]]);
-                    break;
-                case 'excenterB':
-                    center = calculateExcenter(points);
-                    break;
-                case 'excenterC':
-                    center = calculateExcenter([points[1], points[2], points[0]]);
                     break;
                 case 'firstIsogonicCenter':
                     center = calculateIsogonicCenter(points, outer = true);
@@ -1819,6 +1841,69 @@ function trilinearToCartesian(points, trilinear) {
     return barycentricToCartesian(points, [u, v, w]);
 }
 
+
+// Function to calculate the excenter for the vertex B (intersection of the internal angle bisectors of the vertex and other external angle bisectors)
+function calculateExcenter(points) {
+    if (useHomogeneousCoordinates) {
+        return trilinearToCartesian(points, [1, -1, 1]);
+    }
+    const [A, B, C] = points;
+    // Lengths of the triangle sides opposite to each vertex
+    const a =  calculateDistance(B, C); // Length of side BC
+    const b =  calculateDistance(C, A); // Length of side CA
+    const c =  calculateDistance(A, B); // Length of side AB
+
+    // Excenter formula for vertex B (opposite to side AC)
+    return {
+        x: (-b * B.x + c * C.x + a * A.x) / (-b + c + a),
+        y: (-b * B.y + c * C.y + a * A.y) / (-b + c + a)
+    }
+}
+
+
+// Function to calculate the Brocard points
+function calculateBrocardPoint(points, number = 1) {
+    const [A, B, C] = points;
+    // Lengths of the triangle sides opposite to each vertex
+    const a =  calculateDistance(B, C); 
+    const b =  calculateDistance(C, A); 
+    const c =  calculateDistance(A, B);
+    // Determine whether the vertices are labeled in counterclockwise order
+    const isCounterclockwise =  calculateCrossProduct(A, B, C) > 0 ? false : true;
+
+    if (useHomogeneousCoordinates) {
+        let barycentric;
+        switch (number) {
+            case 1:
+                if (isCounterclockwise){
+                    barycentric = [c*a/b, a*b/c, b*c/a];
+                }
+                else{
+                    barycentric = [a*b/c, b*c/a, c*a/b];
+                }
+                break;
+            case 2:
+                if (isCounterclockwise){
+                    barycentric = [a*b/c, b*c/a, c*a/b];
+                }
+                else{
+                    barycentric = [c*a/b, a*b/c, b*c/a];
+                }
+                break;
+            case 3:
+                barycentric = [1/(a**2), 1/(b**2), 1/(c**2)];
+                break;
+            default:
+                console.error(`Unknown number: ${number}`);
+                return;
+        }
+        return barycentricToCartesian(points, barycentric);
+    }
+
+    
+
+}
+
 // Function to calculate the centroid of the triangle
 function calculateCentroid(points) {
     if (useHomogeneousCoordinates) {
@@ -1899,24 +1984,6 @@ function calculateOrthocenter(points) {
 
     // Solve for the intersection of the two perpendiculars (Orthocenter)
     return lineIntersectionGivenSlopesAndPoints(perpendicularSlopeAB, C, perpendicularSlopeBC, A);
-}
-
-// Function to calculate the excenter for the vertex B (intersection of the internal angle bisectors of the vertex and other external angle bisectors)
-function calculateExcenter(points) {
-    if (useHomogeneousCoordinates) {
-        return trilinearToCartesian(points, [1, -1, 1]);
-    }
-    const [A, B, C] = points;
-    // Lengths of the triangle sides opposite to each vertex
-    const a =  calculateDistance(B, C); // Length of side BC
-    const b =  calculateDistance(C, A); // Length of side CA
-    const c =  calculateDistance(A, B); // Length of side AB
-
-    // Excenter formula for vertex B (opposite to side AC)
-    return {
-        x: (-b * B.x + c * C.x + a * A.x) / (-b + c + a),
-        y: (-b * B.y + c * C.y + a * A.y) / (-b + c + a)
-    }
 }
 
 // Function to calculate the isogonic center
