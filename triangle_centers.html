@@ -320,6 +320,15 @@ const centerStyles = {
         informationText: '● Bevan point',
         ETCReference: 40,
     },
+    thirdBrocardPoint: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'thirdBrocardPoint-checkbox',
+        displayElementId: 'thirdBrocardPoint',
+        annotationLabel: '3rd Brocard',
+        informationText: '● Third Brocard point',
+        ETCReference: 76,
+    },
     firstAjimaMalfattiPoint: {
         activeColor: '#808080',
         inactiveColor: 'lightgray',
@@ -1115,6 +1124,9 @@ function drawCenters() {
                     break;   
                 case 'BevanPoint':
                     center = calculateBevanPoint(points);
+                    break;
+                case 'thirdBrocardPoint':
+                    center = calculateBrocardPoint(points, number = 3);
                     break;
                 case 'firstAjimaMalfattiPoint':
                     center = calculateFirstAjimaMalfattiPoint(points);
@@ -2051,6 +2063,7 @@ function calculateBrocardPoint(points, number = 1) {
             }
             break;
         case 3:
+            circle = calculateBrocardMidpoint(calculateAnticomplementaryTriangle(points));
             break;
         default:
             console.error(`Unknown number: ${number}`);
