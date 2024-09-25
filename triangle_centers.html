@@ -1794,6 +1794,93 @@ function calculateTangencyPoint(c1, c2) {
     }
 }
 
+
+// Function to calculate the circle passing through points B, C and tangent to line AC at C
+function calculateCircleTangentToLine(C, B, A){
+    // Calculate the slope of the line perpendicular to AC at point C (normal to AC at C)
+    const perpendicularSlope = -1 / calculateSlope(A, C);
+    const tempConst = B.y - C.y;
+    if (!isFinite(perpendicularSlope)) {
+        const center = {
+            x: C.x,
+            y: ((C.x - B.x)**2 + B.y**2 - C.y**2) / 2 / tempConst
+        };
+        return {
+            center: center,
+            radius: calculateDistance(C, center)
+        };
+    }
+    else {
+        const x = (B.x **2 - C.x**2 + tempConst **2 + 2 * perpendicularSlope * C.x * tempConst) / 2 / (B.x - C.x + perpendicularSlope * tempConst);
+        const y = perpendicularSlope * (x - C.x) + C.y;
+        const center = {x, y};
+        return {
+            center: center,
+            radius: calculateDistance(center, B)
+        };
+    }
+}
+
+function calculateIntersectionOfTwoCircles(circleA, circleB) {
+    const cA = circleA.center;
+    const rA = circleA.radius;
+    const cB = circleB.center;
+    const rB = circleB.radius;
+
+    const d = Math.sqrt((cB.x - cA.x)**2 + (cB.y - cA.y)**2);
+
+    // Check if the circles intersect
+    if (d > rA + rB || d < Math.abs(rA - rB) || d === 0) {
+        // No intersection, or circles are identical
+        return null;
+    }
+
+    // a is the distance from cA to the point where the line through the circle intersections crosses the line between the centers
+    const a = (rA**2 - rB**2 + d**2) / (2 * d);
+
+    // h is the distance from the point to the intersection points
+    const h = Math.sqrt(rA**2 - a**2);
+
+    // Point P is the point where the line through the intersections crosses the line between the centers
+    const P = {
+        x: cA.x + a * (cB.x - cA.x) / d,
+        y: cA.y + a * (cB.y - cA.y) / d
+    };
+
+    // The two intersection points
+
+    // P + unit vector from cA to cB rotated by -π/2 to find the first intersection point
+    const intersection1 = {
+        x: P.x + h * (cB.y - cA.y) / d,
+        y: P.y - h * (cB.x - cA.x) / d
+    };
+
+    // P + unit vector from cA to cB rotated by π/2 to find the first intersection point
+    const intersection2 = {
+        x: P.x - h * (cB.y - cA.y) / d,
+        y: P.y + h * (cB.x - cA.x) / d
+    };
+
+    return [intersection1, intersection2];
+}
+
+
+
+function calculateIntersectionOfThreeCircles(circleA, circleB, circleC){
+    const [p1, p2] = calculateIntersectionOfTwoCircles(circleA, circleB);
+    const cC = circleC.center;
+    const rC = circleC.radius;
+    const error1 = Math.abs(rC**2 - (p1.x - cC.x)**2 - (p1.y - cC.y)**2);
+    const error2 = Math.abs(rC**2 - (p2.x - cC.x)**2 - (p2.y - cC.y)**2);
+    if (error1 < error2) {
+        return p1;
+    }
+    else{
+        return p2;
+    }
+}
+
+
 // Function to calculate the angle between a line and the x-axis
 function calculateAngleInRadianWithXAxis(points) {
     const [p1, p2] = points;
@@ -1900,8 +1987,42 @@ function calculateBrocardPoint(points, number = 1) {
         return barycentricToCartesian(points, barycentric);
     }
 
-    
-
+    switch (number) {
+        case 1:
+            if (isCounterclockwise){                
+                const circleA = calculateCircleTangentToLine(C, B, A);
+                const circleB = calculateCircleTangentToLine(A, C, B);
+                const circleC = calculateCircleTangentToLine(B, A, C);
+                circle = calculateIntersectionOfThreeCircles(circleA, circleB, circleC);
+            }
+            else{
+                const circleA = calculateCircleTangentToLine(B, C, A);
+                const circleB = calculateCircleTangentToLine(C, A, B);
+                const circleC = calculateCircleTangentToLine(A, B, C);
+                circle = calculateIntersectionOfThreeCircles(circleA, circleB, circleC);
+            }
+            break;
+        case 2:
+            if (isCounterclockwise){
+                const circleA = calculateCircleTangentToLine(B, C, A);
+                const circleB = calculateCircleTangentToLine(C, A, B);
+                const circleC = calculateCircleTangentToLine(A, B, C);
+                circle = calculateIntersectionOfThreeCircles(circleA, circleB, circleC);
+            }
+            else{
+                const circleA = calculateCircleTangentToLine(C, B, A);
+                const circleB = calculateCircleTangentToLine(A, C, B);
+                const circleC = calculateCircleTangentToLine(B, A, C);
+                circle = calculateIntersectionOfThreeCircles(circleA, circleB, circleC);
+            }
+            break;
+        case 3:
+            break;
+        default:
+            console.error(`Unknown number: ${number}`);
+            return;
+    }
+    return circle;
 }
 
 // Function to calculate the centroid of the triangle
@@ -2358,7 +2479,6 @@ function calculateOrthogonalRegressionLine(points) {
 // Function to calculate the incircle
 function calculateIncircle(points) {
     const [A, B, C] = points;
-    
     // Calculate the incenter (already defined)
     const incenter = calculateIncenter(points);
 
@@ -2380,8 +2500,6 @@ function calculateIncircle(points) {
 // Function to calculate the circumcircle
 function calculateCircumcircle(points) {
     const [A, B, C] = points;
-    
-    // Calculate the circumcenter (already defined)
     const center = calculateCircumcenter(points);
 
     // Calculate the circumradius using the formula R = (a * b * c) / (4 * area)
