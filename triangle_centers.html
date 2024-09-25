@@ -440,6 +440,14 @@ const lineStyles = {
         annotationLabel: 'Nagel',
         informationText: '- Nagel line',
     },
+    BrocardAxis: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'BrocardAxis-checkbox',
+        displayElementId: 'BrocardAxis',
+        annotationLabel: 'Brocard axis',
+        informationText: '- Brocard axis',
+    },
     FermatAxis: {
         activeColor: '#808080',
         inactiveColor: 'lightgray',
@@ -1171,6 +1179,9 @@ function drawLines() {
                     break;
                 case 'NagelLine':
                     lines.push(calculateNagelLine(points));
+                    break;
+                case 'BrocardAxis':
+                    lines.push(calculateBrocardAxis(points));
                     break;
                 case 'FermatAxis':
                     lines.push(calculateFermatAxis(points));
@@ -2451,6 +2462,15 @@ function calculateNagelLine(points) {
         calculateNagelPoint(points)
     ];
 }
+
+// Function to calculate the Brocard axis
+function calculateBrocardAxis(points) {
+    return[
+        calculateSymmedianPoint(points),
+        calculateCircumcenter(points)
+    ];
+}
+
 
 // Function to calculate the Fermat axis
 function calculateFermatAxis(points) {
