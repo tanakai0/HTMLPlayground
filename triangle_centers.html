@@ -672,6 +672,14 @@ const triangleStyles = {
         annotationLabel: 'Orthic',
         informationText: '△ Orthic triangle',
     },
+    anticomplementaryTriangle: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'anticomplementaryTriangle-checkbox',
+        displayElementId: 'anticomplementaryTriangle',
+        annotationLabel: 'Anticomplementary',
+        informationText: '△ Anticomplementary triangle',
+    },
     outerNapoleonTriangle: {
         activeColor: '#008000',
         inactiveColor: 'lightgray',
@@ -1311,6 +1319,9 @@ function drawTriangles() {
                 case 'orthicTriangle':
                     triangle = calculateOrthicTriangle(points);
                     break;
+                case 'anticomplementaryTriangle':
+                    triangle = calculateAnticomplementaryTriangle(points);
+                    break;
                 case 'outerNapoleonTriangle':
                     triangle = calculateNapoleonTriangle(points, outer = true);
                     break;
@@ -1858,13 +1869,13 @@ function calculateIntersectionOfTwoCircles(circleA, circleB) {
         return null;
     }
 
-    // a is the distance from cA to the point where the line through the circle intersections crosses the line between the centers
+    // a is the distance from cA to the point where the line through the circle intersections crosses the radical axis
     const a = (rA**2 - rB**2 + d**2) / (2 * d);
 
     // h is the distance from the point to the intersection points
     const h = Math.sqrt(rA**2 - a**2);
 
-    // Point P is the point where the line through the intersections crosses the line between the centers
+    // Point P is the point where the line through the intersections crosses the radical axis
     const P = {
         x: cA.x + a * (cB.x - cA.x) / d,
         y: cA.y + a * (cB.y - cA.y) / d
@@ -2797,7 +2808,6 @@ function calculateMedialTriangle(points) {
 // Function to calculate the excentral triangles
 function calculateExcentralTriangle(points) {
     const [A, B, C] = points;
-
     return [
         calculateExcenter([C, A, B]),
         calculateExcenter([A, B, C]),
@@ -2818,6 +2828,26 @@ function calculateOrthicTriangle(points) {
         lineIntersectionGivenSlopesAndPoints(slopeBC, B, perpendicularSlopeBC, A),
         lineIntersectionGivenSlopesAndPoints(slopeCA, C, perpendicularSlopeCA, B),
         lineIntersectionGivenSlopesAndPoints(slopeAB, A, perpendicularSlopeAB, C)
+    ];
+}
+
+// Function to calculate the anticomplementary triangles
+function calculateAnticomplementaryTriangle(points) {
+    const [A, B, C] = points;
+    const centroid = calculateCentroid(points);
+    return [
+        {
+            x: 3 * centroid.x - 2 * A.x,
+            y: 3 * centroid.y - 2 * A.y,
+        },
+        {
+            x: 3 * centroid.x - 2 * B.x,
+            y: 3 * centroid.y - 2 * B.y,
+        },
+        {
+            x: 3 * centroid.x - 2 * C.x,
+            y: 3 * centroid.y - 2 * C.y,
+        },
     ];
 }
 
