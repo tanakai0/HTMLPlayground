@@ -302,6 +302,15 @@ const centerStyles = {
         informationText: '● Schiffler point',
         ETCReference: 21,
     },
+    BrocardMidpoint: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray', 
+        checkboxId: 'BrocardMidpoint-checkbox',
+        displayElementId: 'BrocardMidpoint',
+        annotationLabel: 'Brocard midpoint',
+        informationText: '● Brocard midpoint',
+        ETCReference: 39,
+    },
     BevanPoint: {
         activeColor: '#808080',
         inactiveColor: 'lightgray',
@@ -1084,6 +1093,9 @@ function drawCenters() {
                     break;
                 case 'NagelPoint':
                     center = calculateNagelPoint(points);
+                    break;   
+                case 'BrocardMidpoint':
+                    center = calculateBrocardMidpoint(points);
                     break;   
                 case 'BevanPoint':
                     center = calculateBevanPoint(points);
@@ -2260,6 +2272,13 @@ function calculateGergonnePoint(points) {
 function calculateNagelPoint(points) {
     const extouchTriangle = calculateExtouchTriangle(points);
     return lineIntersection(points[0], extouchTriangle[0], points[1], extouchTriangle[1]);
+}
+
+// Function to calculate the Brocard midpoint
+function calculateBrocardMidpoint(points) {
+    const firstBrocardPoint = calculateBrocardPoint(points, number = 1);
+    const secondBrocardPoint = calculateBrocardPoint(points, number = 2);
+    return midpoint(firstBrocardPoint, secondBrocardPoint);
 }
 
 // Function to calculate the Bevan point
