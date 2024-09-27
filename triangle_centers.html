@@ -729,6 +729,22 @@ const triangleStyles = {
         annotationLabel: 'Feuerbach',
         informationText: '△ Feuerbach triangle',
     },
+    firstBrocardTriangle: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'firstBrocardTriangle-checkbox',
+        displayElementId: 'firstBrocardTriangle',
+        annotationLabel: '1st Brocard',
+        informationText: '△ First Brocard triangle',
+    },
+    secondBrocardTriangle: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'secondBrocardTriangle-checkbox',
+        displayElementId: 'secondBrocardTriangle',
+        annotationLabel: '2nd Brocard',
+        informationText: '△ Second Brocard triangle',
+    },
 };
 
 // Define styles for hexagon
@@ -800,7 +816,7 @@ const ctx = canvas.getContext('2d');
 Whether to use trilinear coordinates and barycentric coodinates.
 Using homogeneous coordinates reduces the computational cost, as it simplifies the process of calculating points
 compared to more complex calculations like finding intersections between circles and lines. */
-const useHomogeneousCoordinates = true;
+const useHomogeneousCoordinates = false;
 
 // Combine all styles into one array of style objects
 const allStyles = [
@@ -1060,10 +1076,10 @@ function drawCenters() {
                     center = calculateExcenter([points[1], points[2], points[0]]);
                     break;
                 case 'firstBrocardPoint':
-                    center = calculateBrocardPoint(points, number = 1);
+                    center = calculateBrocardPoint(points, 1);
                     break;
                 case 'secondBrocardPoint':
-                    center = calculateBrocardPoint(points, number = 2);
+                    center = calculateBrocardPoint(points, 2);
                     break;
                 case 'centroid':
                     center = calculateCentroid(points);
@@ -1078,19 +1094,19 @@ function drawCenters() {
                     center = calculateOrthocenter(points);
                     break;
                 case 'firstIsogonicCenter':
-                    center = calculateIsogonicCenter(points, outer = true);
+                    center = calculateIsogonicCenter(points, true);
                     break;
                 case 'FermatPoint':
                     center = calculateFermatPoint(points);
                     break;
                 case 'secondIsogonicCenter':
-                    center = calculateIsogonicCenter(points, outer = false);
+                    center = calculateIsogonicCenter(points, false);
                     break;
                 case 'firstIsodynamicPoint':
-                    center = calculateIsodynamicPoint(points, outer = false);
+                    center = calculateIsodynamicPoint(points, false);
                     break;
                 case 'secondIsodynamicPoint':
-                    center = calculateIsodynamicPoint(points, outer = true);
+                    center = calculateIsodynamicPoint(points, true);
                     break;
                 case 'deLongchampsPoint':
                     center = calculateDeLongchampsPoint(points);
@@ -1102,10 +1118,10 @@ function drawCenters() {
                     center = calculateNinePointCenter(points);
                     break;
                 case 'firstNapoleonPoint':
-                    center = calculateNapoleonPoint(points, outer = true);
+                    center = calculateNapoleonPoint(points, true);
                     break;
                 case 'secondNapoleonPoint':
-                    center = calculateNapoleonPoint(points, outer = false);
+                    center = calculateNapoleonPoint(points, false);
                     break;
                 case 'symmedianPoint':
                     center = calculateSymmedianPoint(points);
@@ -1126,7 +1142,7 @@ function drawCenters() {
                     center = calculateBevanPoint(points);
                     break;
                 case 'thirdBrocardPoint':
-                    center = calculateBrocardPoint(points, number = 3);
+                    center = calculateBrocardPoint(points, 3);
                     break;
                 case 'firstAjimaMalfattiPoint':
                     center = calculateFirstAjimaMalfattiPoint(points);
@@ -1335,10 +1351,10 @@ function drawTriangles() {
                     triangle = calculateAnticomplementaryTriangle(points);
                     break;
                 case 'outerNapoleonTriangle':
-                    triangle = calculateNapoleonTriangle(points, outer = true);
+                    triangle = calculateNapoleonTriangle(points, true);
                     break;
                 case 'innerNapoleonTriangle':
-                    triangle = calculateNapoleonTriangle(points, outer = false);
+                    triangle = calculateNapoleonTriangle(points, false);
                     break;
                 case 'GergonneTriangle':
                     triangle = calculateGergonneTriangle(points);
@@ -1351,6 +1367,12 @@ function drawTriangles() {
                     break;
                 case 'FeuerbachTriangle':
                     triangle = calculateFeuerbachTriangle(points);
+                    break;
+                case 'firstBrocardTriangle':
+                    triangle = calculateBrocardTriangle(points, 1);
+                    break;
+                case 'secondBrocardTriangle':
+                    triangle = calculateBrocardTriangle(points, 2);
                     break;
                 default:
                     console.error(`Unknown triangle key: ${key}`);
@@ -1376,10 +1398,10 @@ function drawHexagons() {
             
             switch (key) {
                 case 'firstLemoineHexagon':
-                    hexagon = calculateLemoineHexagon(points, selfIntersecting = true);
+                    hexagon = calculateLemoineHexagon(points, true);
                     break;
                 case 'secondLemoineHexagon':
-                    hexagon = calculateLemoineHexagon(points, selfIntersecting = false);
+                    hexagon = calculateLemoineHexagon(points, false);
                     break;
                 default:
                     console.error(`Unknown hexagon key: ${key}`);
@@ -2376,7 +2398,6 @@ function calculateFeuerbachPoint(points) {
     return calculateTangencyPoint(incircle, ninePointCircle);
 }
 
-
 // Function to calculate the Fuhrmann center
 function calculateFuhrmannCenter(points) {
     return calculateCircumcircle(calculateFuhrmannTriangle(points)).center;
@@ -2998,6 +3019,102 @@ function calculateFeuerbachTriangle(points) {
         calculateTangencyPoint(ninePointCircle, excircleC)
     ];
 }
+
+// Function to calculate the Brocard triangle
+function calculateBrocardTriangle(points, number = 1) {
+    const [A, B, C] = points;
+    let triangle;
+    if (useHomogeneousCoordinates){
+        const a = calculateDistance(B, C);
+        const b = calculateDistance(C, A);
+        const c = calculateDistance(A, B);
+        switch(number){
+        case 1:
+            triangle = [
+                trilinearToCartesian(points, [a*b*c, c**3, b**3]),
+                trilinearToCartesian(points, [c**3, a*b*c, a**3]),
+                trilinearToCartesian(points, [b**3, a**3, a*b*c])
+            ];
+            break;
+        case 2:
+            const cosA = Math.cos(calculateAngleInRadians(C, A, B));
+            const cosB = Math.cos(calculateAngleInRadians(A, B, C));
+            const cosC = Math.cos(calculateAngleInRadians(B, C, A));
+            triangle = [
+                trilinearToCartesian(points, [2*b*c*cosA, a*b, c*a]),
+                trilinearToCartesian(points, [a*b, 2*c*a*cosB, b*c]),
+                trilinearToCartesian(points, [c*a, b*c, 2*a*b*cosC])
+            ];
+            break;
+        default:
+            console.error(`Unknown number: ${number}`);
+            return;
+        }
+        return triangle;
+    }
+    
+    const firstBrocardPoint = calculateBrocardPoint(points, 1);
+    const secondBrocardPoint = calculateBrocardPoint(points, 2);
+    const isCounterclockwise =  calculateCrossProduct(A, B, C) > 0 ? false : true;
+
+    switch(number){
+        case 1:
+            if (isCounterclockwise){
+                triangle = [
+                    lineIntersection(B, firstBrocardPoint, C, secondBrocardPoint),
+                    lineIntersection(C, firstBrocardPoint, A, secondBrocardPoint),
+                    lineIntersection(A, firstBrocardPoint, B, secondBrocardPoint)
+                ];
+            }
+            else {
+                triangle = [
+                    lineIntersection(C, firstBrocardPoint, B, secondBrocardPoint),
+                    lineIntersection(A, firstBrocardPoint, C, secondBrocardPoint),
+                    lineIntersection(B, firstBrocardPoint, A, secondBrocardPoint)
+                ];
+            }
+            break;
+        case 2:
+            if (isCounterclockwise){
+                const circleA = calculateCircumcircle([B, C, firstBrocardPoint]);
+                const circleB = calculateCircumcircle([C, A, firstBrocardPoint]);
+                const circleC = calculateCircumcircle([A, B, firstBrocardPoint]);
+                const circleAA = calculateCircumcircle([B, C, secondBrocardPoint]);
+                const circleBB = calculateCircumcircle([C, A, secondBrocardPoint]);
+                const circleCC = calculateCircumcircle([A, B, secondBrocardPoint]);
+                let p1, p2;
+                [p1, p2] = calculateIntersectionOfTwoCircles(circleB, circleCC);
+                const pA = calculateDistance(p1, A) > calculateDistance(p2, A) ? p1 : p2;
+                [p1, p2] = calculateIntersectionOfTwoCircles(circleC, circleAA);
+                const pB = calculateDistance(p1, B) > calculateDistance(p2, B) ? p1 : p2;
+                [p1, p2] = calculateIntersectionOfTwoCircles(circleA, circleBB);
+                const pC = calculateDistance(p1, C) > calculateDistance(p2, C) ? p1 : p2;
+                triangle = [pA, pB, pC];
+            }
+            else {
+                const circleA = calculateCircumcircle([C, B, secondBrocardPoint]);
+                const circleB = calculateCircumcircle([A, C, secondBrocardPoint]);
+                const circleC = calculateCircumcircle([B, A, secondBrocardPoint]);
+                const circleAA = calculateCircumcircle([C, B, firstBrocardPoint]);
+                const circleBB = calculateCircumcircle([A, C, firstBrocardPoint]);
+                const circleCC = calculateCircumcircle([B, A, firstBrocardPoint]);
+                let p1, p2;
+                [p1, p2] = calculateIntersectionOfTwoCircles(circleB, circleCC);
+                const pA = calculateDistance(p1, A) > calculateDistance(p2, A) ? p1 : p2;
+                [p1, p2] = calculateIntersectionOfTwoCircles(circleC, circleAA);
+                const pB = calculateDistance(p1, B) > calculateDistance(p2, B) ? p1 : p2;
+                [p1, p2] = calculateIntersectionOfTwoCircles(circleA, circleBB);
+                const pC = calculateDistance(p1, C) > calculateDistance(p2, C) ? p1 : p2;
+                triangle = [pA, pB, pC];
+            }
+            break;
+        default:
+            console.error(`Unknown number: ${number}`);
+            return;
+    }
+    return triangle;
+}
+
 
 // Function to calculate the Lemoine hexagon
 function calculateLemoineHexagon(points, selfIntersecting = false) {
