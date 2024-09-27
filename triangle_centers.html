@@ -320,6 +320,15 @@ const centerStyles = {
         informationText: '● Bevan point',
         ETCReference: 40,
     },
+    KosnitaPoint: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'KosnitaPoint-checkbox',
+        displayElementId: 'KosnitaPoint',
+        annotationLabel: 'Kosnita',
+        informationText: '● Kosnita point',
+        ETCReference: 54,
+    },
     thirdBrocardPoint: {
         activeColor: '#808080',
         inactiveColor: 'lightgray',
@@ -1162,6 +1171,9 @@ function drawCenters() {
                     break;   
                 case 'BevanPoint':
                     center = calculateBevanPoint(points);
+                    break;
+                case 'KosnitaPoint':
+                    center = calculateKosnitaPoint(points);
                     break;
                 case 'thirdBrocardPoint':
                     center = calculateBrocardPoint(points, 3);
@@ -2375,6 +2387,24 @@ function calculateBrocardMidpoint(points) {
 // Function to calculate the Bevan point
 function calculateBevanPoint(points) {
     return calculateBevanCircle(points).center;
+}
+
+// Function to calculate the Kosnita point
+function calculateKosnitaPoint(points) {
+    const [A, B, C] = points;
+    if (useHomogeneousCoordinates) {        
+        const a = calculateDistance(B, C);
+        const b = calculateDistance(C, A);
+        const c = calculateDistance(A, B);
+        barycentric1 = a**2 / (b**4 + c**4 - (a**2)*(b**2) - 2*(b**2)*(c**2) - (c**2)*(a**2));
+        barycentric2 = b**2 / (c**4 + a**4 - (b**2)*(c**2) - 2*(c**2)*(a**2) - (a**2)*(b**2));
+        barycentric3 = c**2 / (a**4 + b**4 - (c**2)*(a**2) - 2*(a**2)*(b**2) - (b**2)*(c**2));
+        return barycentricToCartesian(points, [barycentric1, barycentric2, barycentric3]);
+    }
+    const O = calculateCircumcenter(points);
+    const OA = calculateCircumcenter([B, C, O]);
+    const OB = calculateCircumcenter([C, A, O]);
+    return lineIntersection(A, OA, B, OB);
 }
 
 // Function to calculate the first Ajima-Malfatti point
