@@ -441,6 +441,14 @@ const lineStyles = {
         annotationLabel: 'Euler',
         informationText: '- Euler line',
     },
+    GergonneLine: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'GergonneLine-checkbox',
+        displayElementId: 'GergonneLine',
+        annotationLabel: 'Gergonne',
+        informationText: '- Gergonne line',
+    },
     NagelLine: {
         activeColor: '#808080',
         inactiveColor: 'lightgray',
@@ -1220,6 +1228,9 @@ function drawLines() {
                     break;           
                 case 'EulerLine':
                     lines.push(calculateEulerLine(points));
+                    break;
+                case 'GergonneLine':
+                    lines.push(calculateGergonneLine(points));
                     break;
                 case 'NagelLine':
                     lines.push(calculateNagelLine(points));
@@ -2509,6 +2520,19 @@ function calculateEulerLine(points) {
     const orthocenter = calculateOrthocenter(points);
     const circumcenter = calculateCircumcenter(points);
     return [orthocenter, circumcenter];
+}
+
+// Function to calculate the Gergonne line
+function calculateGergonneLine(points) {
+    if (!isScaleneTriangle(points)) {
+        return null;
+    }
+    const [A, B, C] = points;
+    const [D, E, F] = calculateIntouchTriangle(points);
+    return [
+        lineIntersection(A, B, D, E),
+        lineIntersection(B, C, E, F)
+    ];
 }
 
 // Function to calculate the Nagel line
