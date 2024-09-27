@@ -679,7 +679,7 @@ const triangleStyles = {
         checkboxId: 'intouchTriangle-checkbox',
         displayElementId: 'intouchTriangle',
         annotationLabel: 'Intouch',
-        informationText: '△ Intouch triangle (Contact triangle)',
+        informationText: '△ Intouch triangle (Contact triangle, Gergonne triangle)',
     },
     extouchTriangle: {
         activeColor: '#808080',
@@ -720,14 +720,6 @@ const triangleStyles = {
         displayElementId: 'innerNapoleonTriangle',
         annotationLabel: 'Inner Napoleon',
         informationText: '△ Inner Napoleon triangle',
-    },
-    GergonneTriangle: {
-        activeColor: '#808080',
-        inactiveColor: 'lightgray',
-        checkboxId: 'GergonneTriangle-checkbox',
-        displayElementId: 'GergonneTriangle',
-        annotationLabel: 'Gergonne',
-        informationText: '△ Gergonne triangle',
     },
     FuhrmannTriangle: {
         activeColor: '#808080',
@@ -1374,9 +1366,6 @@ function drawTriangles() {
                     break;
                 case 'innerNapoleonTriangle':
                     triangle = calculateNapoleonTriangle(points, false);
-                    break;
-                case 'GergonneTriangle':
-                    triangle = calculateGergonneTriangle(points);
                     break;
                 case 'intouchTriangle':
                     triangle = calculateIntouchTriangle(points);
@@ -2343,7 +2332,7 @@ function calculateSymmedianPoint(points) {
 
 // Function to calculate the Gergonne point
 function calculateGergonnePoint(points) {
-    const GergonneTriangle = calculateGergonneTriangle(points);
+    const GergonneTriangle = calculateIntouchTriangle(points);
     return lineIntersection(points[0], GergonneTriangle[0], points[1], GergonneTriangle[1]);
 }
 
@@ -2714,7 +2703,7 @@ function calculateAdamsCircle(points) {
     const slopeBC = calculateSlope(B, C);
     const slopeCA = calculateSlope(C, A);
     const GergonnePoint = calculateGergonnePoint(points);
-    const GergonneTriangle = calculateGergonneTriangle(points);
+    const GergonneTriangle = calculateIntouchTriangle(points);
     const slopeGTAB = calculateSlope(GergonneTriangle[0], GergonneTriangle[1]);
     const slopeGTBC = calculateSlope(GergonneTriangle[1], GergonneTriangle[2]);
     P1 = lineIntersectionGivenSlopesAndPoints(slopeGTAB, GergonnePoint, slopeBC, B);
@@ -2944,26 +2933,6 @@ function calculateNapoleonTriangle(points, outer = true) {
         calculateCentroid([A, B, R1])
     ];
 }
-
-// Function to calculate the Gergonne triangle
-function calculateGergonneTriangle(points) {
-    const [A, B, C] = points;
-    const incenter = calculateIncenter(points);
-    // Slopes of perpendicular bisectors
-    const slopeAB = calculateSlope(A, B);
-    const slopeBC = calculateSlope(B, C);
-    const slopeCA = calculateSlope(C, A);
-    const perpendicularSlopeAB = perpendicularSlope(slopeAB);
-    const perpendicularSlopeBC = perpendicularSlope(slopeBC);
-    const perpendicularSlopeCA = perpendicularSlope(slopeCA);
-
-    return [
-        lineIntersectionGivenSlopesAndPoints(slopeBC, B, perpendicularSlopeBC, incenter),
-        lineIntersectionGivenSlopesAndPoints(slopeCA, C, perpendicularSlopeCA, incenter),
-        lineIntersectionGivenSlopesAndPoints(slopeAB, A, perpendicularSlopeAB, incenter)
-    ];
-}
-
 
 // Function to calculate the intouch triangle
 function calculateIntouchTriangle(points) {
