@@ -673,6 +673,14 @@ const triangleStyles = {
         annotationLabel: 'Excentral',
         informationText: '△ Excentral triangle',
     },
+    intouchTriangle: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'intouchTriangle-checkbox',
+        displayElementId: 'intouchTriangle',
+        annotationLabel: 'Intouch',
+        informationText: '△ Intouch triangle (Contact triangle)',
+    },
     extouchTriangle: {
         activeColor: '#808080',
         inactiveColor: 'lightgray',
@@ -824,7 +832,7 @@ const ctx = canvas.getContext('2d');
 Whether to use trilinear coordinates and barycentric coodinates.
 Using homogeneous coordinates reduces the computational cost, as it simplifies the process of calculating points
 compared to more complex calculations like finding intersections between circles and lines. */
-const useHomogeneousCoordinates = false;
+const useHomogeneousCoordinates = true;
 
 // Combine all styles into one array of style objects
 const allStyles = [
@@ -1369,6 +1377,9 @@ function drawTriangles() {
                     break;
                 case 'GergonneTriangle':
                     triangle = calculateGergonneTriangle(points);
+                    break;
+                case 'intouchTriangle':
+                    triangle = calculateIntouchTriangle(points);
                     break;
                 case 'extouchTriangle':
                     triangle = calculateExtouchTriangle(points);
@@ -2952,6 +2963,37 @@ function calculateGergonneTriangle(points) {
         lineIntersectionGivenSlopesAndPoints(slopeAB, A, perpendicularSlopeAB, incenter)
     ];
 }
+
+
+// Function to calculate the intouch triangle
+function calculateIntouchTriangle(points) {
+    const [A, B, C] = points;
+
+    if (useHomogeneousCoordinates) {
+        const a = calculateDistance(B, C);
+        const b = calculateDistance(C, A);
+        const c = calculateDistance(A, B);
+        return [
+            trilinearToCartesian(points, [0, c*a/(a-b+c), a*b/(a+b-c)]),
+            trilinearToCartesian(points, [b*c/(-a+b+c), 0, a*b/(a+b-c)]),
+            trilinearToCartesian(points, [b*c/(-a+b+c), c*a/(a-b+c), 0])
+        ];
+    }
+
+    const incenter = calculateIncenter(points);
+    const slopeAB = calculateSlope(A, B);
+    const slopeBC = calculateSlope(B, C);
+    const slopeCA = calculateSlope(C, A);
+    const perpendicularSlopeAB = perpendicularSlope(slopeAB);
+    const perpendicularSlopeBC = perpendicularSlope(slopeBC);
+    const perpendicularSlopeCA = perpendicularSlope(slopeCA);
+    return [
+        lineIntersectionGivenSlopesAndPoints(slopeBC, B, perpendicularSlopeBC, incenter),
+        lineIntersectionGivenSlopesAndPoints(slopeCA, C, perpendicularSlopeCA, incenter),
+        lineIntersectionGivenSlopesAndPoints(slopeAB, A, perpendicularSlopeAB, incenter)
+    ];
+}
+
 
 // Function to calculate the extouch triangle
 function calculateExtouchTriangle(points) {
