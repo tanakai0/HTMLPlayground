@@ -525,6 +525,14 @@ const circleStyles = {
         annotationLabel: 'Nine-point',
         informationText: '○ Nine-point circle',
     },
+    threeExternallyTangentCircles: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'threeExternallyTangentCircles-checkbox',
+        displayElementId: 'threeExternallyTangentCircles',
+        annotationLabel: 'Externally tangent circle',
+        informationText: '○ Three externally tangent circles centered at its vertices',
+    },
     smallestCircle: {
         activeColor: '#808080',
         inactiveColor: 'lightgray',
@@ -1310,6 +1318,9 @@ function drawCircles() {
                     break;
                 case 'cosineCircle':
                     circles.push(calculateCosineCircle(points));
+                    break;
+                case 'threeExternallyTangentCircles':
+                    circles.push(...calculateThreeExternallyTangentCircles(points));
                     break;
                 default:
                     console.error(`Unknown circle key: ${key}`);
@@ -2827,6 +2838,18 @@ function calculateCosineCircle(points) {
     };
 }
 
+// Function to calculate the three externally tangent circles centered at its vertices
+function calculateThreeExternallyTangentCircles(points) {
+    const [A, B, C] = points;
+    const a = calculateDistance(B, C);
+    const b = calculateDistance(C, A);
+    const c = calculateDistance(A, B);
+    const semiperimeter = (a + b + c) / 2;
+    const circleA = {center: A, radius: semiperimeter - a};
+    const circleB = {center: B, radius: semiperimeter - b};
+    const circleC = {center: C, radius: semiperimeter - c};
+    return [circleA, circleB, circleC];
+}
 
 // Function to calculate the medial triangles
 function calculateMedialTriangle(points) {
