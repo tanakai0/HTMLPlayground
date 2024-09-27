@@ -365,6 +365,15 @@ const centerStyles = {
         informationText: '● Center of the Lester circle',
         ETCReference: 1116,
     },
+    EvansPoint: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray', 
+        checkboxId: 'EvansPoint-checkbox',
+        displayElementId: 'EvansPoint',
+        annotationLabel: 'Evans',
+        informationText: '● Evans point',
+        ETCReference: 1375,
+    },
 };
 
 // Define styles for lines
@@ -1142,9 +1151,6 @@ function drawCenters() {
                 case 'symmedianPoint':
                     center = calculateSymmedianPoint(points);
                     break;
-                case 'CenterOfTheLesterCircle':
-                    center = calculateLesterCircle(points).center;
-                    break;
                 case 'GergonnePoint':
                     center = calculateGergonnePoint(points);
                     break;
@@ -1178,6 +1184,12 @@ function drawCenters() {
                 case 'FuhrmannCenter':
                     center = calculateFuhrmannCenter(points);
                     break; 
+                case 'CenterOfTheLesterCircle':
+                    center = calculateLesterCircle(points).center;
+                    break;
+                case 'EvansPoint':
+                    center = calculateEvansPoint(points);
+                    break;
                 default:
                     console.error(`Unknown center key: ${key}`);
                     return;
@@ -2423,6 +2435,29 @@ function calculateFeuerbachPoint(points) {
 // Function to calculate the Fuhrmann center
 function calculateFuhrmannCenter(points) {
     return calculateCircumcircle(calculateFuhrmannTriangle(points)).center;
+}
+
+// Function to calculate the Evans point
+function calculateEvansPoint(points) {
+    if (!isScaleneTriangle(points)){
+        return null;
+    }
+    if (useHomogeneousCoordinates){
+        const [A, B, C] = points;
+        const a = calculateDistance(B, C);
+        const b = calculateDistance(C, A);
+        const c = calculateDistance(A, B);
+        const cosA = Math.cos(calculateAngleInRadians(C, A, B));
+        const cosB = Math.cos(calculateAngleInRadians(A, B, C));
+        const cosC = Math.cos(calculateAngleInRadians(B, C, A));
+        const barycentric1 = -2*(a**2)*cosA+b*(a-b+c)*cosB+c*(a+b-c)*cosC;
+        const barycentric2 = -2*(b**2)*cosB+c*(b-c+a)*cosC+a*(b+c-a)*cosA;
+        const barycentric3 = -2*(c**2)*cosC+a*(c-a+b)*cosA+b*(c+a-b)*cosB;
+        return barycentricToCartesian(points, [barycentric1, barycentric2, barycentric3]);
+    }
+    const EulerLine = calculateEulerLine(points);
+    const GergonneLine = calculateGergonneLine(points);
+    return lineIntersection(...EulerLine, ...GergonneLine);
 }
 
 // Function to calculate the sidelines (extended side)
