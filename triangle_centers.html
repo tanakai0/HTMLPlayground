@@ -2492,9 +2492,9 @@ function calculateEvansPoint(points) {
         const a = calculateDistance(B, C);
         const b = calculateDistance(C, A);
         const c = calculateDistance(A, B);
-        const cosA = Math.cos(calculateAngleInRadians(C, A, B));
-        const cosB = Math.cos(calculateAngleInRadians(A, B, C));
-        const cosC = Math.cos(calculateAngleInRadians(B, C, A));
+        const cosA = calculateCosine(C, A, B);
+        const cosB = calculateCosine(A, B, C);
+        const cosC = calculateCosine(B, C, A);
         const barycentric1 = -2*(a**2)*cosA+b*(a-b+c)*cosB+c*(a+b-c)*cosC;
         const barycentric2 = -2*(b**2)*cosB+c*(b-c+a)*cosC+a*(b+c-a)*cosA;
         const barycentric3 = -2*(c**2)*cosC+a*(c-a+b)*cosA+b*(c+a-b)*cosB;
@@ -2993,9 +2993,9 @@ function calculateExcentralTriangle(points) {
 function calculateOrthicTriangle(points) {
     const [A, B, C] = points;
     if (useHomogeneousCoordinates){
-        const cosA = Math.cos(calculateAngleInRadians(C, A, B));
-        const cosB = Math.cos(calculateAngleInRadians(A, B, C));
-        const cosC = Math.cos(calculateAngleInRadians(B, C, A));
+        const cosA = calculateCosine(C, A, B);
+        const cosB = calculateCosine(A, B, C);
+        const cosC = calculateCosine(B, C, A);
         return [
             trilinearToCartesian(points, [0, 1/cosB, 1/cosC]),
             trilinearToCartesian(points, [1/cosA, 0, 1/cosC]),
@@ -3198,9 +3198,9 @@ function calculateBrocardTriangle(points, number = 1) {
             ];
             break;
         case 2:
-            const cosA = Math.cos(calculateAngleInRadians(C, A, B));
-            const cosB = Math.cos(calculateAngleInRadians(A, B, C));
-            const cosC = Math.cos(calculateAngleInRadians(B, C, A));
+            const cosA = calculateCosine(C, A, B);
+            const cosB = calculateCosine(A, B, C);
+            const cosC = calculateCosine(B, C, A);
             triangle = [
                 trilinearToCartesian(points, [2*b*c*cosA, a*b, c*a]),
                 trilinearToCartesian(points, [a*b, 2*c*a*cosB, b*c]),
