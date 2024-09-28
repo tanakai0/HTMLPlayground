@@ -491,6 +491,14 @@ const lineStyles = {
         annotationLabel: 'Fermat axis',
         informationText: '- Fermat axis',
     },
+    OrthicAxis: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'OrthicAxis-checkbox',
+        displayElementId: 'OrthicAxis',
+        annotationLabel: 'Orthic',
+        informationText: '- Orthic axis',
+    },
     OrthogonalRegressionLine: {
         activeColor: '#808080',
         inactiveColor: 'lightgray',
@@ -1265,6 +1273,9 @@ function drawLines() {
                 case 'FermatAxis':
                     lines.push(calculateFermatAxis(points));
                     break;
+                case 'OrthicAxis':
+                    lines.push(calculateOrthicAxis(points));
+                    break;
                 case 'OrthogonalRegressionLine':
                     lines.push(calculateOrthogonalRegressionLine(points));
                     break;
@@ -1670,12 +1681,16 @@ function calculateDistance(p1, p2) {
     return Math.sqrt((p2.x - p1.x) ** 2 + (p2.y - p1.y) ** 2);
 }
 
-// Function to calculate the angle (radian) at the middle point (B) given three points A, B, and C.
-function calculateAngleInRadians(p1, p2, p3) {
+// Function to calculate the cosine value of the angle at the middle point (B) given three points A, B, and C.
+function calculateCosine(p1, p2, p3) {
     const v21 = vectorSubtract(p1, p2);
     const v23 = vectorSubtract(p3, p2);
-    const cosTheta = dotProduct(v21, v23) / (magnitude(v21) * (magnitude(v23)));
-    return Math.acos(cosTheta);
+    return dotProduct(v21, v23) / (magnitude(v21) * (magnitude(v23)));
+}
+
+// Function to calculate the angle (radian) at the middle point (B) given three points A, B, and C.
+function calculateAngleInRadians(p1, p2, p3) {
+    return Math.acos(calculateCosine(p1, p2, p3));
 }
 
 // Function to calculate the angle (degree) at the middle point (B) given three points A, B, and C.
@@ -2625,6 +2640,19 @@ function calculateFermatAxis(points) {
     ];
 }
 
+// Function to calculate the Orthic axis
+function calculateOrthicAxis(points) {
+    if (!isScaleneTriangle(points)) {
+        return null;
+    }
+    const [A, B, C] = points;
+    const [D, E, F] = calculateOrthicTriangle(points);
+    return [
+        lineIntersection(A, B, D, E),
+        lineIntersection(B, C, E, F)
+    ];
+}
+
 // Function to calculate the orthogonal regression line for three vertices
 function calculateOrthogonalRegressionLine(points) {
     // Step 1: Calculate the sample means
@@ -2964,6 +2992,16 @@ function calculateExcentralTriangle(points) {
 // Function to calculate the orthic triangles
 function calculateOrthicTriangle(points) {
     const [A, B, C] = points;
+    if (useHomogeneousCoordinates){
+        const cosA = Math.cos(calculateAngleInRadians(C, A, B));
+        const cosB = Math.cos(calculateAngleInRadians(A, B, C));
+        const cosC = Math.cos(calculateAngleInRadians(B, C, A));
+        return [
+            trilinearToCartesian(points, [0, 1/cosB, 1/cosC]),
+            trilinearToCartesian(points, [1/cosA, 0, 1/cosC]),
+            trilinearToCartesian(points, [1/cosA, 1/cosB, 0]),
+        ];
+    }
     const slopeAB = calculateSlope(A, B);
     const slopeBC = calculateSlope(B, C);
     const slopeCA = calculateSlope(C, A);
