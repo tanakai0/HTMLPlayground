@@ -1241,7 +1241,12 @@ function drawCenters() {
                     center = calculateFuhrmannCenter(points);
                     break; 
                 case 'CenterOfTheLesterCircle':
-                    center = calculateLesterCircle(points).center;
+                    if (!isScaleneTriangle(points)) {
+                        center = null;
+                    }
+                    else {
+                        center = calculateLesterCircle(points).center;
+                    }
                     break;
                 case 'EvansPoint':
                     center = calculateEvansPoint(points);
@@ -2895,16 +2900,13 @@ function calculateSmallestCircle(points) {
 
 // Function to calculate the Lester circle
 function calculateLesterCircle(points) {
+    if (!isScaleneTriangle(points)) {
+        return null;
+    }
     const firstIsogonicCenter = calculateIsogonicCenter(points, outer = true);
     const secondIsogonicCenter = calculateIsogonicCenter(points, outer = false);
     const circumcenter = calculateCircumcenter(points);
-    if (isScaleneTriangle(points)){
-        // When the triangle is scalene
-        return calculateCircumcircle([firstIsogonicCenter, secondIsogonicCenter, circumcenter]);
-    }
-    else{
-        return null;
-    }
+    return calculateCircumcircle([firstIsogonicCenter, secondIsogonicCenter, circumcenter]);
 }
 
 // Function to calculate the Bevan circle
