@@ -526,6 +526,143 @@ const lineStyles = {
     },
 };
 
+// Define styles for triangles
+const triangleStyles = {
+    medialTriangle: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'medialTriangle-checkbox',
+        displayElementId: 'medialTriangle',
+        annotationLabel: 'Medial',
+        informationText: '△ Medial triangle',
+    },
+    excentralTriangle: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'excentralTriangle-checkbox',
+        displayElementId: 'excentralTriangle',
+        annotationLabel: 'Excentral',
+        informationText: '△ Excentral triangle',
+    },
+    intouchTriangle: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'intouchTriangle-checkbox',
+        displayElementId: 'intouchTriangle',
+        annotationLabel: 'Intouch',
+        informationText: '△ Intouch triangle (Contact triangle, Gergonne triangle)',
+    },
+    extouchTriangle: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'extouchTriangle-checkbox',
+        displayElementId: 'extouchTriangle',
+        annotationLabel: 'Extouch',
+        informationText: '△ Extouch triangle',
+    },
+    orthicTriangle: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'orthicTriangle-checkbox',
+        displayElementId: 'orthicTriangle',
+        annotationLabel: 'Orthic',
+        informationText: '△ Orthic triangle',
+    },
+    tangentialTriangle: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'tangentialTriangle-checkbox',
+        displayElementId: 'tangentialTriangle',
+        annotationLabel: 'Tangential',
+        informationText: '△ Tangential triangle',
+    },
+    anticomplementaryTriangle: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'anticomplementaryTriangle-checkbox',
+        displayElementId: 'anticomplementaryTriangle',
+        annotationLabel: 'Anticomplementary',
+        informationText: '△ Anticomplementary triangle',
+    },
+    outerNapoleonTriangle: {
+        activeColor: '#008000',
+        inactiveColor: 'lightgray',
+        checkboxId: 'outerNapoleonTriangle-checkbox',
+        displayElementId: 'outerNapoleonTriangle',
+        annotationLabel: 'Outer Napoleon',
+        informationText: '△ Outer Napoleon triangle',
+    },
+    innerNapoleonTriangle: {
+        activeColor: '#0000FF',
+        inactiveColor: 'lightgray',
+        checkboxId: 'innerNapoleonTriangle-checkbox',
+        displayElementId: 'innerNapoleonTriangle',
+        annotationLabel: 'Inner Napoleon',
+        informationText: '△ Inner Napoleon triangle',
+    },
+    FuhrmannTriangle: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'FuhrmannTriangle-checkbox',
+        displayElementId: 'FuhrmannTriangle',
+        annotationLabel: 'Fuhrmann',
+        informationText: '△ Fuhrmann triangle',
+    },
+    FeuerbachTriangle: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'FeuerbachTriangle-checkbox',
+        displayElementId: 'FeuerbachTriangle',
+        annotationLabel: 'Feuerbach',
+        informationText: '△ Feuerbach triangle',
+    },
+    firstBrocardTriangle: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'firstBrocardTriangle-checkbox',
+        displayElementId: 'firstBrocardTriangle',
+        annotationLabel: '1st Brocard',
+        informationText: '△ First Brocard triangle',
+    },
+    secondBrocardTriangle: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'secondBrocardTriangle-checkbox',
+        displayElementId: 'secondBrocardTriangle',
+        annotationLabel: '2nd Brocard',
+        informationText: '△ Second Brocard triangle',
+    },
+    AymeTriangle: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'AymeTriangle-checkbox',
+        displayElementId: 'AymeTriangle',
+        annotationLabel: 'Ayme',
+        informationText: '△ Ayme triangle',
+    },
+};
+
+// Define styles for hexagon
+const hexagonStyles = {
+    firstLemoineHexagon: {
+        activeColor: '#008000',
+        inactiveColor: 'lightgray',
+        checkboxId: 'firstLemoineHexagon-checkbox',
+        displayElementId: 'firstLemoineHexagon',
+        annotationLabel: '1st Lemoine',
+        informationText: '⬡ First Lemoine hexagon',
+    },
+    secondLemoineHexagon: {
+        activeColor: '#0000FF',
+        inactiveColor: 'lightgray',
+        checkboxId: 'secondLemoineHexagon-checkbox',
+        displayElementId: 'secondLemoineHexagon',
+        annotationLabel: '2nd Lemoine',
+        informationText: '⬡ Second Lemoine hexagon',
+    },
+}
+
+
 // Define styles for circles
 const circleStyles = {
     excircleA: {
@@ -706,142 +843,6 @@ const circleStyles = {
     },
 };
 
-// Define styles for triangles
-const triangleStyles = {
-    medialTriangle: {
-        activeColor: '#808080',
-        inactiveColor: 'lightgray',
-        checkboxId: 'medialTriangle-checkbox',
-        displayElementId: 'medialTriangle',
-        annotationLabel: 'Medial',
-        informationText: '△ Medial triangle',
-    },
-    excentralTriangle: {
-        activeColor: '#808080',
-        inactiveColor: 'lightgray',
-        checkboxId: 'excentralTriangle-checkbox',
-        displayElementId: 'excentralTriangle',
-        annotationLabel: 'Excentral',
-        informationText: '△ Excentral triangle',
-    },
-    intouchTriangle: {
-        activeColor: '#808080',
-        inactiveColor: 'lightgray',
-        checkboxId: 'intouchTriangle-checkbox',
-        displayElementId: 'intouchTriangle',
-        annotationLabel: 'Intouch',
-        informationText: '△ Intouch triangle (Contact triangle, Gergonne triangle)',
-    },
-    extouchTriangle: {
-        activeColor: '#808080',
-        inactiveColor: 'lightgray',
-        checkboxId: 'extouchTriangle-checkbox',
-        displayElementId: 'extouchTriangle',
-        annotationLabel: 'Extouch',
-        informationText: '△ Extouch triangle',
-    },
-    orthicTriangle: {
-        activeColor: '#808080',
-        inactiveColor: 'lightgray',
-        checkboxId: 'orthicTriangle-checkbox',
-        displayElementId: 'orthicTriangle',
-        annotationLabel: 'Orthic',
-        informationText: '△ Orthic triangle',
-    },
-    tangentialTriangle: {
-        activeColor: '#808080',
-        inactiveColor: 'lightgray',
-        checkboxId: 'tangentialTriangle-checkbox',
-        displayElementId: 'tangentialTriangle',
-        annotationLabel: 'Tangential',
-        informationText: '△ Tangential triangle',
-    },
-    anticomplementaryTriangle: {
-        activeColor: '#808080',
-        inactiveColor: 'lightgray',
-        checkboxId: 'anticomplementaryTriangle-checkbox',
-        displayElementId: 'anticomplementaryTriangle',
-        annotationLabel: 'Anticomplementary',
-        informationText: '△ Anticomplementary triangle',
-    },
-    outerNapoleonTriangle: {
-        activeColor: '#008000',
-        inactiveColor: 'lightgray',
-        checkboxId: 'outerNapoleonTriangle-checkbox',
-        displayElementId: 'outerNapoleonTriangle',
-        annotationLabel: 'Outer Napoleon',
-        informationText: '△ Outer Napoleon triangle',
-    },
-    innerNapoleonTriangle: {
-        activeColor: '#0000FF',
-        inactiveColor: 'lightgray',
-        checkboxId: 'innerNapoleonTriangle-checkbox',
-        displayElementId: 'innerNapoleonTriangle',
-        annotationLabel: 'Inner Napoleon',
-        informationText: '△ Inner Napoleon triangle',
-    },
-    FuhrmannTriangle: {
-        activeColor: '#808080',
-        inactiveColor: 'lightgray',
-        checkboxId: 'FuhrmannTriangle-checkbox',
-        displayElementId: 'FuhrmannTriangle',
-        annotationLabel: 'Fuhrmann',
-        informationText: '△ Fuhrmann triangle',
-    },
-    FeuerbachTriangle: {
-        activeColor: '#808080',
-        inactiveColor: 'lightgray',
-        checkboxId: 'FeuerbachTriangle-checkbox',
-        displayElementId: 'FeuerbachTriangle',
-        annotationLabel: 'Feuerbach',
-        informationText: '△ Feuerbach triangle',
-    },
-    firstBrocardTriangle: {
-        activeColor: '#808080',
-        inactiveColor: 'lightgray',
-        checkboxId: 'firstBrocardTriangle-checkbox',
-        displayElementId: 'firstBrocardTriangle',
-        annotationLabel: '1st Brocard',
-        informationText: '△ First Brocard triangle',
-    },
-    secondBrocardTriangle: {
-        activeColor: '#808080',
-        inactiveColor: 'lightgray',
-        checkboxId: 'secondBrocardTriangle-checkbox',
-        displayElementId: 'secondBrocardTriangle',
-        annotationLabel: '2nd Brocard',
-        informationText: '△ Second Brocard triangle',
-    },
-    AymeTriangle: {
-        activeColor: '#808080',
-        inactiveColor: 'lightgray',
-        checkboxId: 'AymeTriangle-checkbox',
-        displayElementId: 'AymeTriangle',
-        annotationLabel: 'Ayme',
-        informationText: '△ Ayme triangle',
-    },
-};
-
-// Define styles for hexagon
-const hexagonStyles = {
-    firstLemoineHexagon: {
-        activeColor: '#008000',
-        inactiveColor: 'lightgray',
-        checkboxId: 'firstLemoineHexagon-checkbox',
-        displayElementId: 'firstLemoineHexagon',
-        annotationLabel: '1st Lemoine',
-        informationText: '⬡ First Lemoine hexagon',
-    },
-    secondLemoineHexagon: {
-        activeColor: '#0000FF',
-        inactiveColor: 'lightgray',
-        checkboxId: 'secondLemoineHexagon-checkbox',
-        displayElementId: 'secondLemoineHexagon',
-        annotationLabel: '2nd Lemoine',
-        informationText: '⬡ Second Lemoine hexagon',
-    },
-}
-
 // Define styles for ellipse
 const ellipseStyles = {
     SteinerInellipse: {
@@ -961,9 +962,9 @@ function reDraw(){
     drawOriginalTriangle();
     drawCenters();
     drawLines();
-    drawCircles();
     drawTriangles();
     drawHexagons();
+    drawCircles();
     drawEllipses();
     updateInfo();
     applyStyles();
@@ -1338,96 +1339,6 @@ function drawLines() {
     });
 }
 
-// Draw circles based on checkbox states
-function drawCircles() {
-    Object.keys(circleStyles).forEach(key => {
-        const style = circleStyles[key];
-        const checkbox = document.getElementById(style.checkboxId);
-
-        if (checkbox && checkbox.checked) {
-            let circles = []; // Multiple circles can be stored here
-
-            // Switch statement to handle different circle calculations
-            switch (key) {
-                case 'incircle':
-                    circles.push(calculateIncircle(points)); // Add a single circle to the list
-                    break;
-                case 'circumcircle':
-                    circles.push(calculateCircumcircle(points));
-                    break;
-                case 'excircleA':
-                    circles.push(calculateExcircle([points[2], points[0], points[1]]));
-                    break;
-                case 'excircleB':
-                    circles.push(calculateExcircle(points));
-                    break;
-                case 'excircleC':
-                    circles.push(calculateExcircle([points[1], points[2], points[0]]));
-                    break;
-                case 'ninePointCircle':
-                    circles.push(calculateNinePointCircle(points));
-                    break;
-                case 'smallestCircle':
-                    circles.push(calculateSmallestCircle(points));
-                    break;
-                case 'LesterCircle':
-                    circles.push(calculateLesterCircle(points));
-                    break;
-                case 'BevanCircle':
-                    circles.push(calculateBevanCircle(points));
-                    break;
-                case 'SpiekerCircle':
-                    circles.push(calculateSpiekerCircle(points));
-                    break;
-                case 'AdamsCircle':
-                    circles.push(calculateAdamsCircle(points));
-                    break;
-                case 'FuhrmannCircle':
-                    circles.push(calculateFuhrmannCircle(points));
-                    break;
-                case 'MandartCircle':
-                    circles.push(calculateMandartCircle(points));
-                    break;
-                case 'MalfattiCircles':
-                    circles.push(...calculateMalfattiCircles(points));
-                    break;
-                case 'ParryCircle':
-                    circles.push(calculateParryCircle(points));
-                    break;
-                case 'BrocardCircle':
-                    circles.push(calculateBrocardCircle(points));
-                    break;
-                case 'TaylorCircle':
-                    circles.push(calculateTaylorCircle(points));
-                    break;
-                case 'VanLamoenCircle':
-                    circles.push(calculateVanLamoenCircle(points));
-                    break;
-                case 'firstLemoineCircle':
-                    circles.push(calculateFirstLemoineCircle(points));
-                    break;
-                case 'cosineCircle':
-                    circles.push(calculateCosineCircle(points));
-                    break;
-                case 'threeExternallyTangentCircles':
-                    circles.push(...calculateThreeExternallyTangentCircles(points));
-                    break;
-                default:
-                    console.error(`Unknown circle key: ${key}`);
-                    return;
-            }
-
-            // Draw
-            circles.forEach(circle => {
-                if (circle) {
-                    drawCircle(circle, style.annotationLabel, style.activeColor);
-                }
-            });
-        }
-    });
-}
-
-
 // Draw triangles based on checkbox states
 function drawTriangles() {
     Object.keys(triangleStyles).forEach(key => {
@@ -1519,6 +1430,96 @@ function drawHexagons() {
             if (hexagon) {
                 drawPolygon(hexagon, style.annotationLabel, style.activeColor);
             }
+        }
+    });
+}
+
+
+// Draw circles based on checkbox states
+function drawCircles() {
+    Object.keys(circleStyles).forEach(key => {
+        const style = circleStyles[key];
+        const checkbox = document.getElementById(style.checkboxId);
+
+        if (checkbox && checkbox.checked) {
+            let circles = []; // Multiple circles can be stored here
+
+            // Switch statement to handle different circle calculations
+            switch (key) {
+                case 'incircle':
+                    circles.push(calculateIncircle(points)); // Add a single circle to the list
+                    break;
+                case 'circumcircle':
+                    circles.push(calculateCircumcircle(points));
+                    break;
+                case 'excircleA':
+                    circles.push(calculateExcircle([points[2], points[0], points[1]]));
+                    break;
+                case 'excircleB':
+                    circles.push(calculateExcircle(points));
+                    break;
+                case 'excircleC':
+                    circles.push(calculateExcircle([points[1], points[2], points[0]]));
+                    break;
+                case 'ninePointCircle':
+                    circles.push(calculateNinePointCircle(points));
+                    break;
+                case 'smallestCircle':
+                    circles.push(calculateSmallestCircle(points));
+                    break;
+                case 'LesterCircle':
+                    circles.push(calculateLesterCircle(points));
+                    break;
+                case 'BevanCircle':
+                    circles.push(calculateBevanCircle(points));
+                    break;
+                case 'SpiekerCircle':
+                    circles.push(calculateSpiekerCircle(points));
+                    break;
+                case 'AdamsCircle':
+                    circles.push(calculateAdamsCircle(points));
+                    break;
+                case 'FuhrmannCircle':
+                    circles.push(calculateFuhrmannCircle(points));
+                    break;
+                case 'MandartCircle':
+                    circles.push(calculateMandartCircle(points));
+                    break;
+                case 'MalfattiCircles':
+                    circles.push(...calculateMalfattiCircles(points));
+                    break;
+                case 'ParryCircle':
+                    circles.push(calculateParryCircle(points));
+                    break;
+                case 'BrocardCircle':
+                    circles.push(calculateBrocardCircle(points));
+                    break;
+                case 'TaylorCircle':
+                    circles.push(calculateTaylorCircle(points));
+                    break;
+                case 'VanLamoenCircle':
+                    circles.push(calculateVanLamoenCircle(points));
+                    break;
+                case 'firstLemoineCircle':
+                    circles.push(calculateFirstLemoineCircle(points));
+                    break;
+                case 'cosineCircle':
+                    circles.push(calculateCosineCircle(points));
+                    break;
+                case 'threeExternallyTangentCircles':
+                    circles.push(...calculateThreeExternallyTangentCircles(points));
+                    break;
+                default:
+                    console.error(`Unknown circle key: ${key}`);
+                    return;
+            }
+
+            // Draw
+            circles.forEach(circle => {
+                if (circle) {
+                    drawCircle(circle, style.annotationLabel, style.activeColor);
+                }
+            });
         }
     });
 }
@@ -1647,19 +1648,6 @@ function drawLine(line, label = '', color = 'black') {
     }
 }
 
-
-// Function to draw a circle
-function drawCircle(circle, label = '', color = 'black') {
-    ctx.beginPath();
-    ctx.arc(circle.center.x, circle.center.y, circle.radius, 0, Math.PI * 2); // Draw a full circle
-    ctx.strokeStyle = color;
-    ctx.stroke();
-    if (label){
-        ctx.fillStyle = color;
-        ctx.fillText(label, circle.center.x, circle.center.y + circle.radius + 15);
-    }
-}
-
 // Function to draw a polygon
 function drawPolygon(polygon, label = '', color = 'black') {
     if (polygon.length < 3) {
@@ -1690,6 +1678,19 @@ function drawPolygon(polygon, label = '', color = 'black') {
 
         ctx.fillStyle = color;
         ctx.fillText(label, centroidX, centroidY);
+    }
+}
+
+
+// Function to draw a circle
+function drawCircle(circle, label = '', color = 'black') {
+    ctx.beginPath();
+    ctx.arc(circle.center.x, circle.center.y, circle.radius, 0, Math.PI * 2); // Draw a full circle
+    ctx.strokeStyle = color;
+    ctx.stroke();
+    if (label){
+        ctx.fillStyle = color;
+        ctx.fillText(label, circle.center.x, circle.center.y + circle.radius + 15);
     }
 }
 
