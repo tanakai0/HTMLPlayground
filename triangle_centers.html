@@ -3256,6 +3256,17 @@ function calculateCircumcevianTriangle(points, p) {
 
 // Function to calculate the circum-medial triangle
 function calculateCircumMedialTriangle(points) {
+    if (useHomogeneousCoordinates) {
+        const [A, B, C] = points;
+        const a = calculateDistance(B, C);
+        const b = calculateDistance(C, A);
+        const c = calculateDistance(A, B);
+        return [
+            trilinearToCartesian(points, [-a*b*c, c*(b**2+c**2), b*(b**2+c**2)]),
+            trilinearToCartesian(points, [c*(c**2+a**2), -a*b*c, a*(c**2+a**2)]),
+            trilinearToCartesian(points, [b*(a**2+b**2), a*(a**2+b**2), -a*b*c])
+        ];
+    }
     const centroid = calculateCentroid(points);
     return calculateCircumcevianTriangle(points, centroid);
 }
