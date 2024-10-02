@@ -311,6 +311,15 @@ const centerStyles = {
         informationText: '● Schiffler point',
         ETCReference: 21,
     },
+    ExeterPoint: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray', 
+        checkboxId: 'ExeterPoint-checkbox',
+        displayElementId: 'ExeterPoint',
+        annotationLabel: 'Exeter',
+        informationText: '● Exeter point',
+        ETCReference: 22,
+    },
     BrocardMidpoint: {
         activeColor: '#808080',
         inactiveColor: 'lightgray', 
@@ -1200,6 +1209,9 @@ function drawCenters() {
                     break;
                 case 'SchifflerPoint':
                     center = calculateSchifflerPoint(points);
+                    break;
+                case 'ExeterPoint':
+                    center = calculateExeterPoint(points);
                     break;
                 case 'ninePointCenter':
                     center = calculateNinePointCenter(points);
@@ -2504,6 +2516,23 @@ function calculateSchifflerPoint(points) {
     const EulerLineA = calculateEulerLine([B, C, incenter]);
     const EulerLineB = calculateEulerLine([C, A, incenter]);
     return lineIntersection(EulerLineA[0], EulerLineA[1], EulerLineB[0], EulerLineB[1]);
+}
+
+// Function to calculate the Exeter point
+function calculateExeterPoint(points) {
+    if (useHomogeneousCoordinates) {
+        const [A, B, C] = points;
+        const a = calculateDistance(B, C);
+        const b = calculateDistance(C, A);
+        const c = calculateDistance(A, B);
+        const a4 = a*a*a*a;
+        const b4 = b*b*b*b;
+        const c4 = c*c*c*c;
+        return barycentricToCartesian(points, [a*a*(b4+c4-a4), b*b*(c4+a4-b4), c*c*(a4+b4-c4)]);
+    }
+    const tangentialTriangle = calculateTangentialTriangle(points);
+    const circumMedialTriangle = calculateCircumMedialTriangle(points);
+    return lineIntersection(tangentialTriangle[0], circumMedialTriangle[0], tangentialTriangle[1], circumMedialTriangle[1]);
 }
 
 // Function to calculate the nine point center
