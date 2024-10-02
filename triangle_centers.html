@@ -284,6 +284,15 @@ const centerStyles = {
         informationText: '● Second Napoleon point',
         ETCReference: 18,
     },
+    ClawsonPoint: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray', 
+        checkboxId: 'ClawsonPoint-checkbox',
+        displayElementId: 'ClawsonPoint',
+        annotationLabel: 'Clawson',
+        informationText: '● Clawson point',
+        ETCReference: 19,
+    },
     deLongchampsPoint: {
         activeColor: '#808080',
         inactiveColor: 'lightgray', 
@@ -1157,6 +1166,9 @@ function drawCenters() {
                     break;
                 case 'secondIsodynamicPoint':
                     center = calculateIsodynamicPoint(points, true);
+                    break;
+                case 'ClawsonPoint':
+                    center = calculateClawsonPoint(points);
                     break;
                 case 'deLongchampsPoint':
                     center = calculateDeLongchampsPoint(points);
@@ -2316,6 +2328,18 @@ function calculateFermatPoint(points) {
     }
 }
 
+// Function to calculate the Clawson point
+function calculateClawsonPoint(points) {
+    const [A, B, C] = points;
+    if (useHomogeneousCoordinates) {
+        const tanA = Math.tan(calculateAngleInRadians(C, A, B));
+        const tanB = Math.tan(calculateAngleInRadians(A, B, C));
+        const tanC = Math.tan(calculateAngleInRadians(B, C, A));
+        trilinearToCartesian(points, [tanA, tanB, tanC]);
+    }
+    const AymeTriangle = calculateAymeTriangle(points);
+    return lineIntersection(A, AymeTriangle[0], B, AymeTriangle[1]);
+}
 
 // Function to calculate the de Longchamps point that is the reflection of the orthocenter of the triangle about the circumcenter
 function calculateDeLongchampsPoint(points) {
