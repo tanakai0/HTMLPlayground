@@ -787,6 +787,14 @@ const triangleStyles = {
         annotationLabel: '2nd Brocard',
         informationText: '△ Second Brocard triangle',
     },
+    AymeTriangle: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'AymeTriangle-checkbox',
+        displayElementId: 'AymeTriangle',
+        annotationLabel: 'Ayme',
+        informationText: '△ Ayme triangle',
+    },
 };
 
 // Define styles for hexagon
@@ -1430,6 +1438,9 @@ function drawTriangles() {
                     break;
                 case 'secondBrocardTriangle':
                     triangle = calculateBrocardTriangle(points, 2);
+                    break;
+                case 'AymeTriangle':
+                    triangle = calculateAymeTriangle(points);
                     break;
                 default:
                     console.error(`Unknown triangle key: ${key}`);
@@ -3274,6 +3285,23 @@ function calculateBrocardTriangle(points, number = 1) {
             return;
     }
     return triangle;
+}
+
+// Function to calculate the Ayme triangle
+function calculateAymeTriangle(points) {
+    const [A, B, C] = points;
+    const circumcircle = calculateCircumcircle(points);
+    const excircleA = calculateExcircle([points[2], points[0], points[1]]);
+    const excircleB = calculateExcircle(points);
+    const excircleC = calculateExcircle([points[1], points[2], points[0]]);
+    const lineA = calculateIntersectionOfTwoCircles(circumcircle, excircleA);
+    const lineB = calculateIntersectionOfTwoCircles(circumcircle, excircleB);
+    const lineC = calculateIntersectionOfTwoCircles(circumcircle, excircleC);
+    return [
+        lineIntersection(lineB[0], lineB[1], lineC[0], lineC[1]),
+        lineIntersection(lineC[0], lineC[1], lineA[0], lineA[1]),
+        lineIntersection(lineA[0], lineA[1], lineB[0], lineB[1])
+    ];
 }
 
 
