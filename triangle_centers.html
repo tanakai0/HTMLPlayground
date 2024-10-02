@@ -444,6 +444,14 @@ const lineStyles = {
         annotationLabel: 'Symmedian',
         informationText: '- Symmedians',
     },
+    exsymmedians: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'exsymmedians-checkbox',
+        displayElementId: 'exsymmedians',
+        annotationLabel: 'Exsymmedian',
+        informationText: '- Exsymmedians',
+    },
     splitters: {
         activeColor: '#808080',
         inactiveColor: 'lightgray',
@@ -1271,7 +1279,10 @@ function drawLines() {
                     break;  
                 case 'symmedians':
                     lines.push(...calculateSymmedians(points));
-                    break;      
+                    break;
+                case 'exsymmedians':
+                    lines.push(...calculateExsymmedians(points));
+                    break;       
                 case 'splitters':
                     lines.push(...calculateSplitters(points));
                     break;
@@ -1850,6 +1861,27 @@ function rotate(P, O, d) {
         y: 2 * intersection.y - point.y
     };
 }
+
+function SlopeAndPointToLine(slope, point) {
+    const deltaX = 10;
+    let point1, point2;
+
+    if (!isFinite(slope)) {
+        // vertical line
+        point1 = point;
+        point2 = { x: point.x, y: point.y + deltaX };
+    } else if (slope === 0) {
+        // horizontal line
+        point1 = point;
+        point2 = { x: point.x + deltaX, y: point.y };
+    } else {
+        point1 = point;
+        point2 = { x: point.x + deltaX, y: point.y + slope * deltaX };
+    }
+
+    return [point1, point2];
+}
+
 
 // Function to find the intersection of two lines (P1, P2) and (Q1, Q2)
 function lineIntersection(P1, P2, Q1, Q2) {
@@ -2604,6 +2636,20 @@ function calculateSymmedians(points) {
         [A, symmedianPoint],
         [B, symmedianPoint],
         [C, symmedianPoint]
+    ];
+}
+
+// Function to calculate the exsymmedians
+function calculateExsymmedians(points) {
+    const [A, B, C] = points;
+    const circumcenter = calculateCircumcenter(points);
+    const slopeA = perpendicularSlope(calculateSlope(A, circumcenter));
+    const slopeB = perpendicularSlope(calculateSlope(B, circumcenter));
+    const slopeC = perpendicularSlope(calculateSlope(C, circumcenter));
+    return [
+        SlopeAndPointToLine(slopeA, A),
+        SlopeAndPointToLine(slopeB, B),
+        SlopeAndPointToLine(slopeC, C),
     ];
 }
 
