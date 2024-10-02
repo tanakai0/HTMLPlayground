@@ -748,6 +748,14 @@ const triangleStyles = {
         annotationLabel: 'Orthic',
         informationText: '△ Orthic triangle',
     },
+    tangentialTriangle: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'tangentialTriangle-checkbox',
+        displayElementId: 'tangentialTriangle',
+        annotationLabel: 'Tangential',
+        informationText: '△ Tangential triangle',
+    },
     anticomplementaryTriangle: {
         activeColor: '#808080',
         inactiveColor: 'lightgray',
@@ -1435,6 +1443,9 @@ function drawTriangles() {
                 case 'orthicTriangle':
                     triangle = calculateOrthicTriangle(points);
                     break;
+                case 'tangentialTriangle':
+                    triangle = calculateTangentialTriangle(points);
+                    break;
                 case 'anticomplementaryTriangle':
                     triangle = calculateAnticomplementaryTriangle(points);
                     break;
@@ -1794,10 +1805,24 @@ function isEquilateralTriangle(points) {
 // Check if a triangle is scalene
 function isScaleneTriangle(points) {
     const [A, B, C] = points;
-    const a = calculateDistance(B, C); // Length of side BC
-    const b = calculateDistance(A, C); // Length of side CA
-    const c = calculateDistance(A, B); // Length of side AB
+    const a = calculateDistance(B, C);
+    const b = calculateDistance(C, A);
+    const c = calculateDistance(A, B);
     return !closeEnoughScalars(a, b) && !closeEnoughScalars(b, c) && !closeEnoughScalars(c, a);
+}
+
+// Check if a triangle is a right triangle
+function isRightTriangle(points) {
+    const [A, B, C] = points;
+    const a = calculateDistance(B, C);
+    const b = calculateDistance(C, A);
+    const c = calculateDistance(A, B);
+
+    // Sort sides so that a <= b <= c
+    const sides = [a, b, c].sort((x, y) => x - y);
+
+    // Check if the triangle satisfies the Pythagorean theorem
+    return closeEnoughScalars(sides[0] ** 2 + sides[1] ** 2, sides[2] ** 2);
 }
 
 function perpendicularSlope(slope) {
@@ -3093,6 +3118,20 @@ function calculateOrthicTriangle(points) {
         lineIntersectionGivenSlopesAndPoints(slopeBC, B, perpendicularSlopeBC, A),
         lineIntersectionGivenSlopesAndPoints(slopeCA, C, perpendicularSlopeCA, B),
         lineIntersectionGivenSlopesAndPoints(slopeAB, A, perpendicularSlopeAB, C)
+    ];
+}
+
+// Function to calculate the tangential triangle
+function calculateTangentialTriangle(points) {
+    if (isRightTriangle(points)) {
+        return null;
+    }
+    const [A, B, C] = points;
+    const [esA, esB, esC] = calculateExsymmedians(points);
+    return [
+        lineIntersection(...esB, ...esC),
+        lineIntersection(...esC, ...esA),
+        lineIntersection(...esA, ...esB),
     ];
 }
 
