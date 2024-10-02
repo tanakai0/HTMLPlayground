@@ -584,6 +584,14 @@ const triangleStyles = {
         annotationLabel: 'Anticomplementary',
         informationText: '△ Anticomplementary triangle',
     },
+    circumMedialTriangle: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'circumMedialTriangle-checkbox',
+        displayElementId: 'circumMedialTriangle',
+        annotationLabel: 'Circum-medial',
+        informationText: '△ Circum-medial triangle',
+    },
     outerNapoleonTriangle: {
         activeColor: '#008000',
         inactiveColor: 'lightgray',
@@ -1365,6 +1373,9 @@ function drawTriangles() {
                 case 'anticomplementaryTriangle':
                     triangle = calculateAnticomplementaryTriangle(points);
                     break;
+                case 'circumMedialTriangle':
+                    triangle = calculateCircumMedialTriangle(points);
+                    break;
                 case 'outerNapoleonTriangle':
                     triangle = calculateNapoleonTriangle(points, true);
                     break;
@@ -2034,6 +2045,77 @@ function calculateCircleTangentToLine(C, B, A){
             radius: calculateDistance(center, B)
         };
     }
+}
+
+function calculateIntersectionOfCircleAndLine(circle, line) {
+    const {radius, center} = circle;
+    const [point1, point2] = line;
+    
+    const x1 = point1.x
+    const y1 = point1.y;
+    const x2 = point2.x
+    const y2 = point2.y;
+    const h = center.x;
+    const k = center.y;
+    const r = radius;
+
+    let intersections = [];
+
+    if (x1 === x2) { // Vertical line (infinite slope)
+        // x = x1, solve (x - h)^2 + (y - k)^2 = r^2
+        const x = x1;
+        const A = 1;
+        const B = -2 * k;
+        const C = (x1 - h) * (x1 - h) + k * k - r * r;
+        const discriminant = B * B - 4 * A * C;
+
+        if (discriminant < 0) return intersections; // No intersection
+
+        const yPos = (-B + Math.sqrt(discriminant)) / (2 * A);
+        const yNeg = (-B - Math.sqrt(discriminant)) / (2 * A);
+
+        intersections.push({ x: x1, y: yPos });
+        if (discriminant > 0) intersections.push({ x: x1, y: yNeg });
+
+    } else if (y1 === y2) { // Horizontal line
+        // y = y1, solve (x - h)^2 + (y - k)^2 = r^2
+        const y = y1;
+        const A = 1;
+        const B = -2 * h;
+        const C = (y1 - k) * (y1 - k) + h * h - r * r;
+        const discriminant = B * B - 4 * A * C;
+
+        if (discriminant < 0) return intersections; // No intersection
+
+        const xPos = (-B + Math.sqrt(discriminant)) / (2 * A);
+        const xNeg = (-B - Math.sqrt(discriminant)) / (2 * A);
+
+        intersections.push({ x: xPos, y: y1 });
+        if (discriminant > 0) intersections.push({ x: xNeg, y: y1 });
+
+    } else { // Finite slope line
+        // Parametrize the line as y = mx + c
+        const m = (y2 - y1) / (x2 - x1);
+        const c = y1 - m * x1;
+
+        // Solve (x - h)^2 + (y - k)^2 = r^2 with y = mx + c
+        const A = 1 + m * m;
+        const B = 2 * (m * (c - k) - h);
+        const C = h * h + (c - k) * (c - k) - r * r;
+        const discriminant = B * B - 4 * A * C;
+
+        if (discriminant < 0) return intersections; // No intersection
+
+        const xPos = (-B + Math.sqrt(discriminant)) / (2 * A);
+        const xNeg = (-B - Math.sqrt(discriminant)) / (2 * A);
+        const yPos = m * xPos + c;
+        const yNeg = m * xNeg + c;
+
+        intersections.push({ x: xPos, y: yPos });
+        if (discriminant > 0) intersections.push({ x: xNeg, y: yNeg });
+    }
+
+    return intersections;
 }
 
 function calculateIntersectionOfTwoCircles(circleA, circleB) {
@@ -3156,6 +3238,26 @@ function calculateAnticomplementaryTriangle(points) {
             y: 3 * centroid.y - 2 * C.y,
         },
     ];
+}
+
+// Function to calculate the circumcevian triangle
+function calculateCircumcevianTriangle(points, p) {
+    const [A, B, C] = points;
+    const circumcircle = calculateCircumcircle(points);
+    let p1, p2;
+    [p1, p2] = calculateIntersectionOfCircleAndLine(circumcircle, [A, p]);
+    const pA = calculateDistance(p1, A) > calculateDistance (p2, A) ? p1 : p2;
+    [p1, p2] = calculateIntersectionOfCircleAndLine(circumcircle, [B, p]);
+    const pB = calculateDistance(p1, B) > calculateDistance (p2, B) ? p1 : p2;
+    [p1, p2] = calculateIntersectionOfCircleAndLine(circumcircle, [C, p]);
+    const pC = calculateDistance(p1, C) > calculateDistance (p2, C) ? p1 : p2;
+    return [pA, pB, pC];
+}
+
+// Function to calculate the circum-medial triangle
+function calculateCircumMedialTriangle(points) {
+    const centroid = calculateCentroid(points);
+    return calculateCircumcevianTriangle(points, centroid);
 }
 
 // Function to calculate the outer Napoleon triangle
