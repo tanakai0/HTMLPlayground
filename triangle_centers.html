@@ -374,6 +374,15 @@ const centerStyles = {
         informationText: '● Second Ajima-Malfatti point',
         ETCReference: 180,
     },
+    equalParalleliansPoint: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'equalParalleliansPoint-checkbox',
+        displayElementId: 'equalParalleliansPoint',
+        annotationLabel: 'Equal parallelians',
+        informationText: '● Equal parallelians point (Congruent parallelians point)',
+        ETCReference: 192,
+    },
     FuhrmannCenter: {
         activeColor: '#808080',
         inactiveColor: 'lightgray',
@@ -1258,6 +1267,9 @@ function drawCenters() {
                 case 'FeuerbachPoint':
                     center = calculateFeuerbachPoint(points);
                     break;
+                case 'equalParalleliansPoint':
+                    center = calculateEqualParalleliansPoint(points);
+                    break;   
                 case 'FuhrmannCenter':
                     center = calculateFuhrmannCenter(points);
                     break; 
@@ -2684,6 +2696,22 @@ function calculateFeuerbachPoint(points) {
     const incircle = calculateIncircle(points);
     const ninePointCircle = calculateNinePointCircle(points);
     return calculateTangencyPoint(incircle, ninePointCircle);
+}
+
+// Function to calculate the equal parallelians point
+function calculateEqualParalleliansPoint(points) {
+    const [A, B, C] = points;
+    if(useHomogeneousCoordinates) {
+        const a = calculateDistance(B, C);
+        const b = calculateDistance(C, A);
+        const c = calculateDistance(A, B);
+        return barycentricToCartesian(points, [c*a+a*b-b*c, a*b+b*c-c*a, b*c+c*a-a*b]);
+    }
+    const anticomplementaryTriangle = calculateAnticomplementaryTriangle(points);
+    const internalAngleBisectors = calculateInternalAngleBisectors(points);
+    const PA = lineIntersection(...internalAngleBisectors[0], B, C);
+    const PB = lineIntersection(...internalAngleBisectors[1], C, A);
+    return lineIntersection(anticomplementaryTriangle[0], PA, anticomplementaryTriangle[1], PB);
 }
 
 // Function to calculate the Fuhrmann center
