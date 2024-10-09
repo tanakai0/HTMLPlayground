@@ -586,6 +586,14 @@ const triangleStyles = {
         annotationLabel: 'Orthic',
         informationText: '△ Orthic triangle',
     },
+    reflectionTriangle: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'reflectionTriangle-checkbox',
+        displayElementId: 'reflectionTriangle',
+        annotationLabel: 'Reflection',
+        informationText: '△ Reflection triangle',
+    },
     tangentialTriangle: {
         activeColor: '#808080',
         inactiveColor: 'lightgray',
@@ -1390,6 +1398,9 @@ function drawTriangles() {
                     break;
                 case 'orthicTriangle':
                     triangle = calculateOrthicTriangle(points);
+                    break;
+                case 'reflectionTriangle':
+                    triangle = calculateReflectionTriangle(points);
                     break;
                 case 'tangentialTriangle':
                     triangle = calculateTangentialTriangle(points);
@@ -3260,6 +3271,27 @@ function calculateOrthicTriangle(points) {
         lineIntersectionGivenSlopesAndPoints(slopeBC, B, perpendicularSlopeBC, A),
         lineIntersectionGivenSlopesAndPoints(slopeCA, C, perpendicularSlopeCA, B),
         lineIntersectionGivenSlopesAndPoints(slopeAB, A, perpendicularSlopeAB, C)
+    ];
+}
+
+
+// Function to calculate the reflection triangles
+function calculateReflectionTriangle(points) {
+    const [A, B, C] = points;
+    if (useHomogeneousCoordinates){
+        const cosA = calculateCosine(C, A, B);
+        const cosB = calculateCosine(A, B, C);
+        const cosC = calculateCosine(B, C, A);
+        return [
+            trilinearToCartesian(points, [-1, 2*cosC, 2*cosB]),
+            trilinearToCartesian(points, [2*cosC, -1, 2*cosA]),
+            trilinearToCartesian(points, [2*cosB, 2*cosA, -1]),
+        ];
+    }
+    return [
+        reflectPointAcrossLine(A, [B, C]),
+        reflectPointAcrossLine(B, [C, A]),
+        reflectPointAcrossLine(C, [A, B])
     ];
 }
 
