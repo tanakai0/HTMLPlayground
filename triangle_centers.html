@@ -875,6 +875,14 @@ const circleStyles = {
         annotationLabel: 'Cosine',
         informationText: '○ Cosine circle (Second Lemoine circle)',
     },
+    ConwayCircle: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'ConwayCircle-checkbox',
+        displayElementId: 'ConwayCircle',
+        annotationLabel: 'Conway',
+        informationText: '○ Conway circle',
+    },
 };
 
 // Define styles for ellipse
@@ -1551,6 +1559,9 @@ function drawCircles() {
                     break;
                 case 'cosineCircle':
                     circles.push(calculateCosineCircle(points));
+                    break;
+                case 'ConwayCircle':
+                    circles.push(calculateConwayCircle(points));
                     break;
                 case 'threeExternallyTangentCircles':
                     circles.push(...calculateThreeExternallyTangentCircles(points));
@@ -3220,6 +3231,16 @@ function calculateCosineCircle(points) {
     return {
         center: calculateSymmedianPoint(points),
         radius: a*b*c / (a**2 + b**2 + c**2)
+    };
+}
+
+// Function to calculate the Conway circle
+function calculateConwayCircle(points) {
+    const incircle = calculateIncircle(points);
+    const semiperimeter = calculateSemiperimeter(points);
+    return {
+        center: incircle.center,
+        radius: Math.sqrt((incircle.radius)**2+semiperimeter**2)
     };
 }
 
