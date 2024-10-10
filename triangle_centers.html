@@ -1951,6 +1951,12 @@ function closeEnoughCircles(c1, c2) {
     return closeEnoughPoints(c1.center, c2.center) && closeEnoughScalars(c1.radius, c2.radius);
 }
 
+// Check if the points ()= [A, B, C]) is counterclockwise or not
+function isCounterclockwiseOrder(points) {
+    const [A, B, C] = points;
+    return calculateCrossProduct(A, B, C) > 0 ? false : true;
+}
+
 // Check if a triangle is equilateral
 function isEquilateralTriangle(points) {
     const [A, B, C] = points;
@@ -2408,7 +2414,7 @@ function calculateBrocardPoint(points, number = 1) {
     const b =  calculateDistance(C, A); 
     const c =  calculateDistance(A, B);
     // Determine whether the vertices are labeled in counterclockwise order
-    const isCounterclockwise =  calculateCrossProduct(A, B, C) > 0 ? false : true;
+    const isCounterclockwise =  isCounterclockwiseOrder(points);
 
     if (useHomogeneousCoordinates) {
         let barycentric;
@@ -3541,13 +3547,9 @@ function calculateNapoleonTriangle(points, outer = true) {
     const [A, B, C] = points;
 
     // Calculate the outer equilateral triangle on each side
-    const crossProductAB_AC = calculateCrossProduct(A, B, C);
-
-    // Determine rotation direction based on cross products
-    let rotationRadian = crossProductAB_AC > 0 ? -60 : 60;
-    if (!outer){
-        rotationRadian = -rotationRadian; 
-    }
+    const isCounterclockwise =  isCounterclockwiseOrder(points);
+    let rotationRadian = isCounterclockwise ? 60 : -60;
+    rotationRadian = outer ? rotationRadian : -rotationRadian;
 
     // Create equilateral triangles on each side
     const R1 = rotate(B, A, rotationRadian);
@@ -3717,7 +3719,7 @@ function calculateBrocardTriangle(points, number = 1) {
     
     const firstBrocardPoint = calculateBrocardPoint(points, 1);
     const secondBrocardPoint = calculateBrocardPoint(points, 2);
-    const isCounterclockwise =  calculateCrossProduct(A, B, C) > 0 ? false : true;
+    const isCounterclockwise =  isCounterclockwiseOrder(points);
 
     switch(number){
         case 1:
@@ -3800,7 +3802,7 @@ function calculateVectenTriangle(points, outer = true) {
     }
 
     // Determine rotation direction based on cross products
-    const isCounterclockwise =  calculateCrossProduct(A, B, C) > 0 ? false : true;
+    const isCounterclockwise =  isCounterclockwiseOrder(points);
     let rotationRadian90 = isCounterclockwise ? 90 : -90;
     rotationRadian90 = outer ? rotationRadian90 : -rotationRadian90;
 
