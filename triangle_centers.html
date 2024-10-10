@@ -392,6 +392,24 @@ const centerStyles = {
         informationText: '● Fuhrmann center',
         ETCReference: 355,
     },
+    outerVectenPoint: {
+        activeColor: '#008000',
+        inactiveColor: 'lightgray',
+        checkboxId: 'outerVectenPoint-checkbox',
+        displayElementId: 'outerVectenPoint',
+        annotationLabel: 'Outer Vecten',
+        informationText: '● Outer Vecten point',
+        ETCReference: 485,
+    },
+    innerVectenPoint: {
+        activeColor: '#0000FF',
+        inactiveColor: 'lightgray',
+        checkboxId: 'innerVectenPoint-checkbox',
+        displayElementId: 'innerVectenPoint',
+        annotationLabel: 'Inner Vecten',
+        informationText: '● Inner Vecten point',
+        ETCReference: 486,
+    },
     CenterOfTheLesterCircle: {
         activeColor: '#808080',
         inactiveColor: 'lightgray', 
@@ -667,7 +685,7 @@ const triangleStyles = {
         informationText: '△ Second Brocard triangle',
     },
     outerVectenTriangle: {
-        activeColor: '#808080',
+        activeColor: '#008000',
         inactiveColor: 'lightgray',
         checkboxId: 'outerVectenTriangle-checkbox',
         displayElementId: 'outerVectenTriangle',
@@ -675,7 +693,7 @@ const triangleStyles = {
         informationText: '△ Outer Vecten triangle',
     },
     innerVectenTriangle: {
-        activeColor: '#808080',
+        activeColor: '#0000FF',
         inactiveColor: 'lightgray',
         checkboxId: 'innerVectenTriangle-checkbox',
         displayElementId: 'innerVectenTriangle',
@@ -1304,7 +1322,13 @@ function drawCenters() {
                     break;   
                 case 'FuhrmannCenter':
                     center = calculateFuhrmannCenter(points);
-                    break; 
+                    break;
+                case 'outerVectenPoint':
+                    center = calculateVectenPoint(points, true);
+                    break;
+                case 'innerVectenPoint':
+                    center = calculateVectenPoint(points, false);
+                    break;
                 case 'CenterOfTheLesterCircle':
                     if (!isScaleneTriangle(points)) {
                         center = null;
@@ -2778,6 +2802,23 @@ function calculateEqualParalleliansPoint(points) {
 // Function to calculate the Fuhrmann center
 function calculateFuhrmannCenter(points) {
     return calculateCircumcircle(calculateFuhrmannTriangle(points)).center;
+}
+
+// Function to calculate the Vecten points
+function calculateVectenPoint(points, outer = true) {
+    const [A, B, C] = points;
+    if (useHomogeneousCoordinates) {
+        const tempConst = outer ? 1 : -1;
+        const cosA = calculateCosine(C, A, B);
+        const cosB = calculateCosine(A, B, C);
+        const cosC = calculateCosine(B, C, A);
+        const sinA = calculateSine(C, A, B);
+        const sinB = calculateSine(A, B, C);
+        const sinC = calculateSine(B, C, A);
+        return trilinearToCartesian(points, [1 / (sinA + tempConst*cosA), 1 / (sinB + tempConst*cosB), 1 / (sinC + tempConst*cosC)]);
+    }
+    const [PA, PB, PC] = calculateVectenTriangle(points, outer);
+    return lineIntersection(A, PA, B, PB);
 }
 
 // Function to calculate the Evans point
