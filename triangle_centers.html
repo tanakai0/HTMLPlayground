@@ -392,6 +392,24 @@ const centerStyles = {
         informationText: '● Fuhrmann center',
         ETCReference: 355,
     },
+    firstKenmotuPoint: {
+        activeColor: '#008000',
+        inactiveColor: 'lightgray',
+        checkboxId: 'firstKenmotuPoint-checkbox',
+        displayElementId: 'firstKenmotuPoint',
+        annotationLabel: '1st Kenmotu',
+        informationText: '● First Kenmotu point (Congruent squares point)',
+        ETCReference: 371,
+    },
+    secondKenmotuPoint: {
+        activeColor: '#0000FF',
+        inactiveColor: 'lightgray',
+        checkboxId: 'secondKenmotuPoint-checkbox',
+        displayElementId: 'secondKenmotuPoint',
+        annotationLabel: '2nd Kenmotu',
+        informationText: '● Second Kenmotu point',
+        ETCReference: 372,
+    },
     outerVectenPoint: {
         activeColor: '#008000',
         inactiveColor: 'lightgray',
@@ -1322,6 +1340,12 @@ function drawCenters() {
                     break;   
                 case 'FuhrmannCenter':
                     center = calculateFuhrmannCenter(points);
+                    break;
+                case 'firstKenmotuPoint':
+                    center = calculateKenmotuPoint(points, true);
+                    break;
+                case 'secondKenmotuPoint':
+                    center = calculateKenmotuPoint(points, false);
                     break;
                 case 'outerVectenPoint':
                     center = calculateVectenPoint(points, true);
@@ -2312,9 +2336,9 @@ function calculateIsogonalConjugate(points, p) {
     // let the reflections of P in the sidelines BC, CA, AB be Pa, Pb, Pc.
     // Then the center of the circle that passes through Pa, Pb and Pc is the isogonal conjugate of P.
     const [A, B, C] = points;
-    const PA = reflectPointAcrossLine(A, [B, C]);
-    const PB = reflectPointAcrossLine(B, [C, A]);
-    const PC = reflectPointAcrossLine(C, [A, B]);
+    const PA = reflectPointAcrossLine(p, [B, C]);
+    const PB = reflectPointAcrossLine(p, [C, A]);
+    const PC = reflectPointAcrossLine(p, [A, B]);
     return calculateCircumcenter([PA, PB, PC]);
 }
 
@@ -2813,6 +2837,22 @@ function calculateEqualParalleliansPoint(points) {
 // Function to calculate the Fuhrmann center
 function calculateFuhrmannCenter(points) {
     return calculateCircumcircle(calculateFuhrmannTriangle(points)).center;
+}
+
+// Function to calculate the Kenmotu point
+function calculateKenmotuPoint(points, outer = true) {
+    if (useHomogeneousCoordinates) {
+        const [A, B, C] = points;
+        const tempConst = outer ? 1 : -1;
+        const cosA = calculateCosine(C, A, B);
+        const cosB = calculateCosine(A, B, C);
+        const cosC = calculateCosine(B, C, A);
+        const sinA = calculateSine(C, A, B);
+        const sinB = calculateSine(A, B, C);
+        const sinC = calculateSine(B, C, A);
+        return trilinearToCartesian(points, [sinA + tempConst*cosA, sinB + tempConst*cosB, sinC + tempConst*cosC]);
+    }
+    return calculateIsogonalConjugate(points, calculateVectenPoint(points, outer));
 }
 
 // Function to calculate the Vecten points
