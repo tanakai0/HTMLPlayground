@@ -2307,6 +2307,17 @@ function calculateAngleInRadianWithXAxis(points) {
     }
 }
 
+// Function to calculate the isogonal conjugate of a point P with respect to a triangle
+function calculateIsogonalConjugate(points, p) {
+    // let the reflections of P in the sidelines BC, CA, AB be Pa, Pb, Pc.
+    // Then the center of the circle that passes through Pa, Pb and Pc is the isogonal conjugate of P.
+    const [A, B, C] = points;
+    const PA = reflectPointAcrossLine(A, [B, C]);
+    const PB = reflectPointAcrossLine(B, [C, A]);
+    const PC = reflectPointAcrossLine(C, [A, B]);
+    return calculateCircumcenter([PA, PB, PC]);
+}
+
 // Function to convert barycentric coordinates to Cartesian coordinates
 function barycentricToCartesian(points, bary) {
     const [A, B, C] = points;
