@@ -927,6 +927,14 @@ const circleStyles = {
         annotationLabel: 'Cosine',
         informationText: '○ Cosine circle (Second Lemoine circle)',
     },
+    KenmotuCircle: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'KenmotuCircle-checkbox',
+        displayElementId: 'KenmotuCircle',
+        annotationLabel: 'Kenmotu',
+        informationText: '○ Kenmotu circle',
+    },
     ConwayCircle: {
         activeColor: '#808080',
         inactiveColor: 'lightgray',
@@ -1629,6 +1637,9 @@ function drawCircles() {
                     break;
                 case 'cosineCircle':
                     circles.push(calculateCosineCircle(points));
+                    break;
+                case 'KenmotuCircle':
+                    circles.push(calculateKenmotuCircle(points));
                     break;
                 case 'ConwayCircle':
                     circles.push(calculateConwayCircle(points));
@@ -3353,6 +3364,19 @@ function calculateCosineCircle(points) {
     return {
         center: calculateSymmedianPoint(points),
         radius: a*b*c / (a**2 + b**2 + c**2)
+    };
+}
+
+// Function to calculate the Kenmotu circle
+function calculateKenmotuCircle(points) {
+    const [A, B, C] = points;
+    const a = calculateDistance(B, C);
+    const b = calculateDistance(C, A);
+    const c = calculateDistance(A, B);
+    const area = calculateArea(points);
+    return {
+        center: calculateKenmotuPoint(points, true),
+        radius: Math.sqrt(2)*a*b*c/(4*area + a**2 + b**2 + c**2)
     };
 }
 
