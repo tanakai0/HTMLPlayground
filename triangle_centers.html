@@ -666,6 +666,22 @@ const triangleStyles = {
         annotationLabel: '2nd Brocard',
         informationText: '△ Second Brocard triangle',
     },
+    outerVectenTriangle: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'outerVectenTriangle-checkbox',
+        displayElementId: 'outerVectenTriangle',
+        annotationLabel: 'Outer Vecten',
+        informationText: '△ Outer Vecten triangle',
+    },
+    innerVectenTriangle: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'innerVectenTriangle-checkbox',
+        displayElementId: 'innerVectenTriangle',
+        annotationLabel: 'Inner Vecten',
+        informationText: '△ Inner Vecten triangle',
+    },
     AymeTriangle: {
         activeColor: '#808080',
         inactiveColor: 'lightgray',
@@ -1443,6 +1459,12 @@ function drawTriangles() {
                 case 'secondBrocardTriangle':
                     triangle = calculateBrocardTriangle(points, 2);
                     break;
+                case 'outerVectenTriangle':
+                    triangle = calculateVectenTriangle(points, true);
+                    break;
+                case 'innerVectenTriangle':
+                    triangle = calculateVectenTriangle(points, false);
+                    break;
                 case 'AymeTriangle':
                     triangle = calculateAymeTriangle(points);
                     break;
@@ -1789,11 +1811,36 @@ function calculateDistance(p1, p2) {
     return Math.sqrt((p2.x - p1.x) ** 2 + (p2.y - p1.y) ** 2);
 }
 
+function vectorSubtract(p1, p2) {
+    return { x: p1.x - p2.x, y: p1.y - p2.y };
+}
+
+function calculateDotProduct(v1, v2) {
+    return v1.x * v2.x + v1.y * v2.y;
+}
+
+// Cross product of vectors p1p2 and p1p3
+function calculateCrossProduct(p1, p2, p3) {
+    return (p2.x - p1.x) * (p3.y - p1.y) - (p2.y - p1.y) * (p3.x - p1.x);
+}
+
+function magnitude(v) {
+    return Math.sqrt(v.x * v.x + v.y * v.y);
+}
+
 // Function to calculate the cosine value of the angle at the middle point (B) given three points A, B, and C.
 function calculateCosine(p1, p2, p3) {
     const v21 = vectorSubtract(p1, p2);
     const v23 = vectorSubtract(p3, p2);
-    return dotProduct(v21, v23) / (magnitude(v21) * (magnitude(v23)));
+    return calculateDotProduct(v21, v23) / (magnitude(v21) * (magnitude(v23)));
+}
+
+// Function to calculate the sine value of the angle at the middle point (B) given three points A, B, and C.
+function calculateSine(p1, p2, p3) {
+    const v21 = vectorSubtract(p1, p2);
+    const v23 = vectorSubtract(p3, p2);
+    const crossProductMagnitude = Math.abs(v21.x * v23.y - v21.y * v23.x);
+    return crossProductMagnitude / (magnitude(v21) * magnitude(v23));
 }
 
 // Function to calculate the angle (radian) at the middle point (B) given three points A, B, and C.
@@ -1822,18 +1869,6 @@ function calculateArea(points) {
     return Math.abs((A.x * (B.y - C.y) + B.x * (C.y - A.y) + C.x * (A.y - B.y))) / 2;
 }
 
-function vectorSubtract(p1, p2) {
-    return { x: p1.x - p2.x, y: p1.y - p2.y };
-}
-
-function dotProduct(v1, v2) {
-    return v1.x * v2.x + v1.y * v2.y;
-}
-
-function magnitude(v) {
-    return Math.sqrt(v.x * v.x + v.y * v.y);
-}
-
 function calculateSlope(p1, p2) {
     return (p2.y - p1.y) / (p2.x - p1.x)
 }
@@ -1843,11 +1878,6 @@ function midpoint(p1, p2){
         x: (p1.x + p2.x) / 2,
         y: (p1.y + p2.y) / 2
     }
-}
-
-// Cross product of vectors p1p2 and p1p3
-function calculateCrossProduct(p1, p2, p3) {
-    return (p2.x - p1.x) * (p3.y - p1.y) - (p2.y - p1.y) * (p3.x - p1.x);
 }
 
 function closeEnoughScalars(val1, val2) {
@@ -3629,6 +3659,41 @@ function calculateBrocardTriangle(points, number = 1) {
             return;
     }
     return triangle;
+}
+
+// Function to calculate the Vecten triangle
+function calculateVectenTriangle(points, outer = true) {
+    const [A, B, C] = points;
+
+    if (useHomogeneousCoordinates) {
+        const tempConst = outer ? 1 : -1;
+        const cosA = calculateCosine(C, A, B);
+        const cosB = calculateCosine(A, B, C);
+        const cosC = calculateCosine(B, C, A);
+        const sinA = calculateSine(C, A, B);
+        const sinB = calculateSine(A, B, C);
+        const sinC = calculateSine(B, C, A);
+        const trilinearA = [-1*tempConst, sinC + tempConst*cosC, sinB + tempConst*cosB];
+        const trilinearB = [sinC + tempConst*cosC, -1*tempConst, sinA + tempConst*cosA];
+        const trilinearC = [sinB + tempConst*cosB, sinA + tempConst*cosA, -1*tempConst];
+        return [
+            trilinearToCartesian(points, trilinearA),
+            trilinearToCartesian(points, trilinearB),
+            trilinearToCartesian(points, trilinearC),
+        ];
+    }
+
+    // Determine rotation direction based on cross products
+    const isCounterclockwise =  calculateCrossProduct(A, B, C) > 0 ? false : true;
+    let rotationRadian90 = isCounterclockwise ? 90 : -90;
+    rotationRadian90 = outer ? rotationRadian90 : -rotationRadian90;
+
+    return [
+        midpoint(rotate(C, B, rotationRadian90), C),
+        midpoint(rotate(A, C, rotationRadian90), A),
+        midpoint(rotate(B, A, rotationRadian90), B)
+    ];
+
 }
 
 // Function to calculate the Ayme triangle
