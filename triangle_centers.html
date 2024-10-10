@@ -1796,6 +1796,15 @@ function calculateAngleInDegrees(p1, p2, p3) {
     return thetaRad * (180 / Math.PI);
 }
 
+// Function to calculate the semiperimeter of the triangle
+function calculateSemiperimeter(points) {
+    const [A, B, C] = points;
+    const a = calculateDistance(B, C);
+    const b = calculateDistance(A, C);
+    const c = calculateDistance(A, B);
+    return (a + b + c) / 2;
+}
+
 // Function to calculate the area of the triangle
 function calculateArea(points) {
     const [A, B, C] = points;
