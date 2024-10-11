@@ -347,6 +347,15 @@ const centerStyles = {
         informationText: '● Kosnita point',
         ETCReference: 54,
     },
+    PrasolovPoint: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray', 
+        checkboxId: 'PrasolovPoint-checkbox',
+        displayElementId: 'PrasolovPoint',
+        annotationLabel: 'Prasolov',
+        informationText: '● Prasolov point',
+        ETCReference: 68,
+    },
     thirdBrocardPoint: {
         activeColor: '#808080',
         inactiveColor: 'lightgray',
@@ -1325,6 +1334,9 @@ function drawCenters() {
                 case 'KosnitaPoint':
                     center = calculateKosnitaPoint(points);
                     break;
+                case 'PrasolovPoint':
+                    center = calculatePrasolovPoint(points);
+                    break;
                 case 'thirdBrocardPoint':
                     center = calculateBrocardPoint(points, 3);
                     break;
@@ -2054,6 +2066,10 @@ function rotate(P, O, d) {
     };
 }
 
+function reflectPointAcrossCenter(point, center) {
+    return {x: 2*center.x-point.x, y:2*center.y-point.y};
+}
+
 function SlopeAndPointToLine(slope, point) {
     const deltaX = 10;
     let point1, point2;
@@ -2778,6 +2794,31 @@ function calculateKosnitaPoint(points) {
     const OA = calculateCircumcenter([B, C, O]);
     const OB = calculateCircumcenter([C, A, O]);
     return lineIntersection(A, OA, B, OB);
+}
+
+// Function to calculate the Prasolov point
+function calculatePrasolovPoint(points) {
+    const [A, B, C] = points;
+    if (useHomogeneousCoordinates) {
+        const a = calculateDistance(B, C);
+        const b = calculateDistance(C, A);
+        const c = calculateDistance(A, B);
+        const a2 = a*a;
+        const b2 = b*b;
+        const c2 = c*c;
+        const a4 = a2*a2;
+        const b4 = b2*b2;
+        const c4 = c2*c2;
+        const barycentricA = (b2 + c2 - a2) / (a4 + b4 + c4 - 2*a2*b2 - 2*c2*a2);
+        const barycentricB = (c2 + a2 - b2) / (b4 + c4 + a4 - 2*b2*c2 - 2*a2*b2);
+        const barycentricC = (a2 + b2 - c2) / (c4 + a4 + b4 - 2*c2*a2 - 2*b2*c2);
+        return barycentricToCartesian(points, [barycentricA, barycentricB, barycentricC]);
+    }
+    const ninePointCenter = calculateNinePointCenter(points);
+    const [PA, PB, PC] = calculateOrthicTriangle(points);
+    const QA = reflectPointAcrossCenter(PA, ninePointCenter);
+    const QB = reflectPointAcrossCenter(PB, ninePointCenter);
+    return lineIntersection(A, QA, B, QB);
 }
 
 // Function to calculate the first Ajima-Malfatti point
