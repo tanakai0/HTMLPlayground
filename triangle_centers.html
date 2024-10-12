@@ -320,6 +320,15 @@ const centerStyles = {
         informationText: '● Exeter point',
         ETCReference: 22,
     },
+    farOutPoint: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray', 
+        checkboxId: 'farOutPoint-checkbox',
+        displayElementId: 'farOutPoint',
+        annotationLabel: 'Far-out',
+        informationText: '● Far-out point',
+        ETCReference: 23,
+    },
     BrocardMidpoint: {
         activeColor: '#808080',
         inactiveColor: 'lightgray', 
@@ -1331,6 +1340,9 @@ function drawCenters() {
                     break;
                 case 'ExeterPoint':
                     center = calculateExeterPoint(points);
+                    break;
+                case 'farOutPoint':
+                    center = calculateFarOutPoint(points);
                     break;
                 case 'ninePointCenter':
                     center = calculateNinePointCenter(points);
@@ -2732,6 +2744,37 @@ function calculateExeterPoint(points) {
     const tangentialTriangle = calculateTangentialTriangle(points);
     const circumMedialTriangle = calculateCircumMedialTriangle(points);
     return lineIntersection(tangentialTriangle[0], circumMedialTriangle[0], tangentialTriangle[1], circumMedialTriangle[1]);
+}
+
+// Function to calculate the far-out point
+function calculateFarOutPoint(points) {
+    // a[b4 + c4 - a4 - b2c2] 
+    if (isEquilateralTriangle(points)) {
+        return null;
+    }
+    const [A, B, C] = points;
+    if (useHomogeneousCoordinates) {
+        const a = calculateDistance(B, C);
+        const b = calculateDistance(C, A);
+        const c = calculateDistance(A, B);
+        const a2 = a*a;
+        const b2 = b*b;
+        const c2 = c*c;
+        const a4 = a2*a2;
+        const b4 = b2*b2;
+        const c4 = c2*c2;
+        const trilinearA = a * (b4 + c4 - a4 - b2 * c2);
+        const trilinearB = b * (c4 + a4 - b4 - c2 * a2);
+        const trilinearC = c * (a4 + b4 - c4 - a2 * b2);
+        return trilinearToCartesian(points, [trilinearA, trilinearB, trilinearC]);
+    }
+    const circumcenter = calculateCircumcenter(points);
+    const [PA, PB, PC] = calculateTangentialTriangle(points);
+    const circumcircleA = calculateCircumcircle([A, PA, circumcenter]);
+    const circumcircleB = calculateCircumcircle([B, PB, circumcenter]);
+    const circumcircleC = calculateCircumcircle([C, PC, circumcenter]);
+    const [P1, P2] = calculateIntersectionOfTwoCircles(circumcircleA, circumcircleB);
+    return (calculateDistance(P1, circumcenter) > calculateDistance(P2, circumcenter))? P1 : P2;
 }
 
 // Function to calculate the nine point center
