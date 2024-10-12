@@ -833,6 +833,14 @@ const circleStyles = {
         annotationLabel: 'Externally tangent circle',
         informationText: '○ Three externally tangent circles centered at its vertices',
     },
+    orthocentroidalCircle: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'orthocentroidalCircle-checkbox',
+        displayElementId: 'orthocentroidalCircle',
+        annotationLabel: 'Orthocentroidal',
+        informationText: '○ Orthocentroidal circle',
+    },
     smallestCircle: {
         activeColor: '#808080',
         inactiveColor: 'lightgray',
@@ -1630,6 +1638,9 @@ function drawCircles() {
                     break;
                 case 'ninePointCircle':
                     circles.push(calculateNinePointCircle(points));
+                    break;
+                case 'orthocentroidalCircle':
+                    circles.push(calculateOrthocentroidalCircle(points));
                     break;
                 case 'smallestCircle':
                     circles.push(calculateSmallestCircle(points));
@@ -3289,6 +3300,19 @@ function calculateNinePointCircle(points) {
         center: calculateNinePointCenter(points),
         radius: circumcircle.radius / 2
     };
+}
+
+// Function to calculate the orthocentroidal circle
+function calculateOrthocentroidalCircle(points) {
+    if (isEquilateralTriangle(points)) {
+        return null;
+    }
+    const centroid = calculateCentroid(points);
+    const orthocenter = calculateOrthocenter(points);
+    return {
+        center: midpoint(centroid, orthocenter),
+        radius: calculateDistance(centroid, orthocenter) / 2
+    }
 }
 
 // Function to calculate the smallest circle that contains all vertices of the original triangle
