@@ -365,6 +365,15 @@ const centerStyles = {
         informationText: '● Third Brocard point',
         ETCReference: 76,
     },
+    focusOfKiepertParabola: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'focusOfKiepertParabola-checkbox',
+        displayElementId: 'focusOfKiepertParabola',
+        annotationLabel: 'Focus of Kiepert parabola',
+        informationText: '● Focus of Kiepert parabola',
+        ETCReference: 110,
+    },
     firstAjimaMalfattiPoint: {
         activeColor: '#808080',
         inactiveColor: 'lightgray',
@@ -1347,6 +1356,9 @@ function drawCenters() {
                     break;
                 case 'thirdBrocardPoint':
                     center = calculateBrocardPoint(points, 3);
+                    break;
+                case 'focusOfKiepertParabola':
+                    center = calculateFocusOfKiepertParabola(points);
                     break;
                 case 'firstAjimaMalfattiPoint':
                     center = calculateFirstAjimaMalfattiPoint(points);
@@ -2830,6 +2842,31 @@ function calculatePrasolovPoint(points) {
     const QA = reflectPointAcrossCenter(PA, ninePointCenter);
     const QB = reflectPointAcrossCenter(PB, ninePointCenter);
     return lineIntersection(A, QA, B, QB);
+}
+
+// Function to calculate the focus of Kiepert parabola
+function calculateFocusOfKiepertParabola(points) {
+    if (isEquilateralTriangle(points)) {
+        return null;
+    }
+    const [A, B, C] = points;
+    if (useHomogeneousCoordinates) {
+        const a = calculateDistance(B, C);
+        const b = calculateDistance(C, A);
+        const c = calculateDistance(A, B);
+        const a2 = a*a;
+        const b2 = b*b;
+        const c2 = c*c;
+        return barycentricToCartesian(points, [a2/(b2-c2), b2/(c2-a2), c2/(a2-b2)]);
+    }
+    const centroid = calculateCentroid(points);
+    const PA = reflectPointAcrossLine(centroid, [B, C]);
+    const PB = reflectPointAcrossLine(centroid, [C, A]);
+    const PC = reflectPointAcrossLine(centroid, [A, B]);
+    const circumcircleA = calculateCircumcircle([A, PB, PC]);
+    const circumcircleB = calculateCircumcircle([B, PC, PA]);
+    const circumcircleC = calculateCircumcircle([C, PA, PB]);
+    return calculateIntersectionOfThreeCircles(circumcircleA, circumcircleB, circumcircleC);
 }
 
 // Function to calculate the first Ajima-Malfatti point
