@@ -72,6 +72,8 @@
     <div id="triangles-section"></div>
     <p>Hexagons</p>
     <div id="hexagons-section"></div>
+    <p>Parabolas</p>
+    <div id="parabolas-section"></div>
     <p>Circles</p>
     <div id="circles-section"></div>
     <p>Ellipses</p>
@@ -784,6 +786,19 @@ const hexagonStyles = {
 }
 
 
+// Define styles for parabola
+const parabolaStyles = {
+    testParabola: {
+        activeColor: '#0000FF',
+        inactiveColor: 'lightgray',
+        checkboxId: 'testParabola-checkbox',
+        displayElementId: 'testParabola',
+        annotationLabel: 'test',
+        informationText: '⬡ Test parabola',
+    },
+}
+
+
 // Define styles for circles
 const circleStyles = {
     excircleA: {
@@ -1043,17 +1058,19 @@ const useHomogeneousCoordinates = true;
 const allStyles = [
     ...Object.values(centerStyles),
     ...Object.values(lineStyles),
-    ...Object.values(circleStyles),
     ...Object.values(triangleStyles),
     ...Object.values(hexagonStyles),
+    ...Object.values(parabolaStyles),
+    ...Object.values(circleStyles),
     ...Object.values(ellipseStyles)
 ];
 const allCheckboxIds = [
     ...Object.values(centerStyles).map(style => style.checkboxId),
     ...Object.values(lineStyles).map(style => style.checkboxId),
-    ...Object.values(circleStyles).map(style => style.checkboxId),
     ...Object.values(triangleStyles).map(style => style.checkboxId),
     ...Object.values(hexagonStyles).map(style => style.checkboxId),
+    ...Object.values(parabolaStyles).map(style => style.checkboxId),
+    ...Object.values(circleStyles).map(style => style.checkboxId),
     ...Object.values(ellipseStyles).map(style => style.checkboxId),
 ];
 
@@ -1077,9 +1094,10 @@ function initializeStyles() {
     });
     createCheckboxes(Object.values(centerStyles), 'centers-section', 'center-info');
     createCheckboxes(Object.values(lineStyles), 'lines-section', 'line-info');
-    createCheckboxes(Object.values(circleStyles), 'circles-section', 'circle-info');
     createCheckboxes(Object.values(triangleStyles), 'triangles-section', 'triangle-info');
     createCheckboxes(Object.values(hexagonStyles), 'hexagons-section', 'hexagon-info');
+    createCheckboxes(Object.values(parabolaStyles), 'parabolas-section', 'parabola-info');
+    createCheckboxes(Object.values(circleStyles), 'circles-section', 'circle-info');
     createCheckboxes(Object.values(ellipseStyles), 'ellipses-section', 'ellipse-info');
 
     // Default the checkboxes for the five significant centers
@@ -1109,6 +1127,7 @@ function reDraw(){
     drawLines();
     drawTriangles();
     drawHexagons();
+    drawParabolas();
     drawCircles();
     drawEllipses();
     updateInfo();
@@ -1622,6 +1641,34 @@ function drawHexagons() {
 }
 
 
+// Draw parabolas based on checkbox states
+function drawParabolas() {
+    Object.keys(parabolaStyles).forEach(key => {
+        const style = parabolaStyles[key];
+        const checkbox = document.getElementById(style.checkboxId);
+        
+        if (checkbox && checkbox.checked) {
+            let parabolas = [];
+            
+            switch (key) {
+                case 'testParabola':
+                    parabolas.push(calculateTestParabola(points));
+                    break;
+                default:
+                    console.error(`Unknown parabola key: ${key}`);
+                    return;
+            }
+
+            // Draw
+            parabolas.forEach(parabola => {
+                if (parabola) {
+                    drawParabola(parabola, style.annotationLabel, style.activeColor);
+                }
+            });
+        }
+    });
+}
+
 // Draw circles based on checkbox states
 function drawCircles() {
     Object.keys(circleStyles).forEach(key => {
@@ -1877,6 +1924,34 @@ function drawPolygon(polygon, label = '', color = 'black') {
     }
 }
 
+
+/*
+Function to draw a parabola
+Parabola data structure
+const parabola = {
+    focus: {x: ???, y: ???},  // Focus of the parabola
+    directrix: [{x: ???, y: ???}, {x: ???, y: ???}],  // Two points pass through the directrix of the parabola
+};
+*/
+function drawParabola(parabola, label = '', color = 'black') {
+    const m = calculateSlope(parabola.directrix);
+    if (isFinite(m)) {
+        
+    }
+    else {
+
+    }
+    ctx.beginPath();
+    ctx.moveTo(x0, y0);
+    ctx.quadraticCurveTo(x1, y1, x2, y2);
+    ctx.strokeStyle = color;
+    ctx.stroke();
+
+    if (label){
+        ctx.fillStyle = color;
+        ctx.fillText(label, parabola.focus.x, parabola.focus.y);
+    }
+}
 
 // Function to draw a circle
 function drawCircle(circle, label = '', color = 'black') {
@@ -3274,6 +3349,15 @@ function calculateOrthogonalRegressionLine(points) {
     }
 }
     
+
+// Function to calculate the test parabola
+function calculateTestParabola(points) {
+    return {
+        focus: calculateFocusOfKiepertParabola(points),
+        directrix: calculateEulerLine(points) 
+    };
+}
+
 
 // Function to calculate the incircle
 function calculateIncircle(points) {
