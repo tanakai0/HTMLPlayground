@@ -788,14 +788,6 @@ const hexagonStyles = {
 
 // Define styles for parabola
 const parabolaStyles = {
-    testParabola: {
-        activeColor: '#0000FF',
-        inactiveColor: 'lightgray',
-        checkboxId: 'testParabola-checkbox',
-        displayElementId: 'testParabola',
-        annotationLabel: 'test',
-        informationText: '⬡ Test parabola',
-    },
 }
 
 
@@ -1651,9 +1643,6 @@ function drawParabolas() {
             let parabolas = [];
             
             switch (key) {
-                case 'testParabola':
-                    parabolas.push(calculateTestParabola(points));
-                    break;
                 default:
                     console.error(`Unknown parabola key: ${key}`);
                     return;
@@ -1934,16 +1923,9 @@ const parabola = {
 };
 */
 function drawParabola(parabola, label = '', color = 'black') {
-    const m = calculateSlope(parabola.directrix);
-    if (isFinite(m)) {
-        
-    }
-    else {
-
-    }
     ctx.beginPath();
-    ctx.moveTo(x0, y0);
-    ctx.quadraticCurveTo(x1, y1, x2, y2);
+    ctx.moveTo(100, 100);
+    ctx.quadraticCurveTo(0, 0, 400, 500);
     ctx.strokeStyle = color;
     ctx.stroke();
 
@@ -3348,16 +3330,6 @@ function calculateOrthogonalRegressionLine(points) {
         return [{x: meanX, y: meanY}, {x: meanX, y: meanY + 1}];
     }
 }
-    
-
-// Function to calculate the test parabola
-function calculateTestParabola(points) {
-    return {
-        focus: calculateFocusOfKiepertParabola(points),
-        directrix: calculateEulerLine(points) 
-    };
-}
-
 
 // Function to calculate the incircle
 function calculateIncircle(points) {
