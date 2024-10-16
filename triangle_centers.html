@@ -84,29 +84,37 @@
 // Define styles for centers
 // ETCReference is the reference number of the encyclopedia of triangle centers (ETC)
 const centerStyles = {
-    excenterA: {
+    // excenterA: {
+    //     activeColor: '#ee7800',
+    //     inactiveColor: 'lightgray', 
+    //     checkboxId: 'excenterA-checkbox',
+    //     displayElementId: 'excenterA',
+    //     annotationLabel: 'Excenter (A)',
+    //     informationText: '● Excenter opposite to vertex A',
+    // },
+    // excenterB: {
+    //     activeColor: '#ee7800',
+    //     inactiveColor: 'lightgray', 
+    //     checkboxId: 'excenterB-checkbox',
+    //     displayElementId: 'excenterB',
+    //     annotationLabel: 'Excenter (B)',
+    //     informationText: '● Excenter opposite to vertex B',
+    // },
+    // excenterC: {
+    //     activeColor: '#ee7800',
+    //     inactiveColor: 'lightgray', 
+    //     checkboxId: 'excenterC-checkbox',
+    //     displayElementId: 'excenterC',
+    //     annotationLabel: 'Excenter (C)',
+    //     informationText: '● Excenter opposite to vertex C',
+    // },
+    excenters: {
         activeColor: '#ee7800',
         inactiveColor: 'lightgray', 
-        checkboxId: 'excenterA-checkbox',
-        displayElementId: 'excenterA',
-        annotationLabel: 'Excenter (A)',
-        informationText: '● Excenter opposite to vertex A',
-    },
-    excenterB: {
-        activeColor: '#ee7800',
-        inactiveColor: 'lightgray', 
-        checkboxId: 'excenterB-checkbox',
-        displayElementId: 'excenterB',
-        annotationLabel: 'Excenter (B)',
-        informationText: '● Excenter opposite to vertex B',
-    },
-    excenterC: {
-        activeColor: '#ee7800',
-        inactiveColor: 'lightgray', 
-        checkboxId: 'excenterC-checkbox',
-        displayElementId: 'excenterC',
-        annotationLabel: 'Excenter (C)',
-        informationText: '● Excenter opposite to vertex C',
+        checkboxId: 'excenters-checkbox',
+        displayElementId: 'excenters',
+        annotationLabel: 'Excenter',
+        informationText: '● Excenters',
     },
     firstBrocardPoint: {
         activeColor: '#808080',
@@ -801,29 +809,37 @@ const parabolaStyles = {
 
 // Define styles for circles
 const circleStyles = {
-    excircleA: {
+    // excircleA: {
+    //     activeColor: '#ee7800',
+    //     inactiveColor: 'lightgray',
+    //     checkboxId: 'excircleA-checkbox',
+    //     displayElementId: 'excircleA',
+    //     annotationLabel: 'Excircle (A)',
+    //     informationText: '○ Excircle opposite to vertex A',
+    // },
+    // excircleB: {
+    //     activeColor: '#ee7800',
+    //     inactiveColor: 'lightgray',
+    //     checkboxId: 'excircleB-checkbox',
+    //     displayElementId: 'excircleB',
+    //     annotationLabel: 'Excircle (B)',
+    //     informationText: '○ Excircle opposite to vertex B',
+    // },
+    // excircleC: {
+    //     activeColor: '#ee7800',
+    //     inactiveColor: 'lightgray',
+    //     checkboxId: 'excircleC-checkbox',
+    //     displayElementId: 'excircleC',
+    //     annotationLabel: 'Excircle (C)',
+    //     informationText: '○ Excircle opposite to vertex C',
+    // },
+    excircles: {
         activeColor: '#ee7800',
         inactiveColor: 'lightgray',
-        checkboxId: 'excircleA-checkbox',
-        displayElementId: 'excircleA',
-        annotationLabel: 'Excircle (A)',
-        informationText: '○ Excircle opposite to vertex A',
-    },
-    excircleB: {
-        activeColor: '#ee7800',
-        inactiveColor: 'lightgray',
-        checkboxId: 'excircleB-checkbox',
-        displayElementId: 'excircleB',
-        annotationLabel: 'Excircle (B)',
-        informationText: '○ Excircle opposite to vertex B',
-    },
-    excircleC: {
-        activeColor: '#ee7800',
-        inactiveColor: 'lightgray',
-        checkboxId: 'excircleC-checkbox',
-        displayElementId: 'excircleC',
-        annotationLabel: 'Excircle (C)',
-        informationText: '○ Excircle opposite to vertex C',
+        checkboxId: 'excircles-checkbox',
+        displayElementId: 'excircles',
+        annotationLabel: 'Excircle',
+        informationText: '○ Excircles',
     },
     incircle: {
         activeColor: '#008000',
@@ -1102,9 +1118,10 @@ function initializeStyles() {
 
     // Default the checkboxes for the five significant centers
     const defaultTrueCheckboxes = [
-        centerStyles.excenterA.checkboxId,
-        centerStyles.excenterB.checkboxId,
-        centerStyles.excenterC.checkboxId,
+        // centerStyles.excenterA.checkboxId,
+        // centerStyles.excenterB.checkboxId,
+        // centerStyles.excenterC.checkboxId,
+        centerStyles.excenters.checkboxId,
         centerStyles.incenter.checkboxId,
         centerStyles.centroid.checkboxId,
         centerStyles.circumcenter.checkboxId,
@@ -1306,14 +1323,17 @@ function drawCenters() {
 
             // Switch statement to handle different center calculations
             switch (key) {
-                case 'excenterA':
-                    centers.push(calculateExcenter([points[2], points[0], points[1]]));
-                    break;
-                case 'excenterB':
-                    centers.push(calculateExcenter(points));
-                    break;
-                case 'excenterC':
-                    centers.push(calculateExcenter([points[1], points[2], points[0]]));
+                // case 'excenterA':
+                //     centers.push(calculateExcenter([points[2], points[0], points[1]]));
+                //     break;
+                // case 'excenterB':
+                //     centers.push(calculateExcenter(points));
+                //     break;
+                // case 'excenterC':
+                //     centers.push(calculateExcenter([points[1], points[2], points[0]]));
+                //     break;
+                case 'excenters':
+                    centers.push(...calculateExcenters(points));
                     break;
                 case 'firstBrocardPoint':
                     centers.push(calculateBrocardPoint(points, 1));
@@ -1682,14 +1702,17 @@ function drawCircles() {
                 case 'circumcircle':
                     circles.push(calculateCircumcircle(points));
                     break;
-                case 'excircleA':
-                    circles.push(calculateExcircle([points[2], points[0], points[1]]));
-                    break;
-                case 'excircleB':
-                    circles.push(calculateExcircle(points));
-                    break;
-                case 'excircleC':
-                    circles.push(calculateExcircle([points[1], points[2], points[0]]));
+                // case 'excircleA':
+                //     circles.push(calculateExcircle([points[2], points[0], points[1]]));
+                //     break;
+                // case 'excircleB':
+                //     circles.push(calculateExcircle(points));
+                //     break;
+                // case 'excircleC':
+                //     circles.push(calculateExcircle([points[1], points[2], points[0]]));
+                //     break;
+                case 'excircles':
+                    circles.push(...calculateExcircles(points));
                     break;
                 case 'ninePointCircle':
                     circles.push(calculateNinePointCircle(points));
@@ -2715,7 +2738,6 @@ function trilinearToCartesian(points, trilinear) {
     return barycentricToCartesian(points, [u, v, w]);
 }
 
-
 // Function to calculate the excenter for the vertex B (intersection of the internal angle bisectors of the vertex and other external angle bisectors)
 function calculateExcenter(points) {
     if (useHomogeneousCoordinates) {
@@ -2734,6 +2756,14 @@ function calculateExcenter(points) {
     }
 }
 
+// Function to calculate the three excenters
+function calculateExcenters(points) {
+    return [
+        calculateExcenter([points[2], points[0], points[1]]),
+        calculateExcenter(points),
+        calculateExcenter([points[1], points[2], points[0]]),
+    ];
+}
 
 // Function to calculate the Brocard points
 function calculateBrocardPoint(points, number = 1) {
@@ -3634,6 +3664,15 @@ function calculateExcircle(points) {
         center: calculateExcenter(points),
         radius: 2 * area / (-b + c + a)
     };
+}
+
+// Function to calculate the three excircles
+function calculateExcircles(points) {
+    return [
+        calculateExcircle([points[2], points[0], points[1]]),
+        calculateExcircle(points),
+        calculateExcircle([points[1], points[2], points[0]])
+    ];
 }
 
 // Function to calculate the nine-point circle
