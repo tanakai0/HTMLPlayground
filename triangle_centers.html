@@ -788,14 +788,14 @@ const hexagonStyles = {
 
 // Define styles for parabola
 const parabolaStyles = {
-    // KiepertParabola: {
-    //     activeColor: '#0000FF',
-    //     inactiveColor: 'lightgray',
-    //     checkboxId: 'KiepertParabola-checkbox',
-    //     displayElementId: 'KiepertParabola',
-    //     annotationLabel: 'Kiepert',
-    //     informationText: 'Kiepert parabola',
-    // },
+    KiepertParabola: {
+        activeColor: '#0000FF',
+        inactiveColor: 'lightgray',
+        checkboxId: 'KiepertParabola-checkbox',
+        displayElementId: 'KiepertParabola',
+        annotationLabel: 'Kiepert',
+        informationText: 'Kiepert parabola',
+    },
 }
 
 
@@ -1652,7 +1652,7 @@ function drawParabolas() {
             
             switch (key) {
                 case 'KiepertParabola':
-                    circles.push(calculateKiepertParabola(points)); // Add a single circle to the list
+                    parabolas.push(calculateKiepertParabola(points)); // Add a single circle to the list
                     break;
                 default:
                     console.error(`Unknown parabola key: ${key}`);
@@ -2063,6 +2063,7 @@ function _drawParabola(ctx, x, y, a, rotation, startPos = 0, endPos = 0, counter
         intersections.push(...intersectionOfParabolaAndLine(a, transformedBottomLeftCorner, transformedBottomRightCorner, epsilon));
         intersections.push(...intersectionOfParabolaAndLine(a,    transformedTopLeftCorner,  transformedBottomLeftCorner, epsilon));
         intersections.push(...intersectionOfParabolaAndLine(a,   transformedTopRightCorner, transformedBottomRightCorner, epsilon));
+
         // Select the points in the rectangle constructed from the frame lines.
         intersections = filterInRectangle(intersections, transformedTopLeftCorner, transformedTopRightCorner,
                                           transformedBottomRightCorner, transformedBottomLeftCorner, epsilon);
@@ -2112,13 +2113,17 @@ const parabola = {
 */
 function drawParabola(parabola, label = '', color = 'black') {
     const a = calculateDistanceToLine(parabola.focus, parabola.directrix) / 2;
-    const slope = calculateSlope(parabola.directrix);
+    const slope = calculateSlope(...parabola.directrix);
     const intercept = parabola.directrix[0].y - slope * parabola.directrix[0].x;
     let rotation = calculateAngleInRadianWithXAxis(parabola.directrix);
-    if (slope * parabola.focus.x + intercept < parabola.focus.y) {
+    if (Math.abs(rotation) > Math.PI / 2) {
+        rotation = rotation > 0 ? rotation - Math.PI : rotation + Math.PI;
+    }
+    if (slope * parabola.focus.x + intercept > parabola.focus.y) {
         rotation += Math.PI;
     }
-    _drawParabola(ctx, focus.x, focus.y, a, rotation, 0, 0, true, color);
+    console.log(rotation);
+    _drawParabola(ctx, parabola.focus.x, parabola.focus.y, a, rotation, 0, 0, false, color);
 
     if (label){
         ctx.fillStyle = color;
@@ -2667,13 +2672,12 @@ function calculateAngleInRadianWithXAxis(line) {
     }
     // the line is vertical
     else if (closeEnoughScalars(p1. x, p2.x)) {
-        console.log('asfsd')
         return Math.PI / 2;
     }
     else{
         const deltaX = p2.x - p1.x;
         const deltaY = p2.y - p1.y;
-        return angleInRadians = Math.atan2(deltaY, deltaX);
+        return angleInRadians = Math.atan2(deltaY, deltaX);  // -pi <= theta <= pi
     }
 }
 
@@ -3543,6 +3547,9 @@ function calculateOrthogonalRegressionLine(points) {
 
 // Function to calculate the KiepertParabola
 function calculateKiepertParabola(points) {
+    if (isEquilateralTriangle(points)) {
+        return null;
+    }
     return {
         focus: calculateFocusOfKiepertParabola(points),
         directrix: calculateEulerLine(points)
