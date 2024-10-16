@@ -1,5 +1,5 @@
 # HTMLPlayground
-HTMLPlayground offers a collection of unique HTML files designed to showcase creative web elements and experiments.
+Practice for HTML files.
 
 ## Demos
 - [Zen_search](https://tanakai0.github.io/HTMLPlayground/Zen_search.html)
