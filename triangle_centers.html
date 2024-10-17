@@ -1017,6 +1017,14 @@ const circleStyles = {
         annotationLabel: 'Conway',
         informationText: '○ Conway circle',
     },
+    mixtilinearIncircles: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'mixtilinearIncircles-checkbox',
+        displayElementId: 'mixtilinearIncircles',
+        annotationLabel: 'Mixtilinear incircle',
+        informationText: '○ Mixtilinear incircles',
+    },
 };
 
 // Define styles for ellipse
@@ -1767,6 +1775,9 @@ function drawCircles() {
                     break;
                 case 'ConwayCircle':
                     circles.push(calculateConwayCircle(points));
+                    break;
+                case 'mixtilinearIncircles':
+                    circles.push(...calculateMixtilinearIncircles(points));
                     break;
                 case 'threeExternallyTangentCircles':
                     circles.push(...calculateThreeExternallyTangentCircles(points));
@@ -3917,6 +3928,36 @@ function calculateConwayCircle(points) {
         center: incircle.center,
         radius: Math.sqrt((incircle.radius)**2+semiperimeter**2)
     };
+}
+
+// Function to calculate the mixtilinear incircle (for 2nd point B in points) which is tangent to two of its sides (AB and BC)
+// and internally tangent to its circumcircle.
+function calculateMixtilinearIncircle(points) {
+    const [A, B, C] = points;
+    const incenter = calculateIncenter(points);
+    const lineBI = [B, incenter];
+    const slopeAB = calculateSlope(A, B);
+    const slopeBC = calculateSlope(B, C);
+    const verticalSlopeToLineBI = perpendicularSlope(calculateSlope(...lineBI));
+    const verticalToSlopeAB = perpendicularSlope(slopeAB);
+    const verticalToSlopeBC = perpendicularSlope(slopeBC);
+    const D = lineIntersectionGivenSlopesAndPoints(slopeAB, B, verticalSlopeToLineBI, incenter);
+    const E = lineIntersectionGivenSlopesAndPoints(slopeBC, B, verticalSlopeToLineBI, incenter);
+    const center = lineIntersectionGivenSlopesAndPoints(verticalToSlopeAB, D, verticalToSlopeBC, E);
+    return {
+        center: center,
+        radius: calculateDistance(D, center) 
+    };
+}
+
+// Function to calculate the mixtilinear incircles
+function calculateMixtilinearIncircles(points) {
+    const [A, B, C] = points;
+    return[
+        calculateMixtilinearIncircle([C, A, B]),  // A-mixtilinear incircle
+        calculateMixtilinearIncircle([A, B, C]),  // B-mixtilinear incircle
+        calculateMixtilinearIncircle([B, C, A])   // C-mixtilinear incircle
+    ];
 }
 
 // Function to calculate the three externally tangent circles centered at its vertices
