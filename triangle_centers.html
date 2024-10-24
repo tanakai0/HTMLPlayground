@@ -420,6 +420,15 @@ const centerStyles = {
         informationText: '● Parry point',
         ETCReference: 111,
     },
+    isoperimetricPoint: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'isoperimetricPoint-checkbox',
+        displayElementId: 'isoperimetricPoint',
+        annotationLabel: 'Isoperimetric',
+        informationText: '● Isoperimetric point',
+        ETCReference: 175,
+    },
     equalDetourPoint: {
         activeColor: '#808080',
         inactiveColor: 'lightgray',
@@ -1470,6 +1479,9 @@ function drawCenters() {
                     break;
                 case 'ParryPoint':
                     centers.push(calculateParryPoint(points));
+                    break;
+                case 'isoperimetricPoint':
+                    centers.push(calculateIsoperimetricPoint(points));
                     break;
                 case 'equalDetourPoint':
                     centers.push(calculateEqualDetourPoint(points));
@@ -3361,6 +3373,23 @@ function calculateParryPoint(points) {
     else {
         return p2;
     }
+}
+
+
+// Function to calculate the isoperimetric point
+function calculateIsoperimetricPoint(points) {
+    const [A, B, C] = points;
+    //if (useHomogeneousCoordinates) {
+        const a = calculateDistance(B, C);
+        const b = calculateDistance(C, A);
+        const c = calculateDistance(A, B);
+        const excircles = calculateExcircles(points);
+        const ra = excircles[0].radius;
+        const rb = excircles[1].radius;
+        const rc = excircles[2].radius;
+        return barycentricToCartesian(points, [a-ra, b-rb, c-rc]);
+    //}
+    // Is there any drawing procedure?
 }
 
 
