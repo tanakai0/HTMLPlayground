@@ -1093,6 +1093,14 @@ const circleStyles = {
         annotationLabel: 'Inner Soddy',
         informationText: '○ Inner Soddy circle',
     },
+    GEOSCircle: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'GEOSCircle-checkbox',
+        displayElementId: 'GEOSCircle',
+        annotationLabel: 'GEOS',
+        informationText: '○ GEOS circle',
+    },
 };
 
 // Define styles for ellipse
@@ -1873,6 +1881,9 @@ function drawCircles() {
                     break;
                 case 'innerSoddyCircle':
                     circles.push(calculateSoddyCircle(points, false));
+                    break;
+                case 'GEOSCircle':
+                    circles.push(calculateGEOSCircle(points));
                     break;
                 default:
                     console.error(`Unknown circle key: ${key}`);
@@ -4181,6 +4192,21 @@ function calculateSoddyCircle(points, outer = true) {
         center: center,
         radius: radius
     };
+}
+
+// Function to calculate the GEOS circle
+function calculateGEOSCircle(points) {
+    if (isEquilateralTriangle(points)) {
+        return null;
+    }
+    const GergonneLine = calculateGergonneLine(points);
+    const EulerLine = calculateEulerLine(points);
+    const orthicAxis = calculateOrthicAxis(points);
+    const SoddyLine = calculateSoddyLine(points);
+    const GS = lineIntersection(...GergonneLine, ...SoddyLine);
+    const EO = lineIntersection(...EulerLine, ...orthicAxis);
+    const GO = lineIntersection(...GergonneLine, ...orthicAxis);
+    return calculateCircumcircle([GS, EO, GO]);
 }
 
 // Function to calculate the medial triangles
