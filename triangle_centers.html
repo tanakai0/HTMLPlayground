@@ -420,6 +420,15 @@ const centerStyles = {
         informationText: '● Parry point',
         ETCReference: 111,
     },
+    equalDetourPoint: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'equalDetourPoint-checkbox',
+        displayElementId: 'equalDetourPoint',
+        annotationLabel: 'Equal detour',
+        informationText: '● Equal detour point',
+        ETCReference: 176,
+    },
     firstAjimaMalfattiPoint: {
         activeColor: '#808080',
         inactiveColor: 'lightgray',
@@ -1461,6 +1470,9 @@ function drawCenters() {
                     break;
                 case 'ParryPoint':
                     centers.push(calculateParryPoint(points));
+                    break;
+                case 'equalDetourPoint':
+                    centers.push(calculateEqualDetourPoint(points));
                     break;
                 case 'firstAjimaMalfattiPoint':
                     centers.push(calculateFirstAjimaMalfattiPoint(points));
@@ -3349,6 +3361,23 @@ function calculateParryPoint(points) {
     else {
         return p2;
     }
+}
+
+
+// Function to calculate the equal detour point
+function calculateEqualDetourPoint(points) {
+    const [A, B, C] = points;
+    //if (useHomogeneousCoordinates) {
+        const a = calculateDistance(B, C);
+        const b = calculateDistance(C, A);
+        const c = calculateDistance(A, B);
+        const excircles = calculateExcircles(points);
+        const ra = excircles[0].radius;
+        const rb = excircles[1].radius;
+        const rc = excircles[2].radius;
+        return barycentricToCartesian(points, [a+ra, b+rb, c+rc]);
+    //}
+    // Is there any drawing procedure?
 }
 
 // Function to calculate the first Ajima-Malfatti point
