@@ -426,7 +426,7 @@ const centerStyles = {
         checkboxId: 'isoperimetricPoint-checkbox',
         displayElementId: 'isoperimetricPoint',
         annotationLabel: 'Isoperimetric',
-        informationText: '● Isoperimetric point',
+        informationText: '● Isoperimetric point (Outer Soddy center)',
         ETCReference: 175,
     },
     equalDetourPoint: {
@@ -435,7 +435,7 @@ const centerStyles = {
         checkboxId: 'equalDetourPoint-checkbox',
         displayElementId: 'equalDetourPoint',
         annotationLabel: 'Equal detour',
-        informationText: '● Equal detour point',
+        informationText: '● Equal detour point (Inner Soddy center)',
         ETCReference: 176,
     },
     firstAjimaMalfattiPoint: {
@@ -618,6 +618,14 @@ const lineStyles = {
         displayElementId: 'NagelLine',
         annotationLabel: 'Nagel',
         informationText: '- Nagel line',
+    },
+    SoddyLine: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'SoddyLine-checkbox',
+        displayElementId: 'SoddyLine',
+        annotationLabel: 'Soddy',
+        informationText: '- Soddy line',
     },
     vanAubelLine: {
         activeColor: '#808080',
@@ -1582,6 +1590,9 @@ function drawLines() {
                     break;
                 case 'NagelLine':
                     lines.push(calculateNagelLine(points));
+                    break;
+                case 'SoddyLine':
+                    lines.push(calculateSoddyLine(points));
                     break;
                 case 'vanAubelLine':
                     lines.push(calculateVanAubelLine(points));
@@ -3676,6 +3687,17 @@ function calculateNagelLine(points) {
     return [
         calculateIncenter(points),
         calculateNagelPoint(points)
+    ];
+}
+
+// Function to calculate the Soddy line
+function calculateSoddyLine(points) {
+    if (isEquilateralTriangle(points)) {
+        return null;
+    }
+    return [
+        calculateIsoperimetricPoint(points),
+        calculateEqualDetourPoint(points)
     ];
 }
 
