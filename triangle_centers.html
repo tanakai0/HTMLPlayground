@@ -1077,6 +1077,22 @@ const circleStyles = {
         annotationLabel: 'Mixtilinear incircle',
         informationText: '○ Mixtilinear incircles',
     },
+    outerSoddyCircle: {
+        activeColor: '#008000',
+        inactiveColor: 'lightgray',
+        checkboxId: 'outerSoddyCircle-checkbox',
+        displayElementId: 'outerSoddyCircle',
+        annotationLabel: 'Outer Soddy',
+        informationText: '○ Outer Soddy circle',
+    },
+    innerSoddyCircle: {
+        activeColor: '#0000FF',
+        inactiveColor: 'lightgray',
+        checkboxId: 'innerSoddyCircle-checkbox',
+        displayElementId: 'innerSoddyCircle',
+        annotationLabel: 'Inner Soddy',
+        informationText: '○ Inner Soddy circle',
+    },
 };
 
 // Define styles for ellipse
@@ -1851,6 +1867,12 @@ function drawCircles() {
                     break;
                 case 'threeExternallyTangentCircles':
                     circles.push(...calculateThreeExternallyTangentCircles(points));
+                    break;
+                case 'outerSoddyCircle':
+                    circles.push(calculateSoddyCircle(points, true));
+                    break;
+                case 'innerSoddyCircle':
+                    circles.push(calculateSoddyCircle(points, false));
                     break;
                 default:
                     console.error(`Unknown circle key: ${key}`);
@@ -4144,6 +4166,21 @@ function calculateThreeExternallyTangentCircles(points) {
     const circleB = {center: B, radius: semiperimeter - b};
     const circleC = {center: C, radius: semiperimeter - c};
     return [circleA, circleB, circleC];
+}
+
+// Function to calculate the Soddy circles
+function calculateSoddyCircle(points, outer = true) {
+    const center = outer ? calculateIsoperimetricPoint(points) : calculateEqualDetourPoint(points);
+    const threeExternallyTangentCircles = calculateThreeExternallyTangentCircles(points);
+    const rA = threeExternallyTangentCircles[0].radius;
+    const rB = threeExternallyTangentCircles[1].radius;
+    const rC = threeExternallyTangentCircles[2].radius;
+    const sign = outer ? -1 : 1;
+    const radius = (rA*rB*rC) / Math.abs(2*Math.sqrt(rA*rB*rC*(rA+rB+rC))+sign*(rA*rB+rB*rC+rC*rA));
+    return {
+        center: center,
+        radius: radius
+    };
 }
 
 // Function to calculate the medial triangles
