@@ -384,6 +384,15 @@ const centerStyles = {
         informationText: '● Third Brocard point',
         ETCReference: 76,
     },
+    TarryPoint: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'TarryPoint-checkbox',
+        displayElementId: 'TarryPoint',
+        annotationLabel: 'Tarry',
+        informationText: '● Tarry point',
+        ETCReference: 98,
+    },
     focusOfKiepertParabola: {
         activeColor: '#808080',
         inactiveColor: 'lightgray',
@@ -1423,6 +1432,9 @@ function drawCenters() {
                     break;
                 case 'thirdBrocardPoint':
                     centers.push(calculateBrocardPoint(points, 3));
+                    break;
+                case 'TarryPoint':
+                    centers.push(calculateTarryPoint(points));
                     break;
                 case 'focusOfKiepertParabola':
                     centers.push(calculateFocusOfKiepertParabola(points));
@@ -3206,6 +3218,35 @@ function calculatePrasolovPoint(points) {
     return lineIntersection(A, QA, B, QB);
 }
 
+// Function to calculate the Tarry point
+function calculateTarryPoint(points) {
+    const [A, B, C] = points;
+    if (useHomogeneousCoordinates) {
+        const a = calculateDistance(B, C);
+        const b = calculateDistance(C, A);
+        const c = calculateDistance(A, B);
+        const a2 = a*a;
+        const b2 = b*b;
+        const c2 = c*c;
+        const a4 = a2*a2;
+        const b4 = b2*b2;
+        const c4 = c2*c2;
+        const barycentricA = 1 / (b4 + c4 - a2*b2 - c2*a2);
+        const barycentricB = 1 / (c4 + a4 - b2*c2 - a2*b2);
+        const barycentricC = 1 / (a4 + b4 - c2*a2 - b2*c2);
+        return barycentricToCartesian(points, [barycentricA, barycentricB, barycentricC]);
+    }
+    const firstBrocardTriangle = calculateBrocardTriangle(points, 1);
+    if (!firstBrocardTriangle) {
+        return null;
+    }
+    const [D, E, F] = firstBrocardTriangle;
+    const perpendicularSlopeA = perpendicularSlope(calculateSlope(E, F));
+    const perpendicularSlopeB = perpendicularSlope(calculateSlope(F, D));
+    return lineIntersectionGivenSlopesAndPoints(perpendicularSlopeA, A, perpendicularSlopeB, B);
+}
+
+
 // Function to calculate the focus of Kiepert parabola
 function calculateFocusOfKiepertParabola(points) {
     if (isEquilateralTriangle(points)) {
@@ -4250,6 +4291,9 @@ function calculateFeuerbachTriangle(points) {
 
 // Function to calculate the Brocard triangle
 function calculateBrocardTriangle(points, number = 1) {
+    if (isEquilateralTriangle(points)) {
+        return null;
+    }
     const [A, B, C] = points;
     let triangle;
     if (useHomogeneousCoordinates){
