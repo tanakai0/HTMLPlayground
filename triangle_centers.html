@@ -789,6 +789,14 @@ const triangleStyles = {
         annotationLabel: 'Ayme',
         informationText: '△ Ayme triangle',
     },
+    SteinerTriangle: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'SteinerTriangle-checkbox',
+        displayElementId: 'SteinerTriangle',
+        annotationLabel: 'Steiner',
+        informationText: '△ Steiner triangle',
+    },
 };
 
 // Define styles for hexagon
@@ -1645,6 +1653,9 @@ function drawTriangles() {
                     break;
                 case 'AymeTriangle':
                     triangle = calculateAymeTriangle(points);
+                    break;
+                case 'SteinerTriangle':
+                    triangle = calculateSteinerTriangle(points);
                     break;
                 default:
                     console.error(`Unknown triangle key: ${key}`);
@@ -4157,6 +4168,17 @@ function calculateAnticomplementaryTriangle(points) {
     ];
 }
 
+// Function to calculate the Cevian triangle
+function calculateCevianTriangle(points, p) {
+    const [A, B, C] = points;
+    return [
+        lineIntersection(A, p, B, C),
+        lineIntersection(B, p, C, A),
+        lineIntersection(C, p, A, B)
+    ];
+}
+
+
 // Function to calculate the circumcevian triangle
 function calculateCircumcevianTriangle(points, p) {
     const [A, B, C] = points;
@@ -4478,6 +4500,17 @@ function calculateAymeTriangle(points) {
         lineIntersection(lineC[0], lineC[1], lineA[0], lineA[1]),
         lineIntersection(lineA[0], lineA[1], lineB[0], lineB[1])
     ];
+}
+
+
+// Function to calculate the Steiner triangle
+function calculateSteinerTriangle(points) {
+    if (isEquilateralTriangle(points)) {
+        return null;
+    }
+    const [A, B, C] = points;
+    const SteinerPoint = calculateSteinerPoint(points);
+    return calculateCevianTriangle(points, SteinerPoint);
 }
 
 
