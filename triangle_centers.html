@@ -421,7 +421,7 @@ const centerStyles = {
         ETCReference: 111,
     },
     isoperimetricPoint: {
-        activeColor: '#808080',
+        activeColor: '#008000',
         inactiveColor: 'lightgray',
         checkboxId: 'isoperimetricPoint-checkbox',
         displayElementId: 'isoperimetricPoint',
@@ -430,7 +430,7 @@ const centerStyles = {
         ETCReference: 175,
     },
     equalDetourPoint: {
-        activeColor: '#808080',
+        activeColor: '#0000FF',
         inactiveColor: 'lightgray',
         checkboxId: 'equalDetourPoint-checkbox',
         displayElementId: 'equalDetourPoint',
@@ -815,6 +815,22 @@ const triangleStyles = {
         displayElementId: 'innerVectenTriangle',
         annotationLabel: 'Inner Vecten',
         informationText: '△ Inner Vecten triangle',
+    },
+    outerSoddyTriangle: {
+        activeColor: '#008000',
+        inactiveColor: 'lightgray',
+        checkboxId: 'outerSoddyTriangle-checkbox',
+        displayElementId: 'outerSoddyTriangle',
+        annotationLabel: 'Outer Soddy',
+        informationText: '△ Outer Soddy triangle',
+    },
+    innerSoddyTriangle: {
+        activeColor: '#0000FF',
+        inactiveColor: 'lightgray',
+        checkboxId: 'innerSoddyTriangle-checkbox',
+        displayElementId: 'innerSoddyTriangle',
+        annotationLabel: 'Inner Soddy',
+        informationText: '△ Inner Soddy triangle',
     },
     AymeTriangle: {
         activeColor: '#808080',
@@ -1730,6 +1746,12 @@ function drawTriangles() {
                 case 'innerVectenTriangle':
                     triangle = calculateVectenTriangle(points, false);
                     break;
+                case 'outerSoddyTriangle':
+                    triangle = calculateSoddyTriangle(points, true);
+                    break;
+                case 'innerSoddyTriangle':
+                    triangle = calculateSoddyTriangle(points, false);
+                    break;
                 case 'AymeTriangle':
                     triangle = calculateAymeTriangle(points);
                     break;
@@ -2542,6 +2564,40 @@ function calculateDistanceToLine(point, line) {
 
 function reflectPointAcrossCenter(point, center) {
     return {x: 2*center.x-point.x, y:2*center.y-point.y};
+}
+
+function calculateInternalDivision(line, ratio) {
+    // line[0]P: line[1]P = ratio[0] : ratio[1]
+    const [point1, point2] = line;
+    const [r1, r2] = ratio;
+
+    const total = r1 + r2;
+    
+    const x = (r1 * point2.x + r2 * point1.x) / total;
+    const y = (r1 * point2.y + r2 * point1.y) / total;
+
+    return { x, y };
+}
+
+function calculateExternalDivision(line, ratio) {
+    // line[0]P: line[1]P = ratio[0] : ratio[1]
+    const [point1, point2] = line;
+    const [r1, r2] = ratio;
+
+    const total = r1 - r2;
+
+    if (total === 0) {
+        throw new Error("The ratio values must not be equal to avoid division by zero.");
+    }
+
+    const x = (r1 * point2.x - r2 * point1.x) / total;
+    const y = (r1 * point2.y - r2 * point1.y) / total;
+
+    return { x, y };
+}
+
+function calculateDivision(line, ratio, isInternal = true) {
+    return isInternal ? calculateInternalDivision(line, ratio) : calculateExternalDivision(line, ratio);
 }
 
 function calculateInternalDivision(line, ratio) {
@@ -4710,6 +4766,41 @@ function calculateVectenTriangle(points, outer = true) {
         midpoint(rotate(B, A, rotationRadian90), B)
     ];
 
+}
+
+// Function to calculate the Soddy triangle
+function calculateSoddyTriangle(points, outer = true) {
+    const [A, B, C] = points;
+    const threeExternallyTangentCircles = calculateThreeExternallyTangentCircles(points);
+    const cA = threeExternallyTangentCircles[0].center;
+    const cB = threeExternallyTangentCircles[1].center;
+    const cC = threeExternallyTangentCircles[2].center;
+    const rA = threeExternallyTangentCircles[0].radius;
+    const rB = threeExternallyTangentCircles[1].radius;
+    const rC = threeExternallyTangentCircles[2].radius;
+    const SoddyCircle = calculateSoddyCircle(points, outer);
+    const cS = SoddyCircle.center;
+    const rS = SoddyCircle.radius;
+    let isInternal = true;
+
+    if (outer) {
+        const circumradius = calculateCircumcircle(points).radius;
+        const inradius = calculateIncircle(points).radius;
+        const semiperimeter = calculateSemiperimeter(points);
+        const area = calculateArea(points);
+        const curvature = (4*circumradius+inradius-2*semiperimeter)/area;
+        if(curvature == 0) {
+            return null;
+        }
+        else if (curvature < 0) {
+            isInternal = false
+        }
+    }
+    return [
+        calculateDivision([cS, cA], [rS, rA], isInternal),
+        calculateDivision([cS, cB], [rS, rB], isInternal),
+        calculateDivision([cS, cC], [rS, rC], isInternal),
+    ];
 }
 
 // Function to calculate the Ayme triangle
