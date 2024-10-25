@@ -856,6 +856,14 @@ const parabolaStyles = {
         annotationLabel: 'Kiepert',
         informationText: '◡ Kiepert parabola',
     },
+    ArtztParabolas: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'ArtztParabolas-checkbox',
+        displayElementId: 'ArtztParabolas',
+        annotationLabel: 'Artzt',
+        informationText: '◡ Artzt parabolas',
+    },
 }
 
 
@@ -1771,6 +1779,9 @@ function drawParabolas() {
             switch (key) {
                 case 'KiepertParabola':
                     parabolas.push(calculateKiepertParabola(points)); // Add a single circle to the list
+                    break;
+                case 'ArtztParabolas':
+                    parabolas.push(...calculateArtztParabolas(points)); // Add a single circle to the list
                     break;
                 default:
                     console.error(`Unknown parabola key: ${key}`);
@@ -3815,7 +3826,7 @@ function calculateOrthogonalRegressionLine(points) {
     }
 }
 
-// Function to calculate the KiepertParabola
+// Function to calculate the Kiepert parabola
 function calculateKiepertParabola(points) {
     if (isEquilateralTriangle(points)) {
         return null;
@@ -3824,6 +3835,32 @@ function calculateKiepertParabola(points) {
         focus: calculateFocusOfKiepertParabola(points),
         directrix: calculateEulerLine(points)
     }
+}
+
+// Function to calculate the Artzt parabolas
+function calculateArtztParabolas(points) {
+    const [A, B, C] = points;
+    let focusA, focusB, focusC;
+    if (isEquilateralTriangle(points)) {
+        focusA = calculateCentroid(points);
+        focusB = focusA;
+        focusC = focusB;
+    }
+    else {
+        const secondBrocardTriangle = calculateBrocardTriangle(points, 2);
+        focusA = secondBrocardTriangle[0];
+        focusB = secondBrocardTriangle[1];
+        focusC = secondBrocardTriangle[2];
+    }
+    const directrixA = [reflectPointAcrossLine(focusA, [A, B]), reflectPointAcrossLine(focusA, [A, C])];
+    const directrixB = [reflectPointAcrossLine(focusB, [B, A]), reflectPointAcrossLine(focusB, [B, C])];
+    const directrixC = [reflectPointAcrossLine(focusC, [C, A]), reflectPointAcrossLine(focusC, [C, B])];
+
+    return [
+        {focus: focusA, directrix: directrixA},
+        {focus: focusB, directrix: directrixB},
+        {focus: focusC, directrix: directrixC},
+    ]
 }
 
 
