@@ -510,6 +510,15 @@ const centerStyles = {
         informationText: '● Inner Vecten point',
         ETCReference: 486,
     },
+    FletcherPoint: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray', 
+        checkboxId: 'FletcherPoint-checkbox',
+        displayElementId: 'FletcherPoint',
+        annotationLabel: 'Fletcher',
+        informationText: '● Fletcher point',
+        ETCReference: 1323,
+    },
     EvansPoint: {
         activeColor: '#808080',
         inactiveColor: 'lightgray', 
@@ -1558,6 +1567,9 @@ function drawCenters() {
                     break;
                 case 'innerVectenPoint':
                     centers.push(calculateVectenPoint(points, false));
+                    break;
+                case 'FletcherPoint':
+                    centers.push(calculateFletcherPoint(points));
                     break;
                 case 'EvansPoint':
                     centers.push(calculateEvansPoint(points));
@@ -3571,6 +3583,29 @@ function calculateVectenPoint(points, outer = true) {
     }
     const [PA, PB, PC] = calculateVectenTriangle(points, outer);
     return lineIntersection(A, PA, B, PB);
+}
+
+// Function to calculate the Fletcher point
+function calculateFletcherPoint(points) {
+    if (!isScaleneTriangle(points)){
+        return null;
+    }
+    if (useHomogeneousCoordinates){
+        const [A, B, C] = points;
+        const a = calculateDistance(B, C);
+        const b = calculateDistance(C, A);
+        const c = calculateDistance(A, B);
+        const a2 = a*a;
+        const b2 = b*b;
+        const c2 = c*c;
+        const barycentric1 = (2*a2-b2-c2-a*b-c*a+2*b*c)/(b+c-a);
+        const barycentric2 = (2*b2-c2-a2-b*c-a*b+2*c*a)/(c+a-b);
+        const barycentric3 = (2*c2-a2-b2-c*a-b*c+2*a*b)/(a+b-c);
+        return barycentricToCartesian(points, [barycentric1, barycentric2, barycentric3]);
+    }
+    const SoddyLine = calculateSoddyLine(points);
+    const GergonneLine = calculateGergonneLine(points);
+    return lineIntersection(...SoddyLine, ...GergonneLine);
 }
 
 // Function to calculate the Evans point
