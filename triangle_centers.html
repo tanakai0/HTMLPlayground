@@ -537,6 +537,24 @@ const centerStyles = {
         informationText: '● Fletcher point',
         ETCReference: 1323,
     },
+    firstRigbyPoint: {
+        activeColor: '#008000',
+        inactiveColor: 'lightgray', 
+        checkboxId: 'firstRigbyPoint-checkbox',
+        displayElementId: 'firstRigbyPoint',
+        annotationLabel: '1st Rigby',
+        informationText: '● First Rigby point',
+        ETCReference: 1371,
+    },
+    secondRigbyPoint: {
+        activeColor: '#0000FF',
+        inactiveColor: 'lightgray', 
+        checkboxId: 'secondRigbyPoint-checkbox',
+        displayElementId: 'secondRigbyPoint',
+        annotationLabel: '2nd Rigby',
+        informationText: '● Second Rigby point',
+        ETCReference: 1372,
+    },
     EvansPoint: {
         activeColor: '#808080',
         inactiveColor: 'lightgray', 
@@ -1610,6 +1628,12 @@ function drawCenters() {
                     break;
                 case 'FletcherPoint':
                     centers.push(calculateFletcherPoint(points));
+                    break;
+                case 'firstRigbyPoint':
+                    centers.push(calculateRigbyPoint(points, true));
+                    break;
+                case 'secondRigbyPoint':
+                    centers.push(calculateRigbyPoint(points, false));
                     break;
                 case 'EvansPoint':
                     centers.push(calculateEvansPoint(points));
@@ -3663,8 +3687,8 @@ function calculateKenmotuPoint(points, outer = true) {
 
 // Function to calculate the Eppstein points
 function calculateEppsteinPoint(points, first = true) {
-    const [A, B, C] = points;
     if (useHomogeneousCoordinates) {
+        const [A, B, C] = points;
         const tempConst = first ? -1 : 1;
         const a = calculateDistance(B, C);
         const b = calculateDistance(C, A);
@@ -3716,6 +3740,24 @@ function calculateFletcherPoint(points) {
     const SoddyLine = calculateSoddyLine(points);
     const GergonneLine = calculateGergonneLine(points);
     return lineIntersection(...SoddyLine, ...GergonneLine);
+}
+
+// Function to calculate the Rigby point
+function calculateRigbyPoint(points, first = true) {
+    if (useHomogeneousCoordinates){
+        const [A, B, C] = points;
+        const tempConst = first ? 1 : -1;
+        const a = calculateDistance(B, C);
+        const b = calculateDistance(C, A);
+        const c = calculateDistance(A, B);
+        const area = calculateArea(points);
+        const trilinear1 = 1+tempConst*8*area/(3*a*(b+c-a));
+        const trilinear2 = 1+tempConst*8*area/(3*b*(c+a-b));
+        const trilinear3 = 1+tempConst*8*area/(3*c*(a+b-c));
+        return trilinearToCartesian(points, [trilinear1, trilinear2, trilinear3]);
+    }
+    const SoddyTriangle = calculateSoddyTriangle(points, !first);
+    return calculateSymmedianPoint(SoddyTriangle);
 }
 
 // Function to calculate the Evans point
