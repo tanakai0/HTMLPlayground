@@ -492,6 +492,24 @@ const centerStyles = {
         informationText: '● Second Kenmotu point',
         ETCReference: 372,
     },
+    firstEppsteinPoint: {
+        activeColor: '#008000',
+        inactiveColor: 'lightgray',
+        checkboxId: 'firstEppsteinPoint-checkbox',
+        displayElementId: 'firstEppsteinPoint',
+        annotationLabel: '1st Eppstein',
+        informationText: '● First Eppstein point',
+        ETCReference: 481,
+    },
+    secondEppsteinPoint: {
+        activeColor: '#0000FF',
+        inactiveColor: 'lightgray',
+        checkboxId: 'secondEppsteinPoint-checkbox',
+        displayElementId: 'secondEppsteinPoint',
+        annotationLabel: '2nd Eppstein',
+        informationText: '● Second Eppstein point',
+        ETCReference: 482,
+    },
     outerVectenPoint: {
         activeColor: '#008000',
         inactiveColor: 'lightgray',
@@ -1577,6 +1595,12 @@ function drawCenters() {
                     break;
                 case 'secondKenmotuPoint':
                     centers.push(calculateKenmotuPoint(points, false));
+                    break;
+                case 'firstEppsteinPoint':
+                    centers.push(calculateEppsteinPoint(points, true));
+                    break;
+                case 'secondEppsteinPoint':
+                    centers.push(calculateEppsteinPoint(points, false));
                     break;
                 case 'outerVectenPoint':
                     centers.push(calculateVectenPoint(points, true));
@@ -3636,6 +3660,24 @@ function calculateKenmotuPoint(points, outer = true) {
     return calculateIsogonalConjugate(points, calculateVectenPoint(points, outer));
 }
 
+
+// Function to calculate the Eppstein points
+function calculateEppsteinPoint(points, first = true) {
+    const [A, B, C] = points;
+    if (useHomogeneousCoordinates) {
+        const tempConst = first ? -1 : 1;
+        const a = calculateDistance(B, C);
+        const b = calculateDistance(C, A);
+        const c = calculateDistance(A, B);
+        const area = calculateArea(points);
+        return trilinearToCartesian(points, [1+tempConst*4*area/(a*(b+c-a)), 1+tempConst*4*area/(b*(c+a-b)), 1+tempConst*4*area/(c*(a+b-c))]);
+    }
+    const intouchTriangle = calculateIntouchTriangle(points);
+    const SoddyTriangle = calculateSoddyTriangle(points, first);
+    return caluclatePerspectiveCenter(intouchTriangle, SoddyTriangle);
+}
+
+
 // Function to calculate the Vecten points
 function calculateVectenPoint(points, outer = true) {
     const [A, B, C] = points;
@@ -4461,6 +4503,9 @@ function calculateCevianTriangle(points, p) {
     ];
 }
 
+function caluclatePerspectiveCenter(triangle1, triangle2) {
+    return lineIntersection(triangle1[0], triangle2[0], triangle1[1], triangle2[1]);
+}
 
 // Function to calculate the circumcevian triangle
 function calculateCircumcevianTriangle(points, p) {
