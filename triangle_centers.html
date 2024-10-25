@@ -2544,6 +2544,18 @@ function reflectPointAcrossCenter(point, center) {
     return {x: 2*center.x-point.x, y:2*center.y-point.y};
 }
 
+function calculateInternalDivision(line, ratio) {
+    const [point1, point2] = line;
+    const [r1, r2] = ratio;
+
+    const total = r1 + r2;
+    
+    const x = (r1 * point2.x + r2 * point1.x) / total;
+    const y = (r1 * point2.y + r2 * point1.y) / total;
+
+    return { x, y };
+}
+
 function SlopeAndPointToLine(slope, point) {
     const deltaX = 10;
     let point1, point2;
