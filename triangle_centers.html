@@ -555,6 +555,24 @@ const centerStyles = {
         informationText: '● Second Rigby point',
         ETCReference: 1372,
     },
+    firstGriffithsPoint: {
+        activeColor: '#008000',
+        inactiveColor: 'lightgray', 
+        checkboxId: 'firstGriffithsPoint-checkbox',
+        displayElementId: 'firstGriffithsyPoint',
+        annotationLabel: '1st Griffiths',
+        informationText: '● First Griffiths point',
+        ETCReference: 1373,
+    },
+    secondGriffithsPoint: {
+        activeColor: '#0000FF',
+        inactiveColor: 'lightgray', 
+        checkboxId: 'secondGriffithsPoint-checkbox',
+        displayElementId: 'secondGriffithsPoint',
+        annotationLabel: '2nd Griffiths',
+        informationText: '● Second Griffiths point',
+        ETCReference: 1374,
+    },
     EvansPoint: {
         activeColor: '#808080',
         inactiveColor: 'lightgray', 
@@ -1634,6 +1652,12 @@ function drawCenters() {
                     break;
                 case 'secondRigbyPoint':
                     centers.push(calculateRigbyPoint(points, false));
+                    break;
+                case 'firstGriffithsPoint':
+                    centers.push(calculateGriffithsPoint(points, true));
+                    break;
+                case 'secondGriffithsPoint':
+                    centers.push(calculateGriffithsPoint(points, false));
                     break;
                 case 'EvansPoint':
                     centers.push(calculateEvansPoint(points));
@@ -3758,6 +3782,26 @@ function calculateRigbyPoint(points, first = true) {
     }
     const SoddyTriangle = calculateSoddyTriangle(points, !first);
     return calculateSymmedianPoint(SoddyTriangle);
+}
+
+// Function to calculate the Griffiths point
+function calculateGriffithsPoint(points, first = true) {
+    if (useHomogeneousCoordinates){
+        const [A, B, C] = points;
+        const tempConst = first ? 1 : -1;
+        const a = calculateDistance(B, C);
+        const b = calculateDistance(C, A);
+        const c = calculateDistance(A, B);
+        const area = calculateArea(points);
+        const trilinear1 = 1+tempConst*8*area/(a*(b+c-a));
+        const trilinear2 = 1+tempConst*8*area/(b*(c+a-b));
+        const trilinear3 = 1+tempConst*8*area/(c*(a+b-c));
+        return trilinearToCartesian(points, [trilinear1, trilinear2, trilinear3]);
+    }
+    const SoddyTriangle1 = calculateSoddyTriangle(points, !first);
+    const SoddyTriangle2 = calculateSoddyTriangle(points, first);
+    const tangentialTriangleOfSoddy2 = calculateTangentialTriangle(SoddyTriangle2);
+    return caluclatePerspectiveCenter(SoddyTriangle1, tangentialTriangleOfSoddy2);
 }
 
 // Function to calculate the Evans point
