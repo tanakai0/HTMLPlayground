@@ -2226,16 +2226,6 @@ function _drawParabola(ctx, x, y, a, rotation, startPos = 0, endPos = 0, counter
     function translate(point, deltaX, deltaY) {
         return {x: point.x + deltaX, y: point.y + deltaY};
     }
-    
-    // Function to rotate a point around the center, expressed in radians.
-    function rotate(point, center, radian) {
-        const deltaX = point.x - center.x;
-        const deltaY = point.y - center.y;
-        return {
-            x: center.x + (deltaX * Math.cos(radian) - deltaY * Math.sin(radian)),
-            y: center.y + (deltaX * Math.sin(radian) + deltaY * Math.cos(radian))
-        };
-    }
 
     // Function to calculate intersections of the parabola and line.
     // a: The focal length of the parabola, where the focus is located at (0, a) and the directrix at y = -a.
@@ -2575,17 +2565,23 @@ function perpendicularSlope(slope) {
     }
 }
 
-// Function to rotate a point P around another point O by d degrees
+// Function to rotate a point around the center, expressed in radians.
 // Be careful to consider the coordinates in canvas environment
-function rotate(P, O, d) {
-    const radian = Math.PI*d / 180;
-    const dx = P.x - O.x;
-    const dy = P.y - O.y;
+function rotate(point, center, radian) {
+    const deltaX = point.x - center.x;
+    const deltaY = point.y - center.y;
     return {
-        x: O.x + (dx * Math.cos(radian) - dy * Math.sin(radian)),
-        y: O.y + (dx * Math.sin(radian) + dy * Math.cos(radian))
+        x: center.x + (deltaX * Math.cos(radian) - deltaY * Math.sin(radian)),
+        y: center.y + (deltaX * Math.sin(radian) + deltaY * Math.cos(radian))
     };
 }
+
+// Function to rotate a point P around another point O by d degrees
+function rotateInDegree(point, center, degree) {
+    const radian = Math.PI*degree / 180;
+    return rotate(point, center, radian);
+}
+
 
 // Function to calculate the distance from a point to a line defined by two points
 function calculateDistanceToLine(point, line) {
@@ -3179,7 +3175,7 @@ function calculateBickartPoints(points) {
     }
     const a = SteinerCircumellipse.radiusX;
     const b = SteinerCircumellipse.radiusY;
-    const radian = SteinerCircumellipse.rotationRadian * 180 / Math.PI;
+    const radian = SteinerCircumellipse.rotationRadian;
     const dist = Math.sqrt(a**2-b**2);
     const slope = Math.tan(radian);
     const p1 = {x: center.x + dist, y: center.y};
@@ -3245,14 +3241,14 @@ function calculateIsogonicCenter(points, outer = true) {
 
     // Determine rotation direction based on the cross product of vectors AB and AC
     const crossProduct = calculateCrossProduct(A, B, C);
-    let rotationRadian = crossProduct > 0 ? -60 : 60;
+    let rotationDegree = crossProduct > 0 ? -60 : 60;
     if (!outer){
-        rotationRadian = -rotationRadian;
+        rotationDegree = -rotationDegree;
     }
 
     // Calculate rotation points for Fermat point
-    const R1 = rotate(B, A, rotationRadian); // Rotate B 60 degrees around A
-    const R2 = rotate(C, A, -rotationRadian); // Rotate C 60 degrees around A
+    const R1 = rotateInDegree(B, A, rotationDegree); // Rotate B 60 degrees around A
+    const R2 = rotateInDegree(C, A, -rotationDegree); // Rotate C 60 degrees around A
 
     // Intersection of lines BR2 and CR1 gives the Fermat point
     return lineIntersection(B, R2, C, R1);
@@ -3269,14 +3265,14 @@ function calculateIsodynamicPoint(points, outer = false) {
 
     // Determine rotation direction based on the cross product of vectors AB and AC
     const crossProduct = calculateCrossProduct(A, B, C);
-    let rotationRadian = crossProduct > 0 ? -60 : 60;
+    let rotationDegree = crossProduct > 0 ? -60 : 60;
     if (!outer){
-        rotationRadian = -rotationRadian;
+        rotationDegree = -rotationDegree;
     }
 
     // Calculate rotation points for Fermat point
-    const P1 = rotate(C, B, rotationRadian);
-    const P2 = rotate(A, C, rotationRadian);
+    const P1 = rotateInDegree(C, B, rotationDegree);
+    const P2 = rotateInDegree(A, C, rotationDegree);
     const Q1 = reflectPointAcrossLine(A, [B, C]);
     const Q2 = reflectPointAcrossLine(B, [C, A]);
 
@@ -4661,13 +4657,13 @@ function calculateNapoleonTriangle(points, outer = true) {
 
     // Calculate the outer equilateral triangle on each side
     const isCounterclockwise =  isCounterclockwiseOrder(points);
-    let rotationRadian = isCounterclockwise ? 60 : -60;
-    rotationRadian = outer ? rotationRadian : -rotationRadian;
+    let rotationDegree = isCounterclockwise ? 60 : -60;
+    rotationDegree = outer ? rotationDegree : -rotationDegree;
 
     // Create equilateral triangles on each side
-    const R1 = rotate(B, A, rotationRadian);
-    const R2 = rotate(C, B, rotationRadian);
-    const R3 = rotate(A, C, rotationRadian);
+    const R1 = rotateInDegree(B, A, rotationDegree);
+    const R2 = rotateInDegree(C, B, rotationDegree);
+    const R3 = rotateInDegree(A, C, rotationDegree);
 
     // Return the points of the outer Napoleon triangle
     return [
@@ -4919,13 +4915,13 @@ function calculateVectenTriangle(points, outer = true) {
 
     // Determine rotation direction based on cross products
     const isCounterclockwise =  isCounterclockwiseOrder(points);
-    let rotationRadian90 = isCounterclockwise ? 90 : -90;
-    rotationRadian90 = outer ? rotationRadian90 : -rotationRadian90;
+    let rotationDegree = isCounterclockwise ? 90 : -90;
+    rotationDegree = outer ? rotationDegree : -rotationDegree;
 
     return [
-        midpoint(rotate(C, B, rotationRadian90), C),
-        midpoint(rotate(A, C, rotationRadian90), A),
-        midpoint(rotate(B, A, rotationRadian90), B)
+        midpoint(rotateInDegree(C, B, rotationDegree), C),
+        midpoint(rotateInDegree(A, C, rotationDegree), A),
+        midpoint(rotateInDegree(B, A, rotationDegree), B)
     ];
 
 }
