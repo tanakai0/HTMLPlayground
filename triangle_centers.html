@@ -132,6 +132,14 @@ const centerStyles = {
         annotationLabel: '2nd Brocard',
         informationText: '● Second Brocard point',
     },
+    BickartPoints: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray', 
+        checkboxId: 'BickartPoints-checkbox',
+        displayElementId: 'BickartPoints',
+        annotationLabel: 'Bickart',
+        informationText: '● Bickart points',
+    },
     incenter: {
         activeColor: '#008000',
         inactiveColor: 'lightgray', 
@@ -1512,14 +1520,17 @@ function drawCenters() {
                 case 'secondBrocardPoint':
                     centers.push(calculateBrocardPoint(points, 2));
                     break;
+                case 'BickartPoints':
+                    centers.push(...calculateBickartPoints(points));
+                    break;
+                case 'incenter':
+                    centers.push(calculateIncenter(points));
+                    break;
                 case 'centroid':
                     centers.push(calculateCentroid(points));
                     break;
                 case 'circumcenter':
                     centers.push(calculateCircumcenter(points));
-                    break;
-                case 'incenter':
-                    centers.push(calculateIncenter(points));
                     break;
                 case 'orthocenter':
                     centers.push(calculateOrthocenter(points));
@@ -3157,6 +3168,26 @@ function calculateCircumcenter(points) {
 
     // Circumcenter calculation
     return lineIntersectionGivenSlopesAndPoints(perpendicularSlopeAB, D, perpendicularSlopeBC, E);
+}
+
+// Function to calculate the Bickart points
+function calculateBickartPoints(points) {
+    const SteinerCircumellipse = calculateSteinerCircumellipse(points);
+    const center = SteinerCircumellipse.center;
+    if (isEquilateralTriangle(points)) {
+        return [center];
+    }
+    const a = SteinerCircumellipse.radiusX;
+    const b = SteinerCircumellipse.radiusY;
+    const radian = SteinerCircumellipse.rotationRadian * 180 / Math.PI;
+    const dist = Math.sqrt(a**2-b**2);
+    const slope = Math.tan(radian);
+    const p1 = {x: center.x + dist, y: center.y};
+    const p2 = {x: center.x - dist, y: center.y};
+    return [
+        rotate(p1, center, radian),
+        rotate(p2, center, radian)
+    ];
 }
 
 // Function to calculate the incenter (intersection of angle bisectors)
