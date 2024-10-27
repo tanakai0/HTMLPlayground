@@ -473,6 +473,15 @@ const centerStyles = {
         informationText: '● Equal parallelians point (Congruent parallelians point)',
         ETCReference: 192,
     },
+    WeillPoint: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'WeillPoint-checkbox',
+        displayElementId: 'WeillPoint',
+        annotationLabel: 'Weill',
+        informationText: '● Weill point',
+        ETCReference: 354,
+    },
     FuhrmannCenter: {
         activeColor: '#808080',
         inactiveColor: 'lightgray',
@@ -1633,7 +1642,10 @@ function drawCenters() {
                     break;
                 case 'equalParalleliansPoint':
                     centers.push(calculateEqualParalleliansPoint(points));
-                    break;   
+                    break;
+                case 'WeillPoint':
+                    centers.push(calculateWeillPoint(points));
+                    break;
                 case 'FuhrmannCenter':
                     centers.push(calculateFuhrmannCenter(points));
                     break;
@@ -3712,6 +3724,19 @@ function calculateEqualParalleliansPoint(points) {
     const PA = lineIntersection(...internalAngleBisectors[0], B, C);
     const PB = lineIntersection(...internalAngleBisectors[1], C, A);
     return lineIntersection(anticomplementaryTriangle[0], PA, anticomplementaryTriangle[1], PB);
+}
+
+
+// Function to calculate the Weill point
+function calculateWeillPoint(points) {
+    if(useHomogeneousCoordinates) {
+        const [A, B, C] = points;
+        const a = calculateDistance(B, C);
+        const b = calculateDistance(C, A);
+        const c = calculateDistance(A, B);
+        return barycentricToCartesian(points, [a*((b-c)**2-a*b-c*a), b*((c-a)**2-b*c-a*b), c*((a-b)**2-c*a-b*c)]);
+    }
+    return calculateCentroid(calculateIntouchTriangle(points));
 }
 
 // Function to calculate the Fuhrmann center
