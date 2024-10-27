@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        #todo-input {
+            width: 70%;
+            padding: 10px;
+            font-size: 16px;
+            margin-right: 5px;
+        }
+        #add-btn {
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .todo-item {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            user-select: none;
+        }
+        .todo-item p {
+            margin: 0;
+            padding-left: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .completed {
+            text-decoration: line-through;
+            color: gray;
+        }
+        .selected {
+            background-color: #d3d3d3;
+        }
+        #trash-container {
+            text-align: right;
+            margin-top: 20px;
+        }
+        #trash-can {
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<h1>To-Do List</h1>
+<p>Note: This app uses local storage to save your to-do items. Data is stored on your device and will persist even if you close your browser. Clearing your browser data may delete saved items.
+</p>
+<div>
+    <input type="text" id="todo-input" placeholder="Add a new task..." />
+    <button id="add-btn">Add</button>
+</div>
+<div id="trash-container">
+    <img src="https://img.icons8.com/material-outlined/24/000000/delete-trash.png" id="trash-can" alt="Trash Can">
+</div>
+<div id="todo-list"></div>
+<script>
+    let todoList = JSON.parse(localStorage.getItem('todoList')) || [];
+    let selectedItems = new Set();
+
+    function renderTodos() {
+        const todoListElement = document.getElementById('todo-list');
+        todoListElement.innerHTML = '';
+        todoList.forEach((todo, index) => {
+            const todoDiv = document.createElement('div');
+            todoDiv.classList.add('todo-item');
+            todoDiv.draggable = true;
+            todoDiv.addEventListener('click', () => toggleSelection(todoDiv, index));
+            todoDiv.addEventListener('dragstart', (e) => handleDragStart(e, index));
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.checked = todo.completed;
+            checkbox.addEventListener('change', () => {
+                toggleComplete(index);
+                clearSelection();  // Clear selection after toggling checkbox
+            });
+
+            const todoText = document.createElement('p');
+            todoText.textContent = todo.text;
+            if (todo.completed) {
+                todoText.classList.add('completed');
+            }
+
+            todoDiv.appendChild(checkbox);
+            todoDiv.appendChild(todoText);
+            todoListElement.append(todoDiv);
+        });
+    }
+
+    function addTodo() {
+        const todoInput = document.getElementById('todo-input');
+        const newTodo = todoInput.value.trim();
+        if (newTodo) {
+            todoList.unshift({ text: newTodo, completed: false });
+            try {
+                saveTodos();
+                renderTodos();
+                todoInput.value = '';
+            } catch (e) {
+                if (e.name === 'QuotaExceededError') {
+                    alert('Local storage is exceeded.');
+                } else {
+                    console.error(e);
+                }
+            }
+        }
+    }
+
+    function toggleComplete(index) {
+        todoList[index].completed = !todoList[index].completed;
+        saveTodos();
+        renderTodos();
+    }
+
+    function saveTodos() {
+        localStorage.setItem('todoList', JSON.stringify(todoList));
+    }
+
+    // Clear all selected items (used after toggling a checkbox)
+    function clearSelection() {
+        selectedItems.clear();
+        document.querySelectorAll('.todo-item.selected').forEach(item => {
+            item.classList.remove('selected');
+        });
+    }
+
+    function toggleSelection(todoDiv, index) {
+        if (selectedItems.has(index)) {
+            selectedItems.delete(index);
+            todoDiv.classList.remove('selected');
+        } else {
+            selectedItems.add(index);
+            todoDiv.classList.add('selected');
+        }
+    }
+
+    function handleDragStart(e, index) {
+        e.dataTransfer.setData('text/plain', index);
+    }
+
+    // delete todo by dropping it into a trash can
+    const trashCan = document.getElementById('trash-can');
+    trashCan.addEventListener('dragover', (e) => e.preventDefault());
+    trashCan.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const draggedIndex = parseInt(e.dataTransfer.getData('text'));
+        if (selectedItems.size === 0) {
+            todoList.splice(draggedIndex, 1);
+        } else {
+            const sortedIndices = Array.from(selectedItems).sort((a, b) => b - a);
+            sortedIndices.forEach(i => todoList.splice(i, 1));
+            selectedItems.clear();
+        }
+        saveTodos();
+        renderTodos();
+    });
+
+    // Add todo in the list
+    document.getElementById('add-btn').addEventListener('click', addTodo);
+    document.getElementById('todo-input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') addTodo();
+    });
+
+    renderTodos();
+</script>
+
+</body>
+</html>
