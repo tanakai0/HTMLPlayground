@@ -410,6 +410,15 @@ const centerStyles = {
         informationText: '● Steiner point',
         ETCReference: 99,
     },
+    focusOfYffParabola: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'focusOfYffParabola-checkbox',
+        displayElementId: 'focusOfYffParabola',
+        annotationLabel: 'Focus of Yff parabola',
+        informationText: '● Focus of Yff parabola',
+        ETCReference: 101,
+    },
     focusOfKiepertParabola: {
         activeColor: '#808080',
         inactiveColor: 'lightgray',
@@ -944,14 +953,6 @@ const hexagonStyles = {
 
 // Define styles for parabola
 const parabolaStyles = {
-    KiepertParabola: {
-        activeColor: '#808080',
-        inactiveColor: 'lightgray',
-        checkboxId: 'KiepertParabola-checkbox',
-        displayElementId: 'KiepertParabola',
-        annotationLabel: 'Kiepert',
-        informationText: '◡ Kiepert parabola',
-    },
     ArtztParabolas: {
         activeColor: '#808080',
         inactiveColor: 'lightgray',
@@ -959,6 +960,22 @@ const parabolaStyles = {
         displayElementId: 'ArtztParabolas',
         annotationLabel: 'Artzt',
         informationText: '◡ Artzt parabolas',
+    },
+    YffParabola: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'YffParabola-checkbox',
+        displayElementId: 'YffParabola',
+        annotationLabel: 'Yff',
+        informationText: '◡ Yff parabola',
+    },
+    KiepertParabola: {
+        activeColor: '#808080',
+        inactiveColor: 'lightgray',
+        checkboxId: 'KiepertParabola-checkbox',
+        displayElementId: 'KiepertParabola',
+        annotationLabel: 'Kiepert',
+        informationText: '◡ Kiepert parabola',
     },
 }
 
@@ -1613,6 +1630,9 @@ function drawCenters() {
                 case 'SteinerPoint':
                     centers.push(calculateSteinerPoint(points));
                     break;
+                case 'focusOfYffParabola':
+                    centers.push(calculateFocusOfYffParabola(points));
+                    break;
                 case 'focusOfKiepertParabola':
                     centers.push(calculateFocusOfKiepertParabola(points));
                     break;
@@ -1906,11 +1926,14 @@ function drawParabolas() {
             let parabolas = [];
             
             switch (key) {
-                case 'KiepertParabola':
-                    parabolas.push(calculateKiepertParabola(points)); // Add a single circle to the list
-                    break;
                 case 'ArtztParabolas':
-                    parabolas.push(...calculateArtztParabolas(points)); // Add a single circle to the list
+                    parabolas.push(...calculateArtztParabolas(points));
+                    break;
+                case 'YffParabola':
+                    parabolas.push(calculateYffParabola(points));
+                    break;
+                case 'KiepertParabola':
+                    parabolas.push(calculateKiepertParabola(points));
                     break;
                 default:
                     console.error(`Unknown parabola key: ${key}`);
@@ -3568,6 +3591,34 @@ function calculateSteinerPoint(points) {
     return lineIntersection(A, AA, B, BB);
 }
 
+// Function to calculate the focus of Yff parabola
+function calculateFocusOfYffParabola(points) {
+    if (isEquilateralTriangle(points)) {
+        return null;
+    }
+    const [A, B, C] = points;
+    if (useHomogeneousCoordinates) {
+        const a = calculateDistance(B, C);
+        const b = calculateDistance(C, A);
+        const c = calculateDistance(A, B);
+        const a2 = a*a;
+        const b2 = b*b;
+        const c2 = c*c;
+        return barycentricToCartesian(points, [a2/(b-c), b2/(c-a), c2/(a-b)]);
+    }
+    const incenter = calculateIncenter(points);
+    const GergonnePoint = calculateGergonnePoint(points);
+    const PA1 = reflectPointAcrossLine(incenter, [B, C]);
+    const PA2 = reflectPointAcrossLine(GergonnePoint, [B, C]);
+    const PB1 = reflectPointAcrossLine(incenter, [C, A]);
+    const PB2 = reflectPointAcrossLine(GergonnePoint, [C, A]);
+    const PC1 = reflectPointAcrossLine(incenter, [A, B]);
+    const PC2 = reflectPointAcrossLine(GergonnePoint, [A, B]);
+    const PA = lineIntersection(PB1, PB2, PC1, PC2);
+    const PB = lineIntersection(PC1, PC2, PA1, PA2);
+    return lineIntersection(A, PA, B, PB);
+
+}
 
 // Function to calculate the focus of Kiepert parabola
 function calculateFocusOfKiepertParabola(points) {
@@ -4109,17 +4160,6 @@ function calculateOrthogonalRegressionLine(points) {
     }
 }
 
-// Function to calculate the Kiepert parabola
-function calculateKiepertParabola(points) {
-    if (isEquilateralTriangle(points)) {
-        return null;
-    }
-    return {
-        focus: calculateFocusOfKiepertParabola(points),
-        directrix: calculateEulerLine(points)
-    }
-}
-
 // Function to calculate the Artzt parabolas
 function calculateArtztParabolas(points) {
     const [A, B, C] = points;
@@ -4146,6 +4186,29 @@ function calculateArtztParabolas(points) {
     ]
 }
 
+
+// Function to calculate the Yff parabola
+function calculateYffParabola(points) {
+    if (isEquilateralTriangle(points)) {
+        return null;
+    }
+    return {
+        focus: calculateFocusOfYffParabola(points),
+        directrix: [calculateOrthocenter(points), calculateMittenpunkt(points)]
+    }
+}
+
+
+// Function to calculate the Kiepert parabola
+function calculateKiepertParabola(points) {
+    if (isEquilateralTriangle(points)) {
+        return null;
+    }
+    return {
+        focus: calculateFocusOfKiepertParabola(points),
+        directrix: calculateEulerLine(points)
+    }
+}
 
 // Function to calculate the incircle
 function calculateIncircle(points) {
