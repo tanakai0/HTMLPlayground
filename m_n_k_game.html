@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>m,n,k-game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            margin-bottom: 0.5em;
+        }
+        .config {
+            margin-bottom: 1em;
+        }
+        .board-container {
+            position: relative;
+        }
+        .board {
+            display: grid;
+            gap: 2px;
+            background-color: #444;
+        }
+        .cell {
+            width: 50px;
+            height: 50px;
+            background-color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            cursor: pointer;
+        }
+        .cell.taken {
+            cursor: not-allowed;
+        }
+        .log {
+            margin-top: 1em;
+            max-width: 300px;
+            text-align: left;
+        }
+        .log-entry {
+            margin: 0.2em 0;
+        }
+        .win-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3em;
+            color: rgba(0, 0, 0, 0.5);
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>m, n, k-game</h1>
+    <div class="config">
+        <label>
+            Rows (m): <input id="rows" type="number" value="3" min="3" max="20">
+        </label>
+        <label>
+            Columns (n): <input id="cols" type="number" value="3" min="3" max="20">
+        </label>
+        <label>
+            Win Condition (k): <input id="winCondition" type="number" value="3" min="3" max="10">
+        </label>
+        <button id="start">Start Game</button>
+    </div>
+    <div class="board-container">
+        <div class="board"></div>
+        <div class="win-message" style="display: none;">Win</div>
+    </div>
+    <div class="log">
+        <h3>Game Log</h3>
+        <div id="logEntries"></div>
+    </div>
+    <script>
+        let board = [];
+        let currentPlayer = "〇"; // "〇" for user, "×" for AI
+        let rows = 3, cols = 3, k = 3;
+        let gameOver = false;
+        const logEntries = document.getElementById('logEntries');
+        const boardContainer = document.querySelector('.board');
+        const winMessage = document.querySelector('.win-message');
+
+        document.getElementById('start').addEventListener('click', initializeGame);
+
+        function initializeGame() {
+            // Get user input
+            rows = parseInt(document.getElementById('rows').value, 10);
+            cols = parseInt(document.getElementById('cols').value, 10);
+            k = parseInt(document.getElementById('winCondition').value, 10);
+
+            // Validate win condition
+            if (k > Math.min(rows, cols)) {
+                alert(`Win condition (k) must be less than or equal to ${Math.min(rows, cols)}.`);
+                return;
+            }
+
+            // Reset game state
+            board = Array(rows).fill(null).map(() => Array(cols).fill(null));
+            boardContainer.innerHTML = '';
+            logEntries.innerHTML = '';
+            winMessage.style.display = 'none';
+            gameOver = false;
+
+            // Create grid layout
+            boardContainer.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+            boardContainer.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+
+            // Populate the board with cells
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    const cell = document.createElement('div');
+                    cell.classList.add('cell');
+                    cell.dataset.row = r;
+                    cell.dataset.col = c;
+                    cell.addEventListener('click', handleUserMove);
+                    boardContainer.appendChild(cell);
+                }
+            }
+        }
+
+        function handleUserMove(event) {
+            if (gameOver) return;
+
+            const cell = event.target;
+            const row = parseInt(cell.dataset.row, 10);
+            const col = parseInt(cell.dataset.col, 10);
+
+            // Ignore clicks on taken cells
+            if (board[row][col] !== null) return;
+
+            // User's move
+            board[row][col] = "〇";
+            cell.textContent = "〇";
+            cell.classList.add('taken');
+            logMove(row, col, "〇");
+
+            if (checkWin(row, col, "〇")) {
+                displayWinMessage("Win");
+                return;
+            }
+
+            // AI's move
+            handleAIMove();
+        }
+
+        function handleAIMove() {
+            if (gameOver) return;
+
+            // Simple AI: first empty cell
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    if (board[r][c] === null) {
+                        board[r][c] = "×";
+                        const cell = document.querySelector(`.cell[data-row="${r}"][data-col="${c}"]`);
+                        cell.textContent = "×";
+                        cell.classList.add('taken');
+                        logMove(r, c, "×");
+
+                        if (checkWin(r, c, "×")) {
+                            displayWinMessage("Lose");
+                        }
+                        return;
+                    }
+                }
+            }
+        }
+
+        function logMove(row, col, player) {
+            const logEntry = document.createElement('div');
+            logEntry.classList.add('log-entry');
+            logEntry.textContent = `${logEntries.children.length + 1}: (${row + 1}, ${col + 1}, ${player})`;
+            logEntries.appendChild(logEntry);
+        }
+
+        function checkWin(row, col, player) {
+            return checkDirection(row, col, player, 0, 1) || // Horizontal
+                   checkDirection(row, col, player, 1, 0) || // Vertical
+                   checkDirection(row, col, player, 1, 1) || // Diagonal /
+                   checkDirection(row, col, player, 1, -1);  // Diagonal \
+        }
+
+        function checkDirection(row, col, player, rowDelta, colDelta) {
+            let count = 1;
+
+            for (let d = 1; d < k; d++) {
+                const r = row + d * rowDelta, c = col + d * colDelta;
+                if (r >= 0 && r < rows && c >= 0 && c < cols && board[r][c] === player) {
+                    count++;
+                } else break;
+            }
+
+            for (let d = 1; d < k; d++) {
+                const r = row - d * rowDelta, c = col - d * colDelta;
+                if (r >= 0 && r < rows && c >= 0 && c < cols && board[r][c] === player) {
+                    count++;
+                } else break;
+            }
+
+            return count >= k;
+        }
+
+        function displayWinMessage(message) {
+            gameOver = true;
+            winMessage.textContent = message;
+            winMessage.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
