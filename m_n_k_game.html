@@ -80,9 +80,14 @@
         <div id="logEntries"></div>
     </div>
     <script>
+        // Constants for player marks
+        const USER_MARK = "〇";
+        const AI_MARK = "×";
+
         let board = [];
-        let currentPlayer = "〇"; // "〇" for user, "×" for AI
+        let currentPlayer = USER_MARK; // Track the current player
         let rows = 3, cols = 3, k = 3;
+        let remainderCellNum = 0; // Remaining number of cells
         let gameOver = false;
         const logEntries = document.getElementById('logEntries');
         const boardContainer = document.querySelector('.board');
@@ -104,10 +109,12 @@
 
             // Reset game state
             board = Array(rows).fill(null).map(() => Array(cols).fill(null));
+            remainderCellNum = rows * cols; // Initialize remaining cells
             boardContainer.innerHTML = '';
             logEntries.innerHTML = '';
             winMessage.style.display = 'none';
             gameOver = false;
+            currentPlayer = USER_MARK; // Reset to user's turn
 
             // Create grid layout
             boardContainer.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
@@ -127,7 +134,8 @@
         }
 
         function handleUserMove(event) {
-            if (gameOver) return;
+            // Prevent moves when it's not the user's turn or the game is over
+            if (gameOver || currentPlayer !== USER_MARK) return;
 
             const cell = event.target;
             const row = parseInt(cell.dataset.row, 10);
@@ -137,40 +145,53 @@
             if (board[row][col] !== null) return;
 
             // User's move
-            board[row][col] = "〇";
-            cell.textContent = "〇";
+            board[row][col] = USER_MARK;
+            cell.textContent = USER_MARK;
             cell.classList.add('taken');
-            logMove(row, col, "〇");
+            logMove(row, col, USER_MARK);
+            remainderCellNum--; // Decrement remaining cells
 
-            if (checkWin(row, col, "〇")) {
+            if (checkWin(row, col, USER_MARK)) {
                 displayWinMessage("Win");
                 return;
             }
 
-            // AI's move
+            if (remainderCellNum === 0) {
+                displayWinMessage("Draw");
+                return;
+            }
+
+            // Switch to AI's turn
+            currentPlayer = AI_MARK;
             handleAIMove();
+            // setTimeout(handleAIMove, 500); // Slight delay for AI move
         }
 
         function handleAIMove() {
-            if (gameOver) return;
+            // Prevent moves when it's not the AI's turn or the game is over
+            if (gameOver || currentPlayer !== AI_MARK) return;
 
             // Simple AI: first empty cell
-            for (let r = 0; r < rows; r++) {
-                for (let c = 0; c < cols; c++) {
-                    if (board[r][c] === null) {
-                        board[r][c] = "×";
-                        const cell = document.querySelector(`.cell[data-row="${r}"][data-col="${c}"]`);
-                        cell.textContent = "×";
-                        cell.classList.add('taken');
-                        logMove(r, c, "×");
+            let [row, col] = randomCell();
+            board[row][col] = AI_MARK;
+            const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+            cell.textContent = AI_MARK;
+            cell.classList.add('taken');
+            logMove(row, col, AI_MARK);
+            remainderCellNum--; // Decrement remaining cells
 
-                        if (checkWin(r, c, "×")) {
-                            displayWinMessage("Lose");
-                        }
-                        return;
-                    }
-                }
+            if (checkWin(row, col, AI_MARK)) {
+                displayWinMessage("Lose");
+                return;
             }
+
+            if (remainderCellNum === 0) {
+                displayWinMessage("Draw");
+                return;
+            }
+
+            // Switch back to user's turn
+            currentPlayer = USER_MARK;
         }
 
         function logMove(row, col, player) {
@@ -211,6 +232,34 @@
             gameOver = true;
             winMessage.textContent = message;
             winMessage.style.display = 'block';
+        }
+
+        // AI strategies
+        
+        function firstEmptyCell() {
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    if (board[r][c] === null) {
+                        return [r, c];
+                    }
+                }
+            }
+        }
+
+        function randomCell() {
+            let emptyCell = [];
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    if (board[r][c] === null) {
+                        emptyCell.push([r, c]);
+                    }
+                }
+            }
+            return emptyCell[Math.floor(Math.random()*emptyCell.length)];
+        }
+
+        function MTCS() {
+
         }
     </script>
 </body>
