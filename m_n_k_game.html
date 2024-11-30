@@ -69,6 +69,16 @@
         <label>
             Win Condition (k): <input id="winCondition" type="number" value="3" min="3" max="10">
         </label>
+        <span id="playerLabel">First Player:</span>
+        <label>
+            <input type="radio" name="firstPlayer" value="user" checked>
+            You
+        </label>
+        <label>
+            <input type="radio" name="firstPlayer" value="AI">
+            AI
+        </label>
+        
         <button id="start">Start Game</button>
     </div>
     <div class="board-container">
@@ -114,7 +124,8 @@
             logEntries.innerHTML = '';
             winMessage.style.display = 'none';
             gameOver = false;
-            currentPlayer = USER_MARK; // Reset to user's turn
+            currentPlayer = document.querySelector('input[name="firstPlayer"]:checked').value == "user" ? USER_MARK: AI_MARK;
+            console.log(currentPlayer);
 
             // Create grid layout
             boardContainer.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
@@ -130,6 +141,19 @@
                     cell.addEventListener('click', handleUserMove);
                     boardContainer.appendChild(cell);
                 }
+            }
+
+            // If AI starts first, make its move
+            if (currentPlayer === AI_MARK) {
+                const row = Math.floor(rows / 2);
+                const col = Math.floor(cols / 2);
+                board[row][col] = AI_MARK;
+                const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+                cell.textContent = AI_MARK;
+                cell.classList.add('taken');
+                logMove(row, col, AI_MARK);
+                remainderCellNum--; // Decrement remaining cells
+                currentPlayer = USER_MARK; // Switch to user's turn
             }
         }
 
