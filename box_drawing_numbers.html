@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Box Drawing Numbers</title>
+    <style>
+        body {
+            font-family: monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px;
+        }
+        #output {
+            white-space: pre;
+            font-size: 16px;
+        }
+        .controls {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <label for="size">Font size: </label>
+        <input type="range" id="size" min="10" max="50" value="16">
+    </div>
+    <div id="output"></div>
+
+    <script>
+        const numbers = {
+            0:`\
+┏━━┓
+┃┏┓┃
+┃┃┃┃
+┃┃┃┃
+┃┗┛┃
+┗━━┛`,
+            1: `\
+┏━┓　
+┗┓┃　
+　┃┃　
+　┃┃　
+┏┛┗┓
+┗━━┛`,
+            2: `\
+┏━━┓
+┗━┓┃
+┏━┛┃
+┃┏━┛
+┃┗━┓
+┗━━┛`,
+            3: `\
+┏━━┓
+┗━┓┃
+┏━┛┃
+┗━┓┃
+┏━┛┃
+┗━━┛`,
+            4: `\
+┏┓┏┓
+┃┃┃┃
+┃┗┛┃
+┗━┓┃
+　　┃┃
+　　┗┛`,
+            5: `\
+┏━━┓
+┃┏━┛
+┃┗━┓
+┗━┓┃
+┏━┛┃
+┗━━┛`,
+            6: `\
+┏┓　　
+┃┃　　
+┃┗━┓
+┃┏┓┃
+┃┗┛┃
+┗━━┛`,
+            7: `\
+┏━━┓
+┃┏┓┃
+┗┛┃┃
+　　┃┃
+　　┃┃
+　　┗┛`,
+            8: `\
+┏━━┓
+┃┏┓┃
+┃┗┛┃
+┃┏┓┃
+┃┗┛┃
+┗━━┛`,
+            9: `\
+┏━━┓
+┃┏┓┃
+┃┗┛┃
+┗━┓┃
+　　┃┃
+　　┗┛`,    ':': `\
+　　　　
+　┏┓　
+　┗┛　
+　┏┓　
+　┗┛　
+　　　　`,  '.': `\
+　　　　
+　　　　
+　　　　
+　　　　
+　┏┓　
+　┗┛　`,
+        };
+
+        const output = document.getElementById("output");
+        const sizeInput = document.getElementById("size");
+
+        function getBoxDrawingTime() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const time = `${hours}:${minutes}:${seconds}`;
+
+            // Create a 6x64 array to render all characters in one row
+            const rows = Array(6).fill('').map(() => Array(64).fill(' '));
+            let offset = 0;
+
+            for (const char of time) {
+                const charArt = (numbers[char] || '').split('\n');
+                for (let i = 0; i < charArt.length; i++) {
+                    for (let j = 0; j < charArt[i].length; j++) {
+                        rows[i][offset + j] = charArt[i][j];
+                    }
+                }
+                offset += 4; // Leave a space between characters
+            }
+
+            return rows.map(row => row.join('')).join('\n');
+        }
+
+        function updateClock() {
+            output.textContent = getBoxDrawingTime();
+        }
+
+        sizeInput.addEventListener("input", () => {
+            output.style.fontSize = `${sizeInput.value}px`;
+        });
+
+        setInterval(updateClock, 1000);
+        updateClock();
+    </script>
+</body>
+</html>
