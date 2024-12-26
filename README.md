@@ -16,6 +16,10 @@ Practice for HTML files.
 - [Zen_search](https://tanakai0.github.io/HTMLPlayground/Zen_search.html)
 
 ## References
-- The matrix_kanji.html was inspired by [servetgulnaroglu/ytb\_matrix\_js: https://youtu\.be/KKRlhyasaTA](https://github.com/servetgulnaroglu/ytb_matrix_js).
+- [Box\-drawing characters \- Wikipedia](https://en.wikipedia.org/wiki/Box-drawing_characters)
+- The matrix_kanji.html was inspired by [servetgulnaroglu/ytb\_matrix\_js](https://github.com/servetgulnaroglu/ytb_matrix_js).
 - [ENCYCLOPEDIA OF TRIANGLE CENTERS](https://faculty.evansville.edu/ck6/encyclopedia/ETC.html)
 - [m,n,k\-game \- Wikipedia](https://en.wikipedia.org/wiki/M,n,k-game)
+- [Simple perfect squared square of lowest order \- ScienceDirect](https://www.sciencedirect.com/science/article/pii/0095895678900412?via%3Dihub)
+- [Magic square \- Wikipedia](https://en.wikipedia.org/wiki/Magic_square)
+- [Determination of the day of the week \- Wikipedia](https://en.wikipedia.org/wiki/Determination_of_the_day_of_the_week)
