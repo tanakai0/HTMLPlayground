@@ -2,6 +2,7 @@
 Practice for HTML files.
 
 ## Demos
+- [box_drawing_clock](https://tanakai0.github.io/HTMLPlayground/box_drawing_clock.html)
 - [color_picker](https://tanakai0.github.io/HTMLPlayground/color_picker.html)
 - [day_of_the_week_quiz](https://tanakai0.github.io/HTMLPlayground/day_of_the_week_quiz.html)
 - [live_markdown_preview](https://tanakai0.github.io/HTMLPlayground/live_markdown_preview.html)
