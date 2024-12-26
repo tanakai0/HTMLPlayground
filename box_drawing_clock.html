@@ -30,70 +30,70 @@
 
     <script>
         const numbers = {
-            0:`\
+            '0':`\
 ┏━━┓
 ┃┏┓┃
 ┃┃┃┃
 ┃┃┃┃
 ┃┗┛┃
 ┗━━┛`,
-            1: `\
+            '1': `\
 ┏━┓　
 ┗┓┃　
 　┃┃　
 　┃┃　
 ┏┛┗┓
 ┗━━┛`,
-            2: `\
+            '2': `\
 ┏━━┓
 ┗━┓┃
 ┏━┛┃
 ┃┏━┛
 ┃┗━┓
 ┗━━┛`,
-            3: `\
+            '3': `\
 ┏━━┓
 ┗━┓┃
 ┏━┛┃
 ┗━┓┃
 ┏━┛┃
 ┗━━┛`,
-            4: `\
+            '4': `\
 ┏┓┏┓
 ┃┃┃┃
 ┃┗┛┃
 ┗━┓┃
 　　┃┃
 　　┗┛`,
-            5: `\
+            '5': `\
 ┏━━┓
 ┃┏━┛
 ┃┗━┓
 ┗━┓┃
 ┏━┛┃
 ┗━━┛`,
-            6: `\
+            '6': `\
 ┏┓　　
 ┃┃　　
 ┃┗━┓
 ┃┏┓┃
 ┃┗┛┃
 ┗━━┛`,
-            7: `\
+            '7': `\
 ┏━━┓
 ┃┏┓┃
 ┗┛┃┃
 　　┃┃
 　　┃┃
 　　┗┛`,
-            8: `\
+            '8': `\
 ┏━━┓
 ┃┏┓┃
 ┃┗┛┃
 ┃┏┓┃
 ┃┗┛┃
 ┗━━┛`,
-            9: `\
+            '9': `\
 ┏━━┓
 ┃┏┓┃
 ┃┗┛┃
@@ -116,6 +116,7 @@
 
         const output = document.getElementById("output");
         const sizeInput = document.getElementById("size");
+        const setIntervalTime = 1000/6;
 
         function getBoxDrawingTime() {
             const now = new Date();
@@ -125,11 +126,18 @@
             const time = `${hours}:${minutes}:${seconds}`;
 
             // Create a 6x64 array to render all characters in one row
-            const rows = Array(6).fill('').map(() => Array(64).fill(' '));
+            const rows = Array(6).fill('').map(() => Array(0).fill(' '));
             let offset = 0;
 
-            for (const char of time) {
-                const charArt = (numbers[char] || '').split('\n');
+            for (let i = 0; i < time.length; i++) {
+                let charArt;
+                if (i == time.length - 1) {
+                    charArt = getChangingTime(seconds[1], now.getMilliseconds() / 1000).split('\n');
+                }
+                else {
+                    char = time[i];
+                    charArt = (numbers[char] || '').split('\n');
+                }
                 for (let i = 0; i < charArt.length; i++) {
                     for (let j = 0; j < charArt[i].length; j++) {
                         rows[i][offset + j] = charArt[i][j];
@@ -141,6 +149,44 @@
             return rows.map(row => row.join('')).join('\n');
         }
 
+        function getChangingTime(oldChar, seconds) {
+            const height = 6;
+            let rows =  Array(height).fill('').map(() => Array(4).fill(' '));
+            const oldNum = parseInt(oldChar, 10);
+            const newNum = (oldNum + 1) % 10;
+            const oldCharArt = (numbers[oldNum] || '').split('\n');
+            const newCharArt = (numbers[newNum] || '').split('\n');
+            let changingRowNum = 0
+            if (seconds < 1/12) {
+                changingRowNum = 0;
+            } else if (1/12 <= seconds && seconds < 3/12) {
+                changingRowNum = 1;
+            } else if (3/12 <= seconds && seconds < 5/12) {
+                changingRowNum = 2;
+            } else if (5/12 <= seconds && seconds < 7/12) {
+                changingRowNum = 3;
+            } else if (7/12 <= seconds && seconds < 9/12) {
+                changingRowNum = 4;
+            } else if (9/12 <= seconds && seconds < 11/12) {
+                changingRowNum = 5;
+            } else {
+                changingRowNum = 6;
+            }
+            for (let i = 0; i < height; i++) {
+                let charRow;
+                if (changingRowNum - i  > 0){
+                    charRow = newCharArt[height + i - changingRowNum];
+                }
+                else {
+                    charRow = oldCharArt[i - changingRowNum];
+                }
+                for (let j = 0; j < 4; j++) {
+                    rows[i][j] = charRow[j];
+                }
+            }
+            return rows.map(row => row.join('')).join('\n');
+        }
+
         function updateClock() {
             output.textContent = getBoxDrawingTime();
         }
@@ -149,7 +195,7 @@
             output.style.fontSize = `${sizeInput.value}px`;
         });
 
-        setInterval(updateClock, 1000);
+        setInterval(updateClock, setIntervalTime);
         updateClock();
     </script>
 </body>
