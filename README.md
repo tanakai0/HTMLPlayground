@@ -15,6 +15,7 @@ Practice for HTML files.
 - [triangle_centers](https://tanakai0.github.io/HTMLPlayground/triangle_centers.html)
 - [Zen_search](https://tanakai0.github.io/HTMLPlayground/Zen_search.html)
 
-## Acknowledgements
-
-The matrix_kanji.html was inspired by [servetgulnaroglu/ytb\_matrix\_js: https://youtu\.be/KKRlhyasaTA](https://github.com/servetgulnaroglu/ytb_matrix_js).
+## References
+- The matrix_kanji.html was inspired by [servetgulnaroglu/ytb\_matrix\_js: https://youtu\.be/KKRlhyasaTA](https://github.com/servetgulnaroglu/ytb_matrix_js).
+- [ENCYCLOPEDIA OF TRIANGLE CENTERS](https://faculty.evansville.edu/ck6/encyclopedia/ETC.html)
+- [m,n,k\-game \- Wikipedia](https://en.wikipedia.org/wiki/M,n,k-game)
