@@ -27,11 +27,16 @@
 
 <script>
   // --- 定数設定 ---
-  const GRID_ROWS = 300;  // グリッド縦方向 m
-  const GRID_COLS = 600;  // グリッド横方向 n
   const CELL_SIZE = 2;  // マス目のサイズ（px）
   const LIGHTNING_COLOR = "white";
   const BACKGROUND_COLOR = "black";
+
+  const MARGIN = 20; // 画面の上下左右に空ける余白(px)
+  // const GRID_ROWS = 300;  // グリッド縦方向 m
+  // const GRID_COLS = 600;  // グリッド横方向 n
+  const GRID_ROWS = Math.floor((window.innerHeight - MARGIN) / CELL_SIZE);
+  const GRID_COLS = Math.floor((window.innerWidth - MARGIN) / CELL_SIZE);
+  console.log(`GRID_ROWS: ${GRID_ROWS}, GRID_COLS: ${GRID_COLS}`);
 
   // --- 初期化 ---
   const canvas = document.getElementById('lightningCanvas');
@@ -242,7 +247,8 @@
     return stop;
   }
 
-  function applyGaussianBlur(gaussianKernel7x7) {
+  function applyGaussianBlur(kernel7x7) {
+    // 雷の経路は画面全体に比べて疎なため、もっと高速化できそう
     const newFields = Array.from({ length: GRID_ROWS }, () => Array(GRID_COLS).fill(0));
 
     for (let i = 0; i < GRID_ROWS; i++) {
@@ -259,7 +265,7 @@
             const ni = i + di;
             const nj = j + dj;
             if (0 <= ni && ni < GRID_ROWS && 0 <= nj && nj < GRID_COLS) {
-              const weight = gaussianKernel7x7[di + 3][dj + 3];
+              const weight = kernel7x7[di + 3][dj + 3];
               sum += cells[ni][nj].electricField * weight;
               weightSum += weight;
             }
@@ -283,7 +289,8 @@
       for (let j = 0; j < GRID_COLS; j++) {
         const field = cells[i][j].electricField; // 0〜1の値
         const gray = Math.floor(field * 255); // 0〜255にスケール
-        const color = `rgb(${gray}, ${gray}, ${gray})`; // グレースケール
+        const blue = Math.floor(field * 255 * 1.1);
+        const color = `rgb(${gray}, ${gray}, ${blue})`; // グレースケール
         ctx.fillStyle = color;
         ctx.fillRect(j * CELL_SIZE, i * CELL_SIZE, CELL_SIZE, CELL_SIZE);
       }
