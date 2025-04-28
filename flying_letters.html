@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Flying Letters</title>
+<style>
+  body {
+    margin: 0;
+    overflow: hidden;
+    background-color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    position: relative;
+  }
+  #container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    perspective: 800px;
+    overflow: hidden;
+  }
+  .letter {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(1);
+    font-size: 400px;
+    font-family: Arial, sans-serif;
+    font-weight: bold;
+    color: white;
+    opacity: 1;
+  }
+</style>
+</head>
+<body>
+<div id="container"></div>
+
+<script>
+const TEXT = "おはよう！";
+const container = document.getElementById('container');
+let index = 0;
+
+function createLetter(char) {
+  const div = document.createElement('div');
+  div.className = 'letter';
+  div.textContent = char;
+  container.appendChild(div);
+  
+  let scale = 1;
+  let opacity = 1;
+
+  function animate() {
+    scale *= 0.98;
+    opacity *= 0.9;
+    div.style.transform = `translate(-50%, -50%) scale(${scale})`;
+    div.style.opacity = opacity;
+
+    if (opacity > 0.01) {
+      requestAnimationFrame(animate);
+    } else {
+      div.remove(); // 消えたら削除
+    }
+  }
+
+  animate();
+}
+
+function launchNext() {
+  if (index < TEXT.length) {
+    createLetter(TEXT[index]);
+    index++;
+    setTimeout(launchNext, 500); // 次の文字を0.5秒ごとに出す
+  }
+}
+
+launchNext();
+</script>
+</body>
+</html>
