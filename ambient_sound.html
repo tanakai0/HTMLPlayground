@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Ambient Sounds</title>
+<style>
+  body {
+    background-color: black;
+    color: white;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+  }
+
+  h1 {
+    margin-bottom: 30px;
+  }
+
+  .sound-control {
+    display: flex;
+    align-items: center;
+    margin: 10px;
+  }
+
+  .label-text {
+    margin-right: 10px;
+    font-size: 20px;
+  }
+
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+  }
+
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.4s;
+    border-radius: 34px;
+  }
+
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+  }
+
+  input:checked + .slider {
+    background-color: #2196F3;
+  }
+
+  input:checked + .slider:before {
+    transform: translateX(26px);
+  }
+</style>
+</head>
+<body>
+<h1>Ambient Sounds</h1>
+
+<div class="sound-control">
+  <span class="label-text">Rain</span>
+  <label class="switch">
+    <input type="checkbox" id="rainButton">
+    <span class="slider"></span>
+  </label>
+</div>
+
+<script>
+
+const rain1Base64 = "data:audio/mp3;base64,//uQZAAAAAAAAAAAAAAAAAAAA...";
+const thunder1Base64 = "data:audio/mp3;base64,//uQZAAAAAAAAAAAAAAAAAAAA...";
+
+const rain1 = new Audio(rain1Base64);
+
+class Sound {
+  constructor(startFunc, stopFunc) {
+    this.start = startFunc;
+    this.stop = stopFunc;
+    this.state = false;
+  }
+}
+
+const sounds = new Map();
+sounds.set("rain", new Sound(startRain, stopRain));
+
+
+function fadeVolume(audio, from, to, duration) {
+  return new Promise(resolve => {
+    const steps = 10;
+    let currentStep = 0;
+    const interval = duration / steps;
+    const volumeDelta = (to - from) / steps;
+
+    audio.volume = from;
+    const fade = setInterval(() => {
+      currentStep++;
+      audio.volume = Math.max(0, Math.min(1, from + volumeDelta * currentStep));
+      if (currentStep >= steps) {
+        clearInterval(fade);
+        resolve();
+      }
+    }, interval);
+  });
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function startRain() {
+    sounds.get("rain").state = true;
+    rain1.loop = true;
+    rain1.play();
+}
+
+async function stopRain() {
+    sounds.get("rain").state = false;
+    rain1.pause();
+    rain1.currentTime = 0;
+
+}
+
+// --- トグル処理 ---
+function toggleSound(type) {
+  const soundObj = sounds.get(type);
+  if (!soundObj) return;
+
+  if (!soundObj.state) {
+    soundObj.start();
+  } else {
+    soundObj.stop();
+  }
+}
+
+// --- イベント設定 ---
+document.getElementById('rainButton').addEventListener('change', () => toggleSound('rain'));
+
+</script>
+</body>
+</html>
