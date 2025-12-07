@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Warp Starfield</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background: #FFF8E7;  /* cosmic latte! */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    canvas {
+      display: block;
+      background: black;
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="space"></canvas>
+
+  <script>
+    const CANVAS_SIZE_RATE = 0.8;
+    const canvas = document.getElementById("space");
+    const vanishingPoint = { x: 0, y: 0 };
+    const ctx = canvas.getContext("2d");
+
+    let Stars = [];
+    const SpawnRate = 20; // milliseconds
+
+    let lastTime = 0;
+    let spawnTimer = 0;
+
+    function generateRandomStar() {
+      return {
+        angle: Math.random() * 2 * Math.PI,
+        radius: Math.random(),
+        speed: 5
+      };
+    }
+
+    function spawnStar(){
+        Stars.push(generateRandomStar());
+    }
+
+    function removeStar(index) {
+        Stars.splice(index, 1);
+    }
+
+    function resizeCanvas() {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+
+      canvas.width  = Math.floor(w * CANVAS_SIZE_RATE);
+      canvas.height = Math.floor(h * CANVAS_SIZE_RATE);
+      
+      vanishingPoint.x = Math.floor(canvas.width / 2);
+      vanishingPoint.y = Math.floor(canvas.height / 2);
+
+      ctx.fillStyle = "black";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function starInCanvas(star) {
+        const x = vanishingPoint.x + star.radius * Math.cos(star.angle);
+        const y = vanishingPoint.y + star.radius * Math.sin(star.angle);
+        return 0 <= x && x <= canvas.width && 0 <= y && y <= canvas.height;
+    }
+
+    function updateStars(dt) {
+        for (let i = Stars.length - 1; i >= 0; i--) {
+            const star = Stars[i];
+            star.radius += star.speed * (dt / 1000) * star.radius;
+
+            if (!starInCanvas(star)) {
+                removeStar(i);
+            }
+        }
+    }
+
+    function starSize(star) {
+        return Math.min(star.radius * 0.02, 4);
+    }
+
+    function renderStars() {
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = "white";
+        Stars.forEach(star => {
+            const x = vanishingPoint.x + star.radius * Math.cos(star.angle);
+            const y = vanishingPoint.y + star.radius * Math.sin(star.angle);
+            
+            const size = starSize(star);
+            
+            ctx.beginPath();
+            ctx.arc(x, y, size, 0, Math.PI * 2);
+            ctx.fill();
+        });
+    }
+
+    function loop(time) {
+        const dt = time - lastTime;
+        lastTime = time;
+
+        spawnTimer += dt;
+        if (spawnTimer > SpawnRate) {
+            spawnStar();
+            spawnTimer = 0;
+        }
+
+        updateStars(dt);
+        renderStars();
+
+        requestAnimationFrame(loop);
+    }
+
+    // Initialize canvas size
+    resizeCanvas();
+    requestAnimationFrame(loop);
+
+    window.addEventListener("resize", resizeCanvas);
+  </script>
+
+</body>
+</html>
