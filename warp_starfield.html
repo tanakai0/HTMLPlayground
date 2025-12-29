@@ -28,8 +28,25 @@
   <script>
     const CANVAS_SIZE_RATE = 0.8;
     const canvas = document.getElementById("space");
-    const vanishingPoint = { x: 0, y: 0 };
     const ctx = canvas.getContext("2d");
+    let centralPoint = { x: 0, y: 0 };
+    let vanishingPoint = { x: 0, y: 0 };
+    let vanishingPointDiff = { x: 0, y: 0 };
+
+    let speed = 5;
+    const SpeedMax = 20;
+    const SpeedMin = 1;
+    const accelRate = 0.05;
+
+    const keys = {
+      w: false,
+      s: false,
+      ArrowUp: false,
+      ArrowDown: false,
+      ArrowLeft: false,
+      ArrowRight: false,
+    };
+
 
     let Stars = [];
     const SpawnRate = 20; // milliseconds
@@ -41,7 +58,8 @@
       return {
         angle: Math.random() * 2 * Math.PI,
         radius: Math.random(),
-        speed: 5
+        speed: speed,
+        vanishingPoint: { x: vanishingPoint.x, y: vanishingPoint.y },
       };
     }
 
@@ -60,8 +78,10 @@
       canvas.width  = Math.floor(w * CANVAS_SIZE_RATE);
       canvas.height = Math.floor(h * CANVAS_SIZE_RATE);
       
-      vanishingPoint.x = Math.floor(canvas.width / 2);
-      vanishingPoint.y = Math.floor(canvas.height / 2);
+      centralPoint.x = Math.floor(canvas.width / 2);
+      centralPoint.y = Math.floor(canvas.height / 2);
+      vanishingPoint.x = centralPoint.x;
+      vanishingPoint.y = centralPoint.y;
 
       ctx.fillStyle = "black";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -76,7 +96,8 @@
     function updateStars(dt) {
         for (let i = Stars.length - 1; i >= 0; i--) {
             const star = Stars[i];
-            star.radius += star.speed * (dt / 1000) * star.radius;
+            let diff = star.speed * (dt / 1000) * star.radius
+            star.radius += diff;
 
             if (!starInCanvas(star)) {
                 removeStar(i);
@@ -94,8 +115,8 @@
 
         ctx.fillStyle = "white";
         Stars.forEach(star => {
-            const x = vanishingPoint.x + star.radius * Math.cos(star.angle);
-            const y = vanishingPoint.y + star.radius * Math.sin(star.angle);
+            const x = star.vanishingPoint.x + star.radius * Math.cos(star.angle);
+            const y = star.vanishingPoint.y + star.radius * Math.sin(star.angle);
             
             const size = starSize(star);
             
@@ -110,8 +131,80 @@
         lastTime = time;
 
         spawnTimer += dt;
+
+        if (keys.w || keys.s){
+          if (keys.w) {
+            speed += accelRate;
+          }
+          if (keys.s) {
+            speed -= accelRate;
+          }
+          speed = Math.min(Math.max(speed, SpeedMin), SpeedMax);
+          Stars.forEach(star => {
+            star.speed = speed;
+          });
+        }
+        const rotateSpeed = 1;
+        if (keys.ArrowUp || keys.ArrowDown || keys.ArrowLeft || keys.ArrowRight) {
+          if (keys.ArrowUp) {
+            vanishingPoint.y -= rotateSpeed;
+          }
+          if (keys.ArrowDown) {
+            vanishingPoint.y += rotateSpeed;
+          }
+          if (keys.ArrowLeft) {
+            vanishingPoint.x -= rotateSpeed;
+          }
+          if (keys.ArrowRight) {
+            vanishingPoint.x += rotateSpeed;
+          }
+          if (vanishingPoint.x < 0) vanishingPoint.x = 0;
+          if (vanishingPoint.x > canvas.width) vanishingPoint.x = canvas.width;
+          if (vanishingPoint.y < 0) vanishingPoint.y = 0;
+          if (vanishingPoint.y > canvas.height) vanishingPoint.y = canvas.height;
+        }
+        const returnSpeed = 0.5;
+        if (!keys.ArrowUp && !keys.ArrowDown) {
+          if (centralPoint.y < vanishingPoint.y){
+            if (vanishingPoint.y - centralPoint.y < returnSpeed * 3){
+              vanishingPoint.y = centralPoint.y;
+            }
+            else{
+              vanishingPoint.y -= returnSpeed;
+            }
+          }
+          else{
+            if (centralPoint.y - vanishingPoint.y < returnSpeed * 3){
+              vanishingPoint.y = centralPoint.y;
+            }
+            else{
+              vanishingPoint.y += returnSpeed;
+            }
+          } 
+        }
+        if (!keys.ArrowLeft && !keys.ArrowRight) {
+          if (centralPoint.x < vanishingPoint.x){
+            if (vanishingPoint.x - centralPoint.x < returnSpeed * 3){
+              vanishingPoint.x = centralPoint.x;
+            }
+            else{
+              vanishingPoint.x -= returnSpeed;
+            }
+          }
+          else{
+            if (centralPoint.x - vanishingPoint.x < returnSpeed * 3){
+              vanishingPoint.x = centralPoint.x;
+            }
+            else{
+              vanishingPoint.x += returnSpeed;
+            }
+          }
+        }
+
         if (spawnTimer > SpawnRate) {
-            spawnStar();
+            for (i=1; i<=10; i++){
+              spawnStar();
+            }
             spawnTimer = 0;
         }
 
@@ -126,6 +219,20 @@
     requestAnimationFrame(loop);
 
     window.addEventListener("resize", resizeCanvas);
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key in keys) {
+        keys[e.key] = true;
+        e.preventDefault(); // 矢印キーのスクロール防止
+      }
+    });
+
+    window.addEventListener("keyup", (e) => {
+      if (e.key in keys) {
+        keys[e.key] = false;
+        e.preventDefault();
+      }
+    });
   </script>
 
 </body>
