@@ -1,0 +1,534 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>共線ゲーム</title>
+  <style>
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP", sans-serif; margin: 16px; }
+    .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    input { width: 6rem; }
+    #wrap { margin-top: 12px; border: 1px solid #ccc; }
+    svg { width: 100%; height: 70vh; display: block; background: #fff; }
+    .hint { color: #555; font-size: 0.9rem; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <h1 style="margin:0 0 12px;">共線ゲーム</h1>
+  <div class="row">
+    <button id="resetSelection" type="button">選択リセット</button>
+    <strong>座標1</strong>: <span id="selectedCoord1">なし</span>
+    <strong>座標2</strong>: <span id="selectedCoord2">なし</span>
+    <button id="drawLine" type="button">直線を引く</button>
+  </div>
+  <div class="row">
+    <span id="player"><strong>先手番</strong></span>
+    <strong>メッセージ</strong>: <span id="message"></span>
+  </div>
+
+  <div id="wrap">
+    <svg id="gridSvg" xmlns="http://www.w3.org/2000/svg" aria-label="grid">
+      <!-- 中身は後で JS で生成 -->
+    </svg>
+  </div>
+  <div class="row">
+    <button id="drawBtn" type="button">盤面リセット</button>
+    <label>m（行方向の交点数）:
+      <input id="mInput" type="number" min="1" max="200" value="5" />
+    </label>
+    <label>n（列方向の交点数）:
+      <input id="nInput" type="number" min="1" max="200" value="4" />
+    </label>
+  </div>
+  <div class="row">
+    <label>選択中の点</label>
+    <input type="color" id="colorSelected" value="#ee1111">
+    <label>訪問済みの点</label><input type="color" id="colorVisited" value="#11aa11">
+    <label>直線</label><input type="color" id="colorLine" value="#0066cc">
+    <label>直線を表示<input type="checkbox" id="toggleLines" checked>
+</label>
+  </div>
+
+  <div class="hint">
+    <strong>共線ゲームのルール</strong><br>
+    一回の操作では二点を通る直線を引くことができる。<br>
+    直線が通る格子点は未選択状態から訪問済み状態へ変わる。<br>
+    二人のプレイヤーは、未選択状態の格子点を通るような直線を交互に引いていく。<br>
+    残った未選択状態の点をすべて埋める直線を最後に引いた人の勝ち。
+  </div>
+
+  <script>
+    // 色に関わる変数
+    const COLOR_NORMAL_POINT = "#666";
+    let COLOR_LINE = "#06c";
+    let COLOR_SELECTED_POINT = "#e11";
+    let COLOR_VISITED_POINT  = "#1a1";
+    document.addEventListener("DOMContentLoaded", () => {
+      COLOR_LINE = document.getElementById("colorLine").value;
+      COLOR_SELECTED_POINT = document.getElementById("colorSelected").value;
+      COLOR_VISITED_POINT  = document.getElementById("colorVisited").value;
+    });
+
+    // 格子点に関わる定数
+    const MAX_M = 50;  // 行方向の最大交点数
+    const MAX_N = 50;  // 列方向の最大交点数
+    const PADDING = 30;  // SVG上の余白（見やすさ用）
+    const POINT_RADIUS = 2.2;  // 交点の半径
+    const STEP = 40;  // グリッド間隔
+
+    // ===== DOM =====
+    const mInput = document.getElementById("mInput");
+    const nInput = document.getElementById("nInput");
+    const drawBtn = document.getElementById("drawBtn");
+    const drawLineBtn = document.getElementById("drawLine");
+    const svg = document.getElementById("gridSvg");
+
+    // メッセージ表示用
+    const messageSpan = document.getElementById("message");
+
+    function showMessage(msg = "") {
+      messageSpan.textContent = msg;
+    }
+
+    // 交点の表示用
+    const selectedCoordSpan1 = document.getElementById("selectedCoord1");
+    const selectedCoordSpan2 = document.getElementById("selectedCoord2");
+    const resetSelectionBtn = document.getElementById("resetSelection");
+    let selectedPoint1 = null;  // circle要素 or null
+    let selectedPoint2 = null;  // circle要素 or null
+
+    function formatCoord(el) {
+      if (!el) return "なし";
+      const gx = Number(el.dataset.gx);
+      const gy = Number(el.dataset.gy);
+      return `(${gx}, ${gy})`;
+    }
+
+    function applyPointColor(circle) {
+      if (!circle) return;
+      // 1) selected が最優先
+      if (circle === selectedPoint1 || circle === selectedPoint2) {
+        circle.setAttribute("fill", COLOR_SELECTED_POINT);
+        return;
+      }
+      // 2) visited
+      if (circle.dataset.visited === "1") {
+        circle.setAttribute("fill", COLOR_VISITED_POINT);
+        return;
+      }
+      // 3) それ以外
+      circle.setAttribute("fill", COLOR_NORMAL_POINT);
+    }
+
+    function updateSelectedLabels() {
+      selectedCoordSpan1.textContent = formatCoord(selectedPoint1);
+      selectedCoordSpan2.textContent = formatCoord(selectedPoint2);
+    }
+
+    function resetSelection() {
+      const old1 = selectedPoint1;
+      const old2 = selectedPoint2;
+      selectedPoint1 = null;
+      selectedPoint2 = null;
+      applyPointColor(old1);
+      applyPointColor(old2);
+      updateSelectedLabels();
+    }
+
+    resetSelectionBtn.addEventListener("click", () => {
+      if (window.GridApp.isGameOver) return;
+      showMessage();
+      resetSelection();
+    });
+
+    function markVisited(circle) {
+      if (!circle) return;
+      circle.dataset.visited = "1";
+      window.GridApp.remainingUnvisited--;
+    }
+
+    function getUnvisitedCirclesOnLine(selectedPoint1, selectedPoint2) {
+      const m = window.GridApp.m;
+      const n = window.GridApp.n;
+      const gx1 = Number(selectedPoint1.dataset.gx);
+      const gy1 = Number(selectedPoint1.dataset.gy);
+      const gx2 = Number(selectedPoint2.dataset.gx);
+      const gy2 = Number(selectedPoint2.dataset.gy);
+      const dx = gx2 - gx1;
+      const dy = gy2 - gy1;
+      // 同一点なら何もしない
+      if (dx === 0 && dy === 0) return [];
+      const g = gcd(dx, dy);
+      const sx = dx / g; // 最小ステップ
+      const sy = dy / g;
+      
+      // (gx1,gy1) から負方向にどこまで行けるか
+      // k を減らしながら範囲内を保てる最大回数
+      let kMin = 0;
+      while (0 <= gx1 + (kMin - 1) * sx && gx1 + (kMin - 1) * sx < m &&
+             0 <= gy1 + (kMin - 1) * sy && gy1 + (kMin - 1) * sy < n) {
+        kMin--;
+      }
+      // 正方向にどこまで行けるか
+      let kMax = 0;
+      while (0 <= gx1 + (kMax + 1) * sx && gx1 + (kMax + 1) * sx < m &&
+             0 <= gy1 + (kMax + 1) * sy && gy1 + (kMax + 1) * sy < n) {
+        kMax++;
+      }
+      const unvisited = [];
+      // kMin..kMax をなめて visited 化
+      for (let k = kMin; k <= kMax; k++) {
+        const gx = gx1 + k * sx;
+        const gy = gy1 + k * sy;
+
+        const c = getGridCircle(gx, gy);
+        if (!c) continue;
+
+        if (c.dataset.visited !== "1"){
+          unvisited.push(c);
+        }
+      }
+      return unvisited;
+    }
+
+    // 直線の表示用
+    const toggleLines = document.getElementById("toggleLines");
+    toggleLines.addEventListener("change", (e) => {
+      setLinesVisible(e.target.checked);
+      window.GridApp.linesVisible = e.target.checked;
+    });
+    
+    function setLinesVisible(visible) {
+      const { layers } = window.GridApp;
+      if (!layers) return;
+      layers.overlayLines.style.display = visible ? "" : "none";
+    }
+
+    drawLineBtn.addEventListener("click", () => {
+      if (window.GridApp.isGameOver) return;
+      showMessage();
+      if (!selectedPoint1 || !selectedPoint2) {
+        showMessage("まず二点を選んでください。");
+      }
+      else {
+        const gx1 = Number(selectedPoint1.dataset.gx);
+        const gy1 = Number(selectedPoint1.dataset.gy);
+        const gx2 = Number(selectedPoint2.dataset.gx);
+        const gy2 = Number(selectedPoint2.dataset.gy);
+      
+        const unvisitedCircles = getUnvisitedCirclesOnLine(selectedPoint1, selectedPoint2);
+        if (unvisitedCircles.length === 0) {
+          showMessage("この直線上に未選択の点はありません。別の直線を引いてください。");
+        }
+        else{
+          // 未選択の点があるなら直線を引く
+          window.GridApp.addLine([gx1, gy1], [gx2, gy2]);
+          for (const c of unvisitedCircles) {
+            markVisited(c);
+            applyPointColor(c);
+          }
+          if (window.GridApp.remainingUnvisited === 0) {
+            const currentPlayer = document.getElementById("player").textContent;
+            showMessage(`${currentPlayer}の勝ち！おめでとうございます！`);
+            window.GridApp.isGameOver = true;
+          }
+          else{
+            if (document.getElementById("player").textContent === "先手番") {
+              document.getElementById("player").textContent = "後手番";
+            } else {
+              document.getElementById("player").textContent = "先手番";
+            }
+          }
+        }
+      }
+      resetSelection();
+    });
+
+    // ===== utility =====
+    function clampInt(v, min, max) {
+      const x = Math.floor(Number(v));
+      if (!Number.isFinite(x)) return min;
+      return Math.max(min, Math.min(max, x));
+    }
+
+    function el(tag, attrs = {}) {
+      const node = document.createElementNS("http://www.w3.org/2000/svg", tag);
+      for (const [k, val] of Object.entries(attrs)) node.setAttribute(k, String(val));
+      return node;
+    }
+
+    /**
+     * 格子座標 (gx, gy) を SVG 座標 (x, y) に変換する
+     * - gx: 0..m-1
+     * - gy: 0..n-1
+     *
+     * 返り値: { x, y }
+     */
+    function makeGridMapper(m, n) {
+      const width = (m - 1) * STEP + 2 * PADDING;
+      const height = (n - 1) * STEP + 2 * PADDING;
+
+      function gridToSvg(gx, gy) {
+        return {
+          x: PADDING + gx * STEP,
+          y: PADDING + gy * STEP,
+        };
+      }
+
+      return { width, height, gridToSvg };
+    }
+
+    // 後で外から使えるように（デバッグや追加描画に便利）
+    window.GridApp = {
+      m: 0,
+      n: 0,
+      remainingUnvisited: 0,
+      isGameOver: false,
+      gridToSvg: null,
+      svg,
+      layers: null, // { gridLines, gridPoints, overlayLines, overlayPoints }
+      redraw,
+      clearOverlay,
+      addPoint,  // 例: GridApp.addPoint(3,2) で格子上に点を追加
+      addLine,  // 例: GridApp.addLine([0,0],[3,2]) で格子点を結ぶ線を追加
+      linesVisible: true, // 直線を表示するか
+    };
+
+    function gcd(a, b) {
+      a = Math.abs(a);
+      b = Math.abs(b);
+      while (b !== 0) {
+        const t = a % b;
+        a = b;
+        b = t;
+      }  
+      return a;
+    }
+
+    // ===== 描画本体 =====
+    function redraw() {
+      const m = clampInt(mInput.value, 1, MAX_M);
+      const n = clampInt(nInput.value, 1, MAX_N);
+      mInput.value = m;
+      nInput.value = n;
+
+      // 現在のマッパー
+      const { width, height, gridToSvg } = makeGridMapper(m, n);
+
+      // SVG を初期化
+      svg.innerHTML = "";
+      svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+
+      // レイヤー構造（後で線や点を追加しやすい）
+      const gridLines = el("g", { id: "grid-lines" });
+      const gridPoints = el("g", { id: "grid-points" });
+      const overlayLines = el("g", { id: "overlay-lines" });
+      const overlayPoints = el("g", { id: "overlay-points" });
+
+      svg.appendChild(gridLines);
+      svg.appendChild(overlayLines);
+      svg.appendChild(gridPoints);
+      svg.appendChild(overlayPoints);
+
+      // 外部公開（後で線・点描画に使う）
+      window.GridApp.m = m;
+      window.GridApp.n = n;
+      window.GridApp.remainingUnvisited = m * n;
+      window.GridApp.isGameOver = false;
+      window.GridApp.gridToSvg = gridToSvg;
+      window.GridApp.layers = { gridLines, gridPoints, overlayLines, overlayPoints };
+
+      // 縦線（x一定）
+      for (let gx = 0; gx < m; gx++) {
+        const p1 = gridToSvg(gx, 0);
+        const p2 = gridToSvg(gx, n - 1);
+        gridLines.appendChild(el("line", {
+          x1: p1.x, y1: p1.y, x2: p2.x, y2: p2.y,
+          stroke: "#ddd", "stroke-width": 1
+        }));
+      }
+
+      // 横線（y一定）
+      for (let gy = 0; gy < n; gy++) {
+        const p1 = gridToSvg(0, gy);
+        const p2 = gridToSvg(m - 1, gy);
+        gridLines.appendChild(el("line", {
+          x1: p1.x, y1: p1.y, x2: p2.x, y2: p2.y,
+          stroke: "#ddd", "stroke-width": 1
+        }));
+      }
+
+      // 交点
+      for (let gy = 0; gy < n; gy++) {
+        for (let gx = 0; gx < m; gx++) {
+          const p = gridToSvg(gx, gy);
+          const c = el("circle", {
+            cx: p.x, cy: p.y, r: POINT_RADIUS,
+            fill: COLOR_NORMAL_POINT
+          });
+          // 後で拾いやすいように格子座標を入れておく
+          c.dataset.gx = String(gx);
+          c.dataset.gy = String(gy);
+          gridPoints.appendChild(c);
+
+          c.addEventListener("click", (e) => {
+            if (window.GridApp.isGameOver) return;
+            showMessage();
+            const el = e.currentTarget;
+            // 連続で同じ点を選んだら無視（任意）
+            if (el === selectedPoint1 || el === selectedPoint2) return;
+            if (selectedPoint1 === null) {
+                // 1点目
+                selectedPoint1 = el;
+                applyPointColor(selectedPoint1);
+            } else if (selectedPoint2 === null) {
+                // 2点目
+                selectedPoint2 = el;
+                applyPointColor(selectedPoint2);
+            } else {
+                // 3点目以降：シフト
+                const old1 = selectedPoint1;
+                // 2→1へ繰り上げ（色は赤のままでOK）
+                selectedPoint1 = selectedPoint2;
+                // 新しい点を2へ
+                selectedPoint2 = el;
+
+                // 1点目を解除
+                applyPointColor(old1);
+                applyPointColor(selectedPoint2);
+            }
+            updateSelectedLabels();
+          });
+        }
+      }
+      selectedPoint1 = null;
+      selectedPoint2 = null;
+      updateSelectedLabels();
+      showMessage("");
+      document.getElementById("player").textContent = "先手番";
+      setLinesVisible(window.GridApp.linesVisible);
+    }
+
+    // ===== 追加描画（後で使う用：サンプル実装） =====
+    function clearOverlay() {
+      const layers = window.GridApp.layers;
+      if (!layers) return;
+      layers.overlayLines.innerHTML = "";
+      layers.overlayPoints.innerHTML = "";
+    }
+
+    // 格子座標に点を打つ（overlay レイヤー）
+    function addPoint(gx, gy, opts = {}) {
+      const { gridToSvg, layers } = window.GridApp;
+      if (!gridToSvg || !layers) return;
+      const p = gridToSvg(gx, gy);
+      const r = opts.r ?? 4;
+      const fill = opts.fill ?? COLOR_SELECTED_POINT;
+      const c = el("circle", { cx: p.x, cy: p.y, r, fill });
+      c.dataset.gx = String(gx);
+      c.dataset.gy = String(gy);
+      layers.overlayPoints.appendChild(c);
+      return c;
+    }
+
+    // 格子点同士を結ぶ直線（描画範囲はsvgの枠いっぱい）（overlay レイヤー）
+    function addLine([x1, y1], [x2, y2], opts = {}) {
+      const { gridToSvg, layers, svg } = window.GridApp;
+      if (!gridToSvg || !layers || !svg) return;
+      const vb = svg.viewBox.baseVal;
+      const W = vb.width;
+      const H = vb.height;
+      const p1 = gridToSvg(x1, y1);
+      const p2 = gridToSvg(x2, y2);
+      const dx = p2.x - p1.x;
+      const dy = p2.y - p1.y;
+      
+      // 同一点なら直線定義できない
+      if (dx === 0 && dy === 0) return null;
+      const EPS = 1e-9;
+      const pts = []; // {x,y,t}
+       
+      function addCandidate(t) {
+        const x = p1.x + t * dx;
+        const y = p1.y + t * dy;
+        // 枠内（辺上）にあるか判定
+        if (x < -EPS || x > W + EPS || y < -EPS || y > H + EPS) return;
+        // 角などで重複しがちなので近い点は除外
+        for (const q of pts) {
+          if (Math.hypot(q.x - x, q.y - y) < 1e-6) return;
+        }
+          pts.push({ x, y, t });
+      }
+
+      // x = 0, x = W との交点
+      if (Math.abs(dx) > EPS) {
+        addCandidate((0 - p1.x) / dx);
+        addCandidate((W - p1.x) / dx);
+      }
+      // y = 0, y = H との交点
+      if (Math.abs(dy) > EPS) {
+        addCandidate((0 - p1.y) / dy);
+        addCandidate((H - p1.y) / dy);
+      }
+      
+      // 枠と交わらない場合
+      if (pts.length < 2) return null;
+
+      // t でソートして「枠内での両端」を選ぶ
+      pts.sort((a, b) => a.t - b.t);
+      const A = pts[0];
+      const B = pts[pts.length - 1];
+
+      const stroke = opts.stroke ?? COLOR_LINE;
+      const strokeWidth = opts.strokeWidth ?? 2;
+      const line = el("line", {
+        x1: A.x, y1: A.y, x2: B.x, y2: B.y,
+        stroke, "stroke-width": strokeWidth
+      });
+      layers.overlayLines.appendChild(line);
+      return line;
+    }
+
+    function getGridCircle(gx, gy) {
+      return document.querySelector(
+        `#grid-points circle[data-gx="${gx}"][data-gy="${gy}"]`
+      );
+    }
+
+    function refreshAllPointColors() {
+      document.querySelectorAll("#grid-points circle").forEach(c => {
+        applyPointColor(c);
+      });
+    }
+    function refreshAllLines() {
+      document.querySelectorAll("#overlay-lines line").forEach(l => {
+        l.setAttribute("stroke", COLOR_LINE);
+      });
+    }
+    document.getElementById("colorSelected").addEventListener("input", e => {
+      COLOR_SELECTED_POINT = e.target.value;
+      refreshAllPointColors();
+    });
+    document.getElementById("colorVisited").addEventListener("input", e => {
+      COLOR_VISITED_POINT = e.target.value;
+      refreshAllPointColors();
+    });
+    document.getElementById("colorLine").addEventListener("input", e => {
+      COLOR_LINE = e.target.value;
+      refreshAllLines();
+    });
+
+    // ===== イベント =====
+    drawBtn.addEventListener("click", redraw);
+    mInput.addEventListener("change", redraw);
+    nInput.addEventListener("change", redraw);
+
+    // 初期描画
+    redraw();
+
+    // 使い方例（必要ならコメント解除）
+    // window.GridApp.addPoint(2, 3);
+    // window.GridApp.addLine([0, 0], [5, 4]);
+  </script>
+</body>
+</html>
