@@ -3,6 +3,7 @@ Practice for HTML files.
 
 ## Demos
 - [box_drawing_clock](https://tanakai0.github.io/HTMLPlayground/box_drawing_clock.html)
+- [collinear_game](https://tanakai0.github.io/HTMLPlayground/collinear_game.html)
 - [color_picker](https://tanakai0.github.io/HTMLPlayground/color_picker.html)
 - [day_of_the_week_quiz](https://tanakai0.github.io/HTMLPlayground/day_of_the_week_quiz.html)
 - [lightning](https://tanakai0.github.io/HTMLPlayground/lightning.html)
