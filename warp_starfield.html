@@ -13,8 +13,9 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      flex-direction: column;
     }
-
+    .hint { color: #555; font-size: 0.9rem; margin-top: 8px;}
     canvas {
       display: block;
       background: black;
@@ -22,9 +23,11 @@
   </style>
 </head>
 <body>
-
   <canvas id="space"></canvas>
-
+  <div class="hint">
+    W/S: accelerate / decelerate<br>
+    ↑/↓/←/→: move
+  </div>
   <script>
     const CANVAS_SIZE_RATE = 0.8;
     const canvas = document.getElementById("space");
