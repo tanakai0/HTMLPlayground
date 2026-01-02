@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>画像ブロック崩し</title>
+  <style>
+    body { margin: 0; font-family: system-ui, sans-serif; background: #111; color: #eee; }
+    .ui { padding: 10px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    canvas { display:block; margin: 0 auto; background: #000; border: 1px solid #333; }
+    .hint { opacity: 0.85; font-size: 14px; }
+    button, input { font: inherit; }
+  </style>
+</head>
+<body>
+  <div class="ui">
+    <input id="file" type="file" accept="image/*">
+    <button id="reset">リセット</button>
+    <span class="hint">←画像を選ぶ / マウスでパドル移動（左右）</span>
+  </div>
+  <canvas id="c" width="800" height="500"></canvas>
+
+  <script>
+    const canvas = document.getElementById("c");
+    const ctx = canvas.getContext("2d");
+
+    // ---- 設定 ----
+    const COLS = 16;
+    const ROWS = 8;
+    const TOP_MARGIN = 20;
+    const BLOCK_PAD = 2;
+
+    // ---- 状態 ----
+    let img = null;
+    let blocks = []; // {x,y,w,h,alive}
+    let score = 0;
+
+    const paddle = { w: 120, h: 14, x: canvas.width/2 - 60, y: canvas.height - 30 };
+    const ball = { r: 8, x: canvas.width/2, y: canvas.height - 60, vx: 4, vy: -4 };
+
+    function initBlocks() {
+      blocks = [];
+      const usableW = canvas.width;
+      const blockW = usableW / COLS;
+      const blockH = 24;
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          const x = c * blockW;
+          const y = TOP_MARGIN + r * blockH;
+          blocks.push({
+            x: x + BLOCK_PAD,
+            y: y + BLOCK_PAD,
+            w: blockW - BLOCK_PAD*2,
+            h: blockH - BLOCK_PAD*2,
+            alive: true
+          });
+        }
+      }
+      score = 0;
+    }
+
+    function resetBall() {
+      ball.x = canvas.width/2;
+      ball.y = canvas.height - 60;
+      // ちょいランダムにして単調さを回避
+      ball.vx = (Math.random() < 0.5 ? -1 : 1) * (3 + Math.random()*2);
+      ball.vy = - (4 + Math.random()*1.5);
+    }
+
+    function resetAll() {
+      initBlocks();
+      paddle.x = canvas.width/2 - paddle.w/2;
+      resetBall();
+    }
+
+    // ---- 入力：マウスでパドル ----
+    canvas.addEventListener("mousemove", (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const mx = e.clientX - rect.left;
+      paddle.x = mx - paddle.w/2;
+      // clamp
+      paddle.x = Math.max(0, Math.min(canvas.width - paddle.w, paddle.x));
+    });
+
+    // ---- 画像読み込み ----
+    document.getElementById("file").addEventListener("change", (e) => {
+      const f = e.target.files?.[0];
+      if (!f) return;
+      const url = URL.createObjectURL(f);
+      const im = new Image();
+      im.onload = () => {
+        img = im;
+        URL.revokeObjectURL(url);
+        resetAll();
+      };
+      im.src = url;
+    });
+
+    document.getElementById("reset").addEventListener("click", () => resetAll());
+
+    // ---- 当たり判定 ----
+    function circleRectHit(cx, cy, r, rx, ry, rw, rh) {
+      // 最近点にクランプ
+      const px = Math.max(rx, Math.min(cx, rx + rw));
+      const py = Math.max(ry, Math.min(cy, ry + rh));
+      const dx = cx - px;
+      const dy = cy - py;
+      return dx*dx + dy*dy <= r*r;
+    }
+
+    function step() {
+      // ball move
+      ball.x += ball.vx;
+      ball.y += ball.vy;
+
+      // wall
+      if (ball.x - ball.r < 0) { ball.x = ball.r; ball.vx *= -1; }
+      if (ball.x + ball.r > canvas.width) { ball.x = canvas.width - ball.r; ball.vx *= -1; }
+      if (ball.y - ball.r < 0) { ball.y = ball.r; ball.vy *= -1; }
+
+      // bottom (miss)
+      if (ball.y - ball.r > canvas.height) {
+        resetBall();
+      }
+
+      // paddle
+      if (circleRectHit(ball.x, ball.y, ball.r, paddle.x, paddle.y, paddle.w, paddle.h) && ball.vy > 0) {
+        // 反射角を少し変える：当たった位置で vx を調整
+        const hit = (ball.x - (paddle.x + paddle.w/2)) / (paddle.w/2); // -1..1
+        ball.vx = hit * 6;     // 最大で左右に強め
+        ball.vy *= -1;
+        ball.y = paddle.y - ball.r - 0.1;
+      }
+
+      // blocks
+      for (const b of blocks) {
+        if (!b.alive) continue;
+        if (circleRectHit(ball.x, ball.y, ball.r, b.x, b.y, b.w, b.h)) {
+          b.alive = false;   // パカッと消える
+          score++;
+
+          // ざっくり反射：上下左右どっちを優先するかを距離で決める
+          const cx = ball.x;
+          const cy = ball.y;
+          const left = Math.abs(cx - b.x);
+          const right = Math.abs(cx - (b.x + b.w));
+          const top = Math.abs(cy - b.y);
+          const bottom = Math.abs(cy - (b.y + b.h));
+          const min = Math.min(left, right, top, bottom);
+          if (min === left || min === right) ball.vx *= -1;
+          else ball.vy *= -1;
+
+          break; // 1フレームで複数消えないように
+        }
+      }
+    }
+
+    // ---- 描画 ----
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // 背景画像（なければ暗いグラデ）
+      if (img) {
+        // 画像をcanvasにフィット（アスペクト維持してcover）
+        const cw = canvas.width, ch = canvas.height;
+        const iw = img.naturalWidth, ih = img.naturalHeight;
+        const scale = Math.max(cw/iw, ch/ih);
+        const dw = iw * scale, dh = ih * scale;
+        const dx = (cw - dw) / 2, dy = (ch - dh) / 2;
+        ctx.drawImage(img, dx, dy, dw, dh);
+      } else {
+        // デフォ背景
+        const g = ctx.createLinearGradient(0,0,0,canvas.height);
+        g.addColorStop(0, "#111");
+        g.addColorStop(1, "#000");
+        ctx.fillStyle = g;
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+      }
+
+      // ブロック
+      ctx.fillStyle = "rgba(255,255,255, 1)";
+      ctx.strokeStyle = "rgba(255,255,255, 1)";
+      for (const b of blocks) {
+        if (!b.alive) continue;
+        ctx.fillRect(b.x, b.y, b.w, b.h);
+        ctx.strokeRect(b.x + 0.5, b.y + 0.5, b.w - 1, b.h - 1);
+      }
+
+      // パドル
+      ctx.fillStyle = "rgba(255,255,255,0.85)";
+      ctx.fillRect(paddle.x, paddle.y, paddle.w, paddle.h);
+
+      // ボール
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(255,255,255,0.95)";
+      ctx.fill();
+
+      // UI
+      ctx.fillStyle = "rgba(0,0,0,0.55)";
+      ctx.fillRect(10, 10, 150, 26);
+      ctx.fillStyle = "#fff";
+      ctx.font = "14px system-ui, sans-serif";
+      ctx.fillText(`score: ${score}`, 18, 28);
+
+      // クリア
+      if (blocks.every(b => !b.alive)) {
+        ctx.fillStyle = "rgba(0,0,0,0.55)";
+        ctx.fillRect(0, canvas.height/2 - 30, canvas.width, 60);
+        ctx.fillStyle = "#fff";
+        ctx.font = "24px system-ui, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("CLEAR! リセットで再挑戦", canvas.width/2, canvas.height/2 + 8);
+        ctx.textAlign = "start";
+      }
+    }
+
+    function loop() {
+      step();
+      draw();
+      requestAnimationFrame(loop);
+    }
+
+    resetAll();
+    loop();
+  </script>
+</body>
+</html>
