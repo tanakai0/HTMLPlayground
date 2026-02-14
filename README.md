@@ -14,6 +14,7 @@ Practice for HTML files.
 - [m_n_k_game](https://tanakai0.github.io/HTMLPlayground/m_n_k_game.html)
 - [sparklers](https://tanakai0.github.io/HTMLPlayground/sparklers.html)
 - [square_puzzle](https://tanakai0.github.io/HTMLPlayground/square_puzzle.html)
+- [task_timer](https://tanakai0.github.io/HTMLPlayground/task_timer.html)
 - [triangle_centers](https://tanakai0.github.io/HTMLPlayground/triangle_centers.html)
 - [warp_starfield](https://tanakai0.github.io/HTMLPlayground/warp_starfield.html)
 - [Zen_search](https://tanakai0.github.io/HTMLPlayground/Zen_search.html)

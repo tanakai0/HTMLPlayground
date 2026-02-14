@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>集中タイマー</title>
+  <style>
+    /* ========== 色の定義（後から調整しやすいように変数化） ========== */
+    :root {
+      --color-break: #ffffff;        /* 休憩（白） */
+      --color-default-task: #2c3e50; /* タスク黒（黒） */
+      --color-red: #e74c3c;
+      --color-blue: #3498db;
+      --color-gray: #95a5a6;
+      --color-purple: #9b59b6;
+      --color-cyan: #00bcd4;
+      --color-yellowgreen: #8bc34a;
+      --color-yellow: #f1c40f;
+      --color-border: #b8d4b8;
+      --color-bg: #e8f5e9;          /* 薄い緑（目に優しい） */
+      --color-text: #333;
+      --color-panel: #f1f8e9;       /* 統計・履歴パネル用の薄い緑 */
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 12px;
+      font-family: sans-serif;
+      background: var(--color-bg);
+      color: var(--color-text);
+    }
+
+    .container {
+      display: flex;
+      gap: 24px;
+      max-width: 900px;
+      margin: 0 auto;
+      flex-wrap: wrap;
+    }
+
+    .left {
+      flex: 0 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .state-label {
+      min-height: 1.5em;
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    .timer-btn {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 3px solid var(--color-border);
+      cursor: pointer;
+      font-size: 0;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .timer-btn:active { transform: scale(0.98); }
+    .timer-btn.show-label { font-size: 0.75rem; line-height: 1.2; }
+    .timer-btn.idle { background: var(--color-gray); }   /* 未計測時 */
+    .timer-btn.break { background: var(--color-break); border-color: #ccc; }
+    .timer-btn.task { background: var(--color-default-task); }
+    .timer-btn.task[data-color="red"] { background: var(--color-red); }
+    .timer-btn.task[data-color="blue"] { background: var(--color-blue); }
+    .timer-btn.task[data-color="gray"] { background: var(--color-gray); }
+    .timer-btn.task[data-color="purple"] { background: var(--color-purple); }
+    .timer-btn.task[data-color="cyan"] { background: var(--color-cyan); }
+    .timer-btn.task[data-color="yellowgreen"] { background: var(--color-yellowgreen); }
+    .timer-btn.task[data-color="yellow"] { background: var(--color-yellow); }
+
+    .right {
+      flex: 1 1 400px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .stats {
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      padding: 10px 12px;
+      background: var(--color-panel);
+    }
+    .stats h3 { margin: 0 0 6px 0; font-size: 0.95rem; }
+    .stats-main { font-size: 0.9rem; }
+    .stats-main .stats-row { padding: 2px 0; }
+    .stats-main .stats-label { display: inline-block; width: 7em; text-align: left; }
+    .stats-main .stats-duration { display: inline-block; min-width: 7em; text-align: right; }
+    .stats-breakdown { margin-top: 8px; padding-left: 0; font-size: 0.9rem; list-style: none; }
+    .stats-breakdown li { padding: 2px 0; }
+    .stats-breakdown .stats-label { display: inline-block; width: 7em; text-align: left; }
+    .stats-breakdown .stats-duration { display: inline-block; min-width: 7em; text-align: right; }
+
+    .history-section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .history-wrap {
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      padding: 8px;
+      background: var(--color-panel);
+      max-height: 280px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+    .history-title { margin: 0 0 6px 0; font-size: 0.95rem; }
+    .history-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      flex: 1;
+      min-height: 0;
+    }
+    .history-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 8px;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+      cursor: default;
+      flex-wrap: wrap;
+    }
+    .history-row:last-child { border-bottom: none; }
+    .history-row.task-row { cursor: pointer; }
+    .history-row .time-range { flex: 1 1 auto; min-width: 0; font-size: 0.85rem; color: #555; }
+    .history-row .duration { flex-shrink: 0; min-width: 5em; font-size: 0.9rem; text-align: right; }
+    .history-row .color-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 1px solid rgba(0,0,0,0.2);
+      flex-shrink: 0;
+    }
+    .history-row .color-radios {
+      display: none;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      margin-top: 6px;
+      padding-top: 6px;
+      border-top: 1px dashed var(--color-border);
+      width: 100%;
+    }
+    .history-row.editing .color-radios { display: flex; }
+    .history-row .color-radios label {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 2px;
+    }
+    .history-row .color-radios input { position: absolute; opacity: 0; width: 0; height: 0; margin: 0; }
+    .history-row .color-radios .color-option {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      transition: transform 0.15s, border-color 0.15s;
+    }
+    .history-row .color-radios input:checked + .color-option {
+      transform: scale(1.35);
+      border-color: rgba(0,0,0,0.3);
+    }
+
+    .history-actions {
+      display: flex;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .btn {
+      padding: 6px 12px;
+      border: 1px solid var(--color-border);
+      border-radius: 4px;
+      background: var(--color-panel);
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .btn:hover { background: #e0edd8; }
+    .btn-danger:hover { background: #fee; border-color: #c00; }
+
+    .memo-wrap {
+      width: 100%;
+      max-width: 240px;
+      margin-top: 8px;
+    }
+    .memo-wrap label { display: block; font-size: 0.85rem; margin-bottom: 4px; color: #555; }
+    .memo-wrap textarea {
+      width: 100%;
+      min-height: 60px;
+      padding: 8px;
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      resize: vertical;
+      background: var(--color-panel);
+      box-sizing: border-box;
+    }
+    .memo-wrap .memo-counter { font-size: 0.75rem; color: #888; text-align: right; margin-top: 2px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="left">
+      <div class="state-label" id="stateLabel"></div>
+      <button type="button" class="timer-btn idle" id="timerBtn" aria-label="計測開始/休憩切り替え"></button>
+      <div class="memo-wrap">
+        <label for="memoInput">メモ</label>
+        <textarea id="memoInput" maxlength="500" placeholder="メモを入力..."></textarea>
+        <div class="memo-counter" id="memoCounter">0/500</div>
+      </div>
+    </div>
+    <div class="right">
+      <div class="stats">
+        <h3>統計</h3>
+        <div id="statsContent"></div>
+        <ul class="stats-breakdown" id="statsBreakdown" style="display:none;"></ul>
+      </div>
+      <div class="history-section">
+        <div class="history-wrap">
+          <h3 class="history-title">履歴</h3>
+          <ul class="history-list" id="historyList"></ul>
+        </div>
+        <div class="history-actions">
+          <button type="button" class="btn" id="downloadBtn">データダウンロード</button>
+          <button type="button" class="btn btn-danger" id="deleteBtn">データ削除</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ========== 色の定義（ラベル・保存用ID・CSS変数対応） ==========
+    const COLOR_IDS = ['break', 'default', 'red', 'yellow', 'yellowgreen', 'blue', 'cyan', 'purple', 'gray'];
+    const COLOR_LABELS = {
+      break: '休憩',
+      default: 'タスク黒',
+      red: 'タスク赤',
+      blue: 'タスク青',
+      gray: 'タスク灰',
+      purple: 'タスク紫',
+      cyan: 'タスク水色',
+      yellowgreen: 'タスク黄緑',
+      yellow: 'タスク黄'
+    };
+    const COLOR_CSS_MAP = {
+      break: 'var(--color-break)',
+      default: 'var(--color-default-task)',
+      red: 'var(--color-red)',
+      blue: 'var(--color-blue)',
+      gray: 'var(--color-gray)',
+      purple: 'var(--color-purple)',
+      cyan: 'var(--color-cyan)',
+      yellowgreen: 'var(--color-yellowgreen)',
+      yellow: 'var(--color-yellow)'
+    };
+    const TASK_COLOR_IDS = ['default', 'red', 'yellow', 'yellowgreen', 'blue', 'cyan', 'purple', 'gray'];
+
+    const STORAGE_KEY = 'task_timer_data';
+    const MEMO_MAX_LENGTH = 500;
+
+    let state = null;       // null | 'task' | 'break'
+    let startTime = null;   // Date (ms) when current segment started
+    let elapsedSeconds = 0; // for current segment (only while running)
+    let history = [];       // [{ type:'task'|'break', colorId, startMs, endMs? }]
+    let memo = '';          // メモ欄の文字列
+    let tickTimer = null;
+    let editingRowIndex = -1;  // 色選択欄を開いている行（別クリックまで維持）
+
+    function getResolvedColor(colorId) {
+      const varName = colorId === 'default' ? '--color-default-task' : '--color-' + colorId;
+      return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+    }
+
+    const stateLabelEl = document.getElementById('stateLabel');
+    const timerBtn = document.getElementById('timerBtn');
+    const statsContent = document.getElementById('statsContent');
+    const statsBreakdown = document.getElementById('statsBreakdown');
+    const historyList = document.getElementById('historyList');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const deleteBtn = document.getElementById('deleteBtn');
+    const memoInput = document.getElementById('memoInput');
+    const memoCounter = document.getElementById('memoCounter');
+
+    function toJST(ms) {
+      return new Date(ms + 9 * 60 * 60 * 1000);
+    }
+    function formatToJSTISO(ms) {
+      const d = toJST(ms);
+      const y = d.getUTCFullYear();
+      const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+      const day = String(d.getUTCDate()).padStart(2, '0');
+      const h = String(d.getUTCHours()).padStart(2, '0');
+      const min = String(d.getUTCMinutes()).padStart(2, '0');
+      const s = String(d.getUTCSeconds()).padStart(2, '0');
+      const milli = String(d.getUTCMilliseconds()).padStart(3, '0');
+      return `${y}-${m}-${day}T${h}:${min}:${s}.${milli}`;
+    }
+
+    function formatTimeJa(ms, withMs) {
+      if (ms == null) return '';
+      const d = toJST(ms);
+      const y = d.getUTCFullYear();
+      const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+      const day = String(d.getUTCDate()).padStart(2, '0');
+      const h = d.getUTCHours();
+      const min = String(d.getUTCMinutes()).padStart(2, '0');
+      const s = d.getUTCSeconds();
+      const sStr = withMs ? (s + d.getUTCMilliseconds() / 1000).toFixed(3) : String(s).padStart(2, '0');
+      return `${y}年${m}月${day}日 ${h}時${min}分${sStr}秒`;
+    }
+
+    function durationSeconds(startMs, endMs) {
+      if (startMs == null || endMs == null) return null;
+      return (endMs - startMs) / 1000;
+    }
+
+    function formatDuration(totalSeconds) {
+      if (totalSeconds == null || totalSeconds < 0) return '';
+      const h = Math.floor(totalSeconds / 3600);
+      const m = Math.floor((totalSeconds % 3600) / 60);
+      const s = Math.floor(totalSeconds % 60);
+      const parts = [];
+      if (h > 0) parts.push(h + '時間');
+      if (m > 0 || h > 0) parts.push(m + '分');
+      parts.push(s + '秒');
+      return parts.join('');
+    }
+
+    function formatDurationWithDecimal(totalSeconds) {
+      if (totalSeconds == null || totalSeconds < 0) return '';
+      const h = Math.floor(totalSeconds / 3600);
+      const m = Math.floor((totalSeconds % 3600) / 60);
+      const sec = totalSeconds % 60;
+      const parts = [];
+      if (h > 0) parts.push(h + '時間');
+      if (m > 0 || h > 0) parts.push(m + '分');
+      parts.push(sec.toFixed(3) + '秒');
+      return parts.join('');
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const data = JSON.parse(raw);
+        state = data.state ?? null;
+        startTime = data.startTime != null ? new Date(data.startTime) : null;
+        elapsedSeconds = data.elapsedSeconds ?? 0;
+        history = Array.isArray(data.history) ? data.history : [];
+        memo = typeof data.memo === 'string' ? data.memo.slice(0, MEMO_MAX_LENGTH) : '';
+      } catch (e) {
+        state = null;
+        startTime = null;
+        elapsedSeconds = 0;
+        history = [];
+        memo = '';
+      }
+    }
+
+    function saveState() {
+      const data = {
+        state,
+        startTime: startTime ? startTime.getTime() : null,
+        elapsedSeconds,
+        history,
+        memo: (memo || '').slice(0, MEMO_MAX_LENGTH)
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    function updateMemoCounter() {
+      const len = memoInput.value.length;
+      memoCounter.textContent = len + '/' + MEMO_MAX_LENGTH;
+    }
+
+    function updateUI() {
+      if (state === null) {
+        stateLabelEl.textContent = '';
+        stateLabelEl.style.color = '';
+        timerBtn.className = 'timer-btn idle' + (history.length === 0 ? ' show-label' : '');
+        timerBtn.textContent = history.length === 0 ? '計測開始' : '';
+        timerBtn.removeAttribute('data-color');
+      } else if (state === 'break') {
+        stateLabelEl.textContent = '現在：休憩';
+        stateLabelEl.style.color = '#666';
+        timerBtn.className = 'timer-btn break';
+        timerBtn.textContent = '';
+        timerBtn.removeAttribute('data-color');
+      } else {
+        const colorId = (history.length > 0 && history[0].type === 'task') ? (history[0].colorId || 'default') : 'default';
+        stateLabelEl.textContent = '現在：' + (COLOR_LABELS[colorId] || 'タスク黒');
+        stateLabelEl.style.color = getResolvedColor(colorId) || '';
+        timerBtn.className = 'timer-btn task';
+        timerBtn.textContent = '';
+        timerBtn.setAttribute('data-color', colorId === 'default' ? '' : colorId);
+      }
+      renderStats();
+      renderHistory();
+    }
+
+    function getTaskTotalSecondsByColor() {
+      const now = Date.now();
+      const byColor = {};
+      history.forEach(entry => {
+        if (entry.type !== 'task') return;
+        const endMs = entry.endMs != null ? entry.endMs : (state === 'task' && history[0] === entry ? now : null);
+        if (endMs == null) return;
+        const cid = entry.colorId || 'default';
+        const sec = (endMs - entry.startMs) / 1000;
+        byColor[cid] = (byColor[cid] || 0) + sec;
+      });
+      return byColor;
+    }
+
+    function getBreakTotalSeconds() {
+      const now = Date.now();
+      return history
+        .filter(e => e.type === 'break')
+        .reduce((sum, e) => {
+          const endMs = e.endMs != null ? e.endMs : (state === 'break' && history[0] === e ? now : null);
+          if (endMs == null) return sum;
+          return sum + (endMs - e.startMs) / 1000;
+        }, 0);
+    }
+
+    function escapeHtml(s) {
+      const div = document.createElement('div');
+      div.textContent = s;
+      return div.innerHTML;
+    }
+
+    function renderStats() {
+      const byColor = getTaskTotalSecondsByColor();
+      const taskTotalSec = Object.values(byColor).reduce((a, b) => a + b, 0);
+      const breakTotalSec = getBreakTotalSeconds();
+      const taskStr = formatDuration(taskTotalSec) || '0秒';
+      const breakStr = formatDuration(breakTotalSec) || '0秒';
+      statsContent.innerHTML =
+        '<div class="stats-main">' +
+        '<div class="stats-row" style="color:#555"><span class="stats-label">休憩合計:</span><span class="stats-duration">' + escapeHtml(breakStr) + '</span></div>' +
+        '<div class="stats-row" style="color:' + escapeHtml(getResolvedColor('default')) + '"><span class="stats-label">タスク合計:</span><span class="stats-duration">' + escapeHtml(taskStr) + '</span></div>' +
+        '</div>';
+
+      const hasNonDefault = Object.keys(byColor).some(c => c !== 'default');
+      if (hasNonDefault) {
+        statsBreakdown.style.display = 'block';
+        statsBreakdown.innerHTML = TASK_COLOR_IDS
+          .filter(cid => (byColor[cid] || 0) > 0)
+          .map(cid => `<li style="color:${getResolvedColor(cid)}"><span class="stats-label">${COLOR_LABELS[cid]}:</span><span class="stats-duration">${formatDuration(byColor[cid])}</span></li>`)
+          .join('');
+      } else {
+        statsBreakdown.style.display = 'none';
+      }
+    }
+
+    function updateFirstRowDurationOnly() {
+      if (history.length === 0) return;
+      const first = history[0];
+      if (first.endMs != null) return;
+      const now = Date.now();
+      const sec = (now - first.startMs) / 1000;
+      const durEl = historyList.querySelector('.history-row .duration');
+      if (durEl) durEl.textContent = formatDuration(Math.floor(sec));
+    }
+
+    function renderHistory() {
+      const prevEditing = editingRowIndex;
+      historyList.innerHTML = history.map((entry, index) => {
+        const isTask = entry.type === 'task';
+        const colorId = entry.colorId || 'default';
+        const startStr = formatTimeJa(entry.startMs, true);
+        const endStr = entry.endMs != null ? formatTimeJa(entry.endMs, true) : '';
+        const timeRange = `開始：${startStr}${endStr ? ' - 終了：' + endStr : ''}`;
+        const durSec = durationSeconds(entry.startMs, entry.endMs);
+        const durStr = durSec != null ? formatDurationWithDecimal(durSec) : '';
+        const dotStyle = `background:${COLOR_CSS_MAP[colorId] || COLOR_CSS_MAP.default}`;
+        const radios = TASK_COLOR_IDS.map(cid => {
+          const optStyle = `background:${COLOR_CSS_MAP[cid] || COLOR_CSS_MAP.default}`;
+          return `<label><input type="radio" name="color_${index}" value="${cid}" ${cid === colorId ? 'checked' : ''}><span class="color-option" style="${optStyle}"></span></label>`;
+        }).join('');
+        return `<li class="history-row ${isTask ? 'task-row' : ''} ${prevEditing === index ? 'editing' : ''}" data-index="${index}">
+          <span class="time-range">${timeRange}</span>
+          <span class="duration">${durStr}</span>
+          <span class="color-dot" style="${dotStyle}"></span>
+          <div class="color-radios">${radios}</div>
+        </li>`;
+      }).join('');
+
+      historyList.querySelectorAll('.history-row.task-row').forEach(row => {
+        const index = parseInt(row.getAttribute('data-index'), 10);
+        row.addEventListener('click', (e) => {
+          if (e.target.closest('.color-radios')) return;
+          editingRowIndex = editingRowIndex === index ? -1 : index;
+          document.querySelectorAll('.history-row.editing').forEach(r => r.classList.remove('editing'));
+          if (editingRowIndex >= 0) row.classList.add('editing');
+        });
+        row.querySelectorAll('.color-radios input').forEach(radio => {
+          radio.addEventListener('click', (e) => e.stopPropagation());
+          radio.addEventListener('change', () => {
+            const newId = radio.value;
+            history[index].colorId = newId === 'default' ? undefined : newId;
+            saveState();
+            updateUI();
+          });
+        });
+      });
+    }
+
+    function tick() {
+      if (state === null || !startTime) return;
+      elapsedSeconds = Math.floor((Date.now() - startTime.getTime()) / 1000);
+      saveState();
+      renderStats();
+      updateFirstRowDurationOnly();
+    }
+
+    function startSegment(type) {
+      state = type;
+      startTime = new Date();
+      elapsedSeconds = 0;
+      history.unshift({ type, colorId: type === 'task' ? undefined : 'break', startMs: startTime.getTime(), endMs: null });
+      saveState();
+      updateUI();
+      if (!tickTimer) tickTimer = setInterval(tick, 1000);
+    }
+
+    function endSegment() {
+      if (history.length > 0 && history[0].endMs == null) {
+        history[0].endMs = Date.now();
+      }
+      saveState();
+      updateUI();
+    }
+
+    timerBtn.addEventListener('click', () => {
+      if (state === null) {
+        startSegment('task');
+      } else if (state === 'task') {
+        endSegment();
+        startSegment('break');
+      } else {
+        endSegment();
+        startSegment('task');
+      }
+    });
+
+    downloadBtn.addEventListener('click', () => {
+      const jstNow = toJST(Date.now());
+      const name = `${jstNow.getUTCFullYear()}${String(jstNow.getUTCMonth()+1).padStart(2,'0')}${String(jstNow.getUTCDate()).padStart(2,'0')}T${String(jstNow.getUTCHours()).padStart(2,'0')}${String(jstNow.getUTCMinutes()).padStart(2,'0')}${String(jstNow.getUTCSeconds()).padStart(2,'0')}.csv`;
+      const header = 'label,start,end,duration_sec\n';
+      const rows = history
+        .filter(e => e.endMs != null)
+        .map(e => {
+          const label = e.type === 'task' ? (COLOR_LABELS[e.colorId || 'default']) : '休憩';
+          const start = formatToJSTISO(e.startMs);
+          const end = formatToJSTISO(e.endMs);
+          const sec = ((e.endMs - e.startMs) / 1000).toFixed(3);
+          return `${label},${start},${end},${sec}`;
+        })
+        .reverse();
+      const csv = header + rows.join('\n');
+      const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = name;
+      a.click();
+      URL.revokeObjectURL(url);
+      alert('履歴をCSVでダウンロードしました。');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.history-row')) {
+        editingRowIndex = -1;
+        document.querySelectorAll('.history-row.editing').forEach(r => r.classList.remove('editing'));
+      }
+    });
+
+    deleteBtn.addEventListener('click', () => {
+      if (!confirm('履歴と状態をすべて削除し、localStorage もクリアします。よろしいですか？')) return;
+      if (tickTimer) clearInterval(tickTimer);
+      tickTimer = null;
+      state = null;
+      startTime = null;
+      elapsedSeconds = 0;
+      history = [];
+      memo = '';
+      memoInput.value = '';
+      updateMemoCounter();
+      localStorage.removeItem(STORAGE_KEY);
+      updateUI();
+    });
+
+    memoInput.addEventListener('input', () => {
+      memo = memoInput.value.slice(0, MEMO_MAX_LENGTH);
+      memoInput.value = memo;
+      updateMemoCounter();
+      saveState();
+    });
+
+    loadState();
+    memoInput.value = memo;
+    updateMemoCounter();
+    if (state !== null && startTime) {
+      tickTimer = setInterval(tick, 1000);
+    }
+    updateUI();
+  </script>
+</body>
+</html>
